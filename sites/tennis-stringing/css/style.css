@@ -1,0 +1,24 @@
+/* Tennis Stringing Site - Site-specific styles */
+/* Imports the shared design system */
+
+/* In production (npm), these would be: */
+/* @import '@vnyson/design-system/css/tokens.css'; */
+/* @import '@vnyson/design-system/css/base.css'; */
+/* @import '@vnyson/design-system/css/components.css'; */
+
+/* For local development with file references: */
+@import '../../../packages/design-system/css/tokens.css';
+@import '../../../packages/design-system/css/base.css';
+@import '../../../packages/design-system/css/components.css';
+
+/* Site-specific overrides and additions */
+
+.contact {
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.contact p {
+  color: var(--color-gray-700);
+  margin-bottom: var(--space-xs);
+}

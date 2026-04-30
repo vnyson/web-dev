@@ -1,0 +1,14 @@
+{
+  "name": "tennis-stringing-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tennis Stringing & Racket Services - static site",
+  "scripts": {
+    "build": "echo 'Static site - no build step'",
+    "dev": "echo 'Open index.html in browser'",
+    "lint": "echo 'No linting configured'"
+  },
+  "dependencies": {
+    "@vnyson/design-system": "workspace:*"
+  }
+}

@@ -1,23 +1,86 @@
-# stringing-static-site
-Static site for Tennis stringing and customizations
+# Personal Brand Monorepo
+
+Monorepo for personal brand design system and multiple static sites.
 
 ## Live Site
-https://vnyson.github.io
+https://vnyson.github.io (Tennis Stringing site)
+
+## Monorepo Structure
+```
+.
+├── packages/
+│   └── design-system/          # @vnyson/design-system
+│       ├── css/tokens.css      # Design tokens (colors, typography, spacing)
+│       ├── css/base.css        # Reset and base styles
+│       └── css/components.css  # Reusable component styles
+├── sites/
+│   └── tennis-stringing/       # Tennis Stringing & Racket Services
+│       ├── index.html
+│       ├── css/style.css       # Site-specific styles
+│       └── package.json        # Workspace dependency
+├── .github/workflows/deploy.yml # CI/CD workflow
+├── package.json               # Yarn workspaces root
+└── turbo.json                 # Turbo task pipeline
+```
+
+## Package Management
+
+Uses **Yarn 4** with workspaces and **Turborepo** for task orchestration.
+
+### Setup
+
+```bash
+# Install Yarn if not already installed
+corepack enable
+corepack prepare yarn@4.5.0 --activate
+
+# Install dependencies
+yarn install
+```
+
+### Development Commands
+
+```bash
+# Run all builds (uses Turbo caching)
+yarn build
+
+# Start all dev servers
+yarn dev
+```
+
+## Design System (@vnyson/design-system)
+
+Shared CSS design tokens and components published to npm.
+
+### Publishing to npm
+
+```bash
+cd packages/design-system
+yarn npm publish --access=public
+```
+
+### Using in a Site
+
+```css
+/* Local development (yarn workspace) */
+@import '../../../packages/design-system/css/tokens.css';
+
+/* After npm publish */
+@import '@vnyson/design-system/css/tokens.css';
+```
 
 ## Deployment
-This site deploys automatically to GitHub Pages via GitHub Actions on every push to `main`.
 
-## Structure
-- `index.html` - Main landing page
-- `css/style.css` - Styles
-- `.github/workflows/deploy.yml` - CI/CD workflow
+GitHub Actions deploys `sites/tennis-stringing` to GitHub Pages on every push to `main`.
 
-## Development
-1. Make changes to files
-2. Commit and push to `main`
-3. GitHub Actions deploys automatically (~1-2 minutes)
+## Adding a New Site
 
-## Future Migration Notes
+1. Create `sites/new-site/` directory
+2. Add `package.json` with workspace dependency: `"@vnyson/design-system": "workspace:*"`
+3. Create your `index.html` and `css/style.css`
+4. Add site-specific workflow if deploying separately
+
+## Migration Notes
 - Currently on GitHub Pages (public repo required for free tier)
 - Can migrate to Cloudflare Pages later for private repo + better performance
 - Custom domain can be added to either platform

@@ -1,0 +1,23 @@
+{
+  "name": "personal-brand-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal brand monorepo with shared design system and multiple sites",
+  "workspaces": [
+    "packages/*",
+    "sites/*"
+  ],
+  "packageManager": "yarn@4.5.0",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "turbo run format"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

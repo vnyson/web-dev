@@ -1,0 +1,28 @@
+{
+  "name": "@vnyson/design-system",
+  "version": "1.0.0",
+  "description": "Personal brand design system - CSS tokens, components, and utilities",
+  "license": "MIT",
+  "files": [
+    "css/"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vnyson/stringing-static-site.git",
+    "directory": "packages/design-system"
+  },
+  "keywords": [
+    "design-system",
+    "css",
+    "tokens",
+    "personal-brand"
+  ],
+  "scripts": {
+    "build": "echo 'No build step for static CSS'",
+    "lint": "echo 'No linting configured'"
+  }
+}

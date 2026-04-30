@@ -1,0 +1,43 @@
+/* Base Styles - Reset and Global Styles */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-family-base);
+    line-height: var(--line-height-normal);
+    color: var(--color-gray-900);
+    background: linear-gradient(
+      135deg, 
+      var(--color-primary-gradient-start) 0%, 
+      var(--color-primary-gradient-end) 100%
+    );
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  a {
+    color: var(--color-primary-gradient-start);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    transition: text-decoration var(--transition-fast);
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
