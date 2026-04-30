@@ -4,7 +4,8 @@
   "private": true,
   "description": "Tennis Stringing & Racket Services - static site",
   "scripts": {
-    "build": "echo 'Static site - no build step'",
+    "build": "npm run copy-css",
+    "copy-css": "mkdir -p css/design-system && cp ../../packages/design-system/css/*.css css/design-system/",
     "dev": "echo 'Open index.html in browser'",
     "lint": "echo 'No linting configured'"
   },

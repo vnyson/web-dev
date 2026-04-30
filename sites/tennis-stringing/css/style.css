@@ -6,10 +6,15 @@
 /* @import '@vnyson/design-system/css/base.css'; */
 /* @import '@vnyson/design-system/css/components.css'; */
 
-/* For local development with file references: */
-@import '../../../packages/design-system/css/tokens.css';
-@import '../../../packages/design-system/css/base.css';
-@import '../../../packages/design-system/css/components.css';
+/* For local development (before build): */
+/* @import '../../../packages/design-system/css/tokens.css'; */
+/* @import '../../../packages/design-system/css/base.css'; */
+/* @import '../../../packages/design-system/css/components.css'; */
+
+/* For production (after npm run build copies files locally): */
+@import './design-system/tokens.css';
+@import './design-system/base.css';
+@import './design-system/components.css';
 
 /* Site-specific overrides and additions */
 

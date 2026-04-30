@@ -3,7 +3,7 @@
 Monorepo for personal brand design system and multiple static sites.
 
 ## Live Site
-https://vnyson.github.io (Tennis Stringing site)
+https://vnyson.github.io 
 
 ## Monorepo Structure
 ```
@@ -71,7 +71,14 @@ yarn npm publish --access=public
 
 ## Deployment
 
-GitHub Actions deploys `sites/tennis-stringing` to GitHub Pages on every push to `main`.
+### Cloudflare Pages (Primary)
+Configured for automatic deployment to Cloudflare Pages on every push to `main`.
+- URL: `https://tennis-stringing.pages.dev` (or your custom domain)
+
+### GitHub Pages (Fallback)
+Alternative deployment available at `https://vnyson.github.io/stringing-static-site/`
+
+See [PUBLISHING.md](PUBLISHING.md) for setup instructions.
 
 ## Adding a New Site
 
