@@ -1,0 +1,68 @@
+# Project: Personal Brand Monorepo
+# Stack: Yarn 4 workspaces + Turborepo, vanilla JS, CSS custom properties, static HTML
+
+## Project Structure
+- `packages/design-system/` — Shared CSS design system (@vnyson/design-system), published to npm
+  - `css/tokens.css` — Design tokens (colors, spacing, typography, etc.)
+  - `css/base.css` — Reset and global styles (@layer base)
+  - `css/components.css` — Reusable component styles (@layer components)
+- `sites/<site-name>/` — Individual static sites
+  - Each site has its own `package.json`, `index.html`, `css/`, `js/`
+  - Sites consume `@vnyson/design-system` via workspace dependency
+  - JS is bundled with esbuild (`js/main.js` → `js/bundle.js`)
+
+## Coding Conventions
+
+### General
+- 2-space indentation, single quotes, trailing commas, LF line endings
+- UTF-8 charset, insert final newline in all files
+- Use `const` by default, `let` only when reassignment is needed, never `var`
+- Prefer early returns over deep nesting
+- No hardcoded magic numbers — use named constants or CSS custom properties
+
+### CSS
+- Always use design tokens from `tokens.css` — never hardcode colors, spacing, font sizes, or radii
+- Use `@layer base` for resets, `@layer components` for component styles
+- New tokens go in `tokens.css`, new components go in `components.css`
+- Use CSS custom properties for all values that may vary or be themed
+- Mobile-first responsive design — use `min-width` media queries
+- Class naming: lowercase, hyphenated (e.g., `.section-divider`, `.heading-xl`)
+
+### JavaScript
+- ES modules only (`import`/`export`)
+- Always check for DOM element existence before operating on it (null guards)
+- Respect `prefers-reduced-motion` for all animations and interactive effects
+- Use event delegation where practical
+- Keep functions small and single-purpose
+
+### HTML
+- Always include `<!DOCTYPE html>`, `lang` attribute, viewport meta, and `<title>`
+- All `<img>` elements must have `alt` attributes
+- No inline styles — use CSS classes
+- Use semantic elements (`<main>`, `<section>`, `<nav>`, etc.)
+
+## Commands
+- `yarn lint` — Run all linters (ESLint, Stylelint, HTMLHint)
+- `yarn lint:css` — Run Stylelint only
+- `yarn lint:html` — Run HTMLHint only
+- `yarn format` — Auto-format all files with Prettier
+- `yarn format:check` — Check formatting without writing
+- `yarn build` — Build all workspaces via Turbo
+- `yarn dev` — Start dev servers
+
+## Commit Messages
+- Use Conventional Commits: `type(scope): description`
+- Types: feat, fix, docs, style, refactor, perf, test, chore, build, ci
+- Examples: `feat(tennis-stringing): add pricing section`, `fix(design-system): correct token spacing scale`
+
+## Before Considering Work Done
+1. Run `yarn format:check` — no formatting issues
+2. Run `yarn lint` — no errors (warnings are acceptable but should be noted)
+3. Run `yarn build` — all workspaces build successfully
+4. Test in browser — visual and interactive behavior is correct
+
+## Adding a New Site
+1. Create `sites/<site-name>/` with `package.json`, `index.html`, `css/`, `js/`
+2. Add `"@vnyson/design-system": "workspace:*"` dependency
+3. Add lint/build scripts matching existing site conventions
+4. Import design system CSS: `@import '../../../packages/design-system/css/tokens.css'`

@@ -23,6 +23,6 @@
   ],
   "scripts": {
     "build": "echo 'No build step for static CSS'",
-    "lint": "echo 'No linting configured'"
+    "lint": "stylelint css/"
   }
 }

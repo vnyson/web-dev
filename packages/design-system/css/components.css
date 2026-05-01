@@ -9,7 +9,9 @@
     background: var(--color-gray-100);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
-    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+    transition:
+      transform var(--transition-normal),
+      box-shadow var(--transition-normal);
   }
 
   .card:hover {

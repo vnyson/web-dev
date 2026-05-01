@@ -1,0 +1,10 @@
+node_modules/
+.yarn/
+.yarn/install-state.gz
+.pnp.cjs
+.pnp.loader.mjs
+.eslintcache
+*.log
+dist/
+.DS_Store
+Thumbs.db

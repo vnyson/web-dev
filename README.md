@@ -3,9 +3,11 @@
 Monorepo for personal brand design system and multiple static sites.
 
 ## Live Site
-https://vnyson.github.io 
+
+https://vnyson.com
 
 ## Monorepo Structure
+
 ```
 .
 ├── packages/
@@ -48,6 +50,43 @@ yarn build
 yarn dev
 ```
 
+## Code Quality
+
+Linting and formatting tools are configured at the repo root.
+
+### Commands
+
+```bash
+# Run all linters (ESLint + Stylelint + HTMLHint)
+yarn lint
+
+# Run individual linters
+yarn lint:css    # Stylelint only
+yarn lint:html  # HTMLHint only
+
+# Format all files with Prettier
+yarn format
+
+# Check formatting without writing
+yarn format:check
+```
+
+### Tooling
+
+| Tool         | Config              | Purpose                                   |
+| ------------ | ------------------- | ----------------------------------------- |
+| Prettier     | `.prettierrc`       | Code formatting (JS, CSS, HTML, JSON, MD) |
+| ESLint       | `eslint.config.cjs` | JS linting (v9 flat config)               |
+| Stylelint    | `.stylelintrc.json` | CSS linting                               |
+| HTMLHint     | `.htmlhintrc`       | HTML markup validation                    |
+| EditorConfig | `.editorconfig`     | Baseline editor consistency               |
+
+### Commit Conventions
+
+Use [Conventional Commits](https://conventionalcommits.org/): `type(scope): description`
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `build`, `ci`
+
 ## Design System (@vnyson/design-system)
 
 Shared CSS design tokens and components published to npm.
@@ -72,10 +111,13 @@ yarn npm publish --access=public
 ## Deployment
 
 ### Cloudflare Pages (Primary)
+
 Configured for automatic deployment to Cloudflare Pages on every push to `main`.
+
 - URL: `https://tennis-stringing.pages.dev` (or your custom domain)
 
 ### GitHub Pages (Fallback)
+
 Alternative deployment available at `https://vnyson.github.io/stringing-static-site/`
 
 See [PUBLISHING.md](PUBLISHING.md) for setup instructions.
@@ -88,6 +130,7 @@ See [PUBLISHING.md](PUBLISHING.md) for setup instructions.
 4. Add site-specific workflow if deploying separately
 
 ## Migration Notes
+
 - Currently on GitHub Pages (public repo required for free tier)
 - Can migrate to Cloudflare Pages later for private repo + better performance
 - Custom domain can be added to either platform

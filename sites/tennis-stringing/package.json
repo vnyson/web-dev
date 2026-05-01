@@ -4,12 +4,18 @@
   "private": true,
   "description": "Tennis Stringing & Racket Services - static site",
   "scripts": {
-    "build": "npm run copy-css",
-    "copy-css": "mkdir -p css/design-system && cp ../../packages/design-system/css/*.css css/design-system/",
+    "build": "npm run copy-css && npm run build:js",
+    "copy-css": "node -e \"const fs=require('fs'),p=require('path');const src=p.resolve('../../packages/design-system/css');const dest=p.resolve('css/design-system');fs.mkdirSync(dest,{recursive:true});fs.readdirSync(src).filter(f=>f.endsWith('.css')).forEach(f=>fs.copyFileSync(p.join(src,f),p.join(dest,f)));console.log('CSS copied')\"",
+    "build:js": "esbuild js/main.js --bundle --outfile=js/bundle.js --minify",
     "dev": "echo 'Open index.html in browser'",
-    "lint": "echo 'No linting configured'"
+    "lint": "eslint js/main.js"
   },
   "dependencies": {
-    "@vnyson/design-system": "workspace:*"
+    "@vnyson/design-system": "workspace:*",
+    "atropos": "^2.0.2",
+    "gsap": "^3.15.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0"
   }
 }

@@ -1,0 +1,11 @@
+node_modules
+.yarn
+.turbo
+.pnp.cjs
+.pnp.loader.mjs
+dist
+**/js/bundle.js
+**/js/bundle.css
+**/css/design-system/
+*.min.css
+*.min.js

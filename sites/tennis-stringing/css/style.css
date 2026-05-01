@@ -18,6 +18,51 @@
 
 /* Site-specific overrides and additions */
 
+/* Atropos container sizing */
+.atropos {
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Entrance animation initial state */
+.animate-in {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Enhanced link hover effects */
+a.magnetic {
+  display: inline-block;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+a.magnetic::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--color-primary-gradient-start);
+  transition: width var(--transition-normal);
+}
+
+a.magnetic:hover::after {
+  width: 100%;
+}
+
+a.magnetic:hover {
+  color: var(--color-primary-gradient-end);
+}
+
 .contact {
   padding-top: var(--space-lg);
   border-top: 1px solid var(--color-gray-200);
