@@ -21,6 +21,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: tennis-stringing
+          projectName: web-dev
           directory: sites/tennis-stringing
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
