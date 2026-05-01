@@ -72,3 +72,59 @@ a.magnetic:hover {
   color: var(--color-gray-700);
   margin-bottom: var(--space-xs);
 }
+
+/* Section styles */
+.services-section,
+.contact-section {
+  width: 100%;
+  max-width: var(--size-card-max);
+  margin-top: var(--space-xl);
+}
+
+.section-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@media (min-width: 480px) {
+  .section-title {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+/* Splash Screen Customization */
+.splash__logo {
+  width: var(--size-icon-lg);
+  height: var(--size-icon-lg);
+  margin-bottom: var(--space-md);
+  color: var(--color-white);
+}
+
+.splash__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-xs);
+  color: var(--color-white);
+}
+
+.splash__subtitle {
+  font-size: var(--font-size-md);
+  color: var(--color-gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+@media (min-width: 480px) {
+  .splash__logo {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .splash__title {
+    font-size: var(--font-size-2xl);
+  }
+}

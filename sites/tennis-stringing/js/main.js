@@ -1,6 +1,7 @@
 import Atropos from 'atropos';
 import 'atropos/css';
 import gsap from 'gsap';
+import { initSplash } from '../../../packages/design-system/js/splash.js';
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -103,6 +104,11 @@ function initLinkHoverEffects() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  initSplash({
+    storageKey: 'tennis-stringing-splash',
+    duration: 1200,
+    mode: 'crossfade',
+  });
   initAtropos();
   initEntranceAnimation();
   initMagneticEffect();

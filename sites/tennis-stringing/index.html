@@ -8,26 +8,77 @@
     <link rel="stylesheet" href="js/bundle.css" />
   </head>
   <body>
+    <!-- Splash Screen -->
+    <div class="splash">
+      <div class="splash__content">
+        <svg class="splash__logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 2v20"/>
+          <path d="M2 12h20"/>
+        </svg>
+        <h1 class="splash__title">Tennis Stringing</h1>
+        <p class="splash__subtitle">RVA Racket Services</p>
+      </div>
+    </div>
+
     <main class="container">
-      <div class="atropos">
-        <div class="atropos-scale">
-          <div class="atropos-rotate">
-            <div class="atropos-inner">
-              <div class="card">
-                <h1 class="animate-in">Coming Soon</h1>
-                <p class="tagline animate-in">Tennis Stringing & Racket Customization Services</p>
-                <p class="description animate-in">
-                  RVA Local Recreational Stringing and Customization services.
-                </p>
-                <div class="contact animate-in">
-                  <p>Questions? Reach out:</p>
-                  <a href="mailto:contact@example.com" class="magnetic">contact@example.com</a>
-                </div>
-              </div>
-            </div>
+      <section class="services-section animate-in">
+        <h2 class="section-title animate-in">Services</h2>
+        <div class="service-grid animate-in">
+          <div class="service-card animate-in">
+            <svg class="service-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2v20"/>
+              <path d="M2 12h20"/>
+            </svg>
+            <h3 class="service-card__title">Stringing</h3>
+            <p class="service-card__description">
+              Professional stringing with quick turnaround and multiple string options.
+            </p>
+          </div>
+
+          <div class="service-card animate-in">
+            <svg class="service-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+            <h3 class="service-card__title">Customization</h3>
+            <p class="service-card__description">
+              Grip sizing, weight balancing, and personalized racket tuning.
+            </p>
+          </div>
+
+          <div class="service-card animate-in">
+            <svg class="service-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+            <h3 class="service-card__title">Repair</h3>
+            <p class="service-card__description">
+              Grommet replacement, bumper guards, and minor racket repairs.
+            </p>
           </div>
         </div>
-      </div>
+      </section>
+
+      <section class="contact-section animate-in">
+        <h2 class="section-title animate-in">Contact</h2>
+        <div class="contact-card animate-in">
+          <h2 class="contact-card__name">Brandon</h2>
+          <div class="contact-card__row">
+            <svg class="contact-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <span>(804) 555-1234</span>
+          </div>
+          <div class="contact-card__row">
+            <svg class="contact-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <a href="mailto:vnyson@gmail.com" class="contact-card__link">vnyson@gmail.com</a>
+          </div>
+        </div>
+      </section>
     </main>
     <script src="js/bundle.js" defer></script>
   </body>
