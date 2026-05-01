@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Personal brand design system - CSS tokens, components, and utilities",
   "license": "MIT",
+  "style": "css/tokens.css",
   "files": [
     "css/"
   ],

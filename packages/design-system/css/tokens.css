@@ -56,6 +56,9 @@
   --transition-normal: 250ms ease;
   --transition-slow: 350ms ease;
 
+  /* Layout */
+  --size-card-max: 600px;
+
   /* Z-index Scale */
   --z-base: 0;
   --z-dropdown: 100;
