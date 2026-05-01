@@ -4,8 +4,9 @@
   /* Card Component */
   .card {
     text-align: center;
-    padding: var(--space-lg);
-    max-width: 600px;
+    padding: var(--space-md);
+    margin: var(--space-sm);
+    max-width: var(--size-card-max);
     background: var(--color-gray-100);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
@@ -21,7 +22,7 @@
 
   /* Typography Components */
   .heading-xl {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-gray-800);
     line-height: var(--line-height-tight);
@@ -53,15 +54,15 @@
     border-top: 1px solid var(--color-gray-200);
   }
 
-  /* Responsive Utilities */
-  @media (max-width: 480px) {
+  /* Responsive — wider screens */
+  @media (min-width: 480px) {
     .card {
-      margin: var(--space-sm);
-      padding: var(--space-md);
+      margin: 0;
+      padding: var(--space-lg);
     }
 
     .heading-xl {
-      font-size: var(--font-size-xl);
+      font-size: var(--font-size-2xl);
     }
   }
 }
