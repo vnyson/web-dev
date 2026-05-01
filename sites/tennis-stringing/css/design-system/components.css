@@ -54,6 +54,219 @@
     border-top: 1px solid var(--color-gray-200);
   }
 
+  /* Service Grid */
+  .service-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+    width: 100%;
+    max-width: var(--size-card-max);
+  }
+
+  @media (min-width: 640px) {
+    .service-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Service Card */
+  .service-card {
+    text-align: center;
+    padding: var(--space-lg);
+    background: var(--color-gray-100);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    transition:
+      transform var(--transition-normal),
+      box-shadow var(--transition-normal);
+  }
+
+  .service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .service-card__icon {
+    width: var(--size-icon-md);
+    height: var(--size-icon-md);
+    margin: 0 auto var(--space-md);
+    color: var(--color-primary-gradient-start);
+  }
+
+  .service-card__title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-800);
+    margin-bottom: var(--space-xs);
+  }
+
+  .service-card__description {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+    line-height: var(--line-height-relaxed);
+  }
+
+  /* Contact Card */
+  .contact-card {
+    padding: var(--space-lg);
+    background: var(--color-gray-100);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    max-width: var(--size-card-max);
+  }
+
+  .contact-card__name {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-800);
+    margin-bottom: var(--space-md);
+  }
+
+  .contact-card__row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-700);
+  }
+
+  .contact-card__row:last-child {
+    margin-bottom: 0;
+  }
+
+  .contact-card__icon {
+    width: var(--size-icon-sm);
+    height: var(--size-icon-sm);
+    flex-shrink: 0;
+    color: var(--color-primary-gradient-start);
+  }
+
+  .contact-card__link {
+    color: var(--color-gray-700);
+    transition: color var(--transition-fast);
+  }
+
+  .contact-card__link:hover {
+    color: var(--color-primary-gradient-end);
+  }
+
+  /* Icon Utility */
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--size-icon-sm);
+    height: var(--size-icon-sm);
+  }
+
+  .icon--md {
+    width: var(--size-icon-md);
+    height: var(--size-icon-md);
+  }
+
+  .icon--lg {
+    width: var(--size-icon-lg);
+    height: var(--size-icon-lg);
+  }
+
+  /* Splash Overlay */
+  .splash {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-splash);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--splash-bg);
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity var(--transition-slow),
+      visibility var(--transition-slow);
+  }
+
+  .splash[hidden],
+  .splash--seen {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .splash__content {
+    text-align: center;
+    color: var(--color-white);
+  }
+
+  /* Splash Animation Keyframes (site-customizable) */
+  @keyframes splash-fade-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes splash-fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  .splash--animate-in .splash__content {
+    animation: splash-fade-in 0.5s ease-out;
+  }
+
+  .splash--animate-out {
+    animation: splash-fade-out var(--transition-slow) ease forwards;
+  }
+
+  /* Crossfade: splash into content */
+  .splash--crossfade {
+    animation: splash-crossfade-out 1s ease forwards;
+  }
+
+  @keyframes splash-crossfade-out {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    40% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.1);
+      visibility: hidden;
+    }
+  }
+
+  .splash--crossfade .splash__content {
+    animation: splash-content-rise 1s ease forwards;
+  }
+
+  @keyframes splash-content-rise {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: translateY(-20px) scale(0.95);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-40px) scale(0.9);
+    }
+  }
+
   /* Responsive — wider screens */
   @media (min-width: 480px) {
     .card {
@@ -63,6 +276,15 @@
 
     .heading-xl {
       font-size: var(--font-size-2xl);
+    }
+
+    .service-grid {
+      gap: var(--space-xl);
+    }
+
+    .service-card__icon {
+      width: var(--size-icon-lg);
+      height: var(--size-icon-lg);
     }
   }
 }

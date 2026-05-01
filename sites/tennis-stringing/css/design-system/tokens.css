@@ -58,6 +58,10 @@
 
   /* Layout */
   --size-card-max: 600px;
+  --size-service-card-min: 280px;
+  --size-icon-sm: 2rem;
+  --size-icon-md: 3rem;
+  --size-icon-lg: 4rem;
 
   /* Z-index Scale */
   --z-base: 0;
@@ -65,4 +69,9 @@
   --z-sticky: 200;
   --z-modal: 300;
   --z-tooltip: 400;
+  --z-splash: 500;
+
+  /* Splash Animation */
+  --splash-duration: 1.5s;
+  --splash-bg: var(--color-gray-900);
 }
