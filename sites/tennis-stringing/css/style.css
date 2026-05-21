@@ -1,22 +1,49 @@
 /* Tennis Stringing Site - Site-specific styles */
-/* Imports the shared design system */
+/* Imports the shared design system from npm package */
 
-/* In production (npm), these would be: */
-/* @import '@vnyson/design-system/css/tokens.css'; */
-/* @import '@vnyson/design-system/css/base.css'; */
-/* @import '@vnyson/design-system/css/components.css'; */
-
-/* For local development (before build): */
-/* @import '../../../packages/design-system/css/tokens.css'; */
-/* @import '../../../packages/design-system/css/base.css'; */
-/* @import '../../../packages/design-system/css/components.css'; */
-
-/* For production (after npm run build copies files locally): */
-@import './design-system/tokens.css';
-@import './design-system/base.css';
-@import './design-system/components.css';
+@import '@vnyson/design-system/css/tokens.css';
+@import '@vnyson/design-system/css/base.css';
+@import '@vnyson/design-system/css/components.css';
 
 /* Site-specific overrides and additions */
+
+body {
+  background: #ffffff;
+}
+
+.main-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Contact Header Section */
+.contact-header {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-xl) var(--space-md);
+  margin-bottom: var(--space-2xl);
+}
+
+.contact-header__content {
+  padding: var(--space-lg);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.contact-header__title {
+  font-size: var(--font-size-xl);
+  color: var(--color-gray-800);
+  margin-bottom: var(--space-md);
+}
+
+.contact-header__info {
+  font-size: var(--font-size-md);
+  color: var(--color-gray-700);
+  margin-bottom: var(--space-xs);
+}
 
 /* Atropos container sizing */
 .atropos {
@@ -127,4 +154,54 @@ a.magnetic:hover {
   .splash__title {
     font-size: var(--font-size-2xl);
   }
+}
+
+/* Animated SVG Services Section */
+.services {
+  display: block;
+  width: 100%;
+  padding: var(--space-xl) var(--space-md);
+}
+
+.services-title {
+  text-align: center;
+  font-size: var(--font-size-xl);
+  color: var(--color-gray-800);
+  margin-bottom: var(--space-xl);
+  font-family: var(--font-family-brand);
+  text-transform: uppercase;
+}
+
+.service-card {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  cursor: pointer;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.service-heading {
+  font-size: var(--font-size-md);
+  color: var(--color-gray-800);
+  margin-bottom: var(--space-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.service-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  line-height: var(--line-height-normal);
+}
+
+.service-rates {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-400);
+  line-height: var(--line-height-small);
 }

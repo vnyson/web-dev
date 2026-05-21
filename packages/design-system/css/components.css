@@ -1,4 +1,5 @@
 /* Component Styles - Reusable UI Components */
+@import './pixel-borders.css';
 
 @layer components {
   /* Card Component */
@@ -170,6 +171,96 @@
     height: var(--size-icon-lg);
   }
 
+  /* NES-style Pixel Border Panel */
+  .panel-pixel {
+    font-family: var(--font-family-brand) !important;
+    --corner-size: 1px;
+    --border-size: 4px;
+    --border-color: #000;
+    --border-inset-color: false;
+  }
+
+  .panel-pixel h1,
+  .panel-pixel h2,
+  .panel-pixel h3,
+  .panel-pixel h4,
+  .panel-pixel h5,
+  .panel-pixel h6 {
+    text-transform: uppercase;
+  }
+
+  .panel-pixel p,
+  .panel-pixel span,
+  .panel-pixel div {
+    text-transform: lowercase;
+  }
+
+  .panel-pixel span.dollar-sign {
+    font-family: var(--font-family-base) !important;
+  }
+
+  /* Flex Utilities - Mobile First */
+  .flex {
+    display: flex;
+  }
+
+  .flex-col {
+    flex-direction: column;
+  }
+
+  .flex-row {
+    flex-direction: row;
+  }
+
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  .items-center {
+    align-items: center;
+  }
+
+  .justify-center {
+    justify-content: center;
+  }
+
+  .justify-between {
+    justify-content: space-between;
+  }
+
+  .gap-sm {
+    gap: var(--space-sm);
+  }
+
+  .gap-md {
+    gap: var(--space-md);
+  }
+
+  .gap-lg {
+    gap: var(--space-lg);
+  }
+
+  .gap-xl {
+    gap: var(--space-xl);
+  }
+
+  .flex-1 {
+    flex: 1;
+  }
+
+  /* Responsive Breakpoints */
+  @media (min-width: 768px) {
+    .md\:flex-row {
+      flex-direction: row;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .lg\:flex-row {
+      flex-direction: row;
+    }
+  }
+
   /* Splash Overlay */
   .splash {
     position: fixed;
@@ -196,6 +287,26 @@
   .splash__content {
     text-align: center;
     color: var(--color-white);
+  }
+
+  .splash__animation {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto var(--space-md);
+    object-fit: contain;
+  }
+
+  .splash__loading-text {
+    font-family: var(--font-family-brand);
+    font-size: var(--font-size-lg);
+    color: var(--color-white);
+    margin-bottom: var(--space-sm);
+  }
+
+  .splash__dots {
+    display: inline-block;
+    min-width: 1.5em;
+    text-align: left;
   }
 
   /* Splash Animation Keyframes (site-customizable) */

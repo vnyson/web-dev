@@ -25,5 +25,8 @@
   "scripts": {
     "build": "echo 'No build step for static CSS'",
     "lint": "stylelint css/"
+  },
+  "dependencies": {
+    "pixel-borders": "^2.0.0"
   }
 }
