@@ -1,17 +1,19 @@
-name: Deploy Preview
+name: Deploy Workers API
 
 on:
-  pull_request:
-    branches: [main]
+  push:
+    branches: [main, admin]
+    paths:
+      - 'workers/api/**'
+  workflow_dispatch:
 
 jobs:
-  deploy-preview:
+  deploy-workers:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       deployments: write
-      pull-requests: write
-    name: Deploy Preview to Cloudflare Pages
+    name: Deploy Workers API
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,16 +27,12 @@ jobs:
         run: corepack enable && corepack prepare yarn@4.5.0 --activate
 
       - name: Install dependencies
-        run: yarn install
+        run: cd workers/api && yarn install
 
-      - name: Build site
-        run: yarn build
-
-      - name: Deploy Preview
-        uses: cloudflare/pages-action@v1
+      - name: Deploy Workers
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: web-dev
-          directory: sites/tennis-stringing
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: deploy
+          workingDirectory: workers/api

@@ -1,0 +1,9 @@
+name = "tennis-admin-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tennis-admin-db"
+database_id = "ea0a7a17-50a0-4008-a85f-589103a6ac7d"
+migrations_dir = "../../db/migrations"

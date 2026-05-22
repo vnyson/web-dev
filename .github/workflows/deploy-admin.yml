@@ -1,17 +1,19 @@
-name: Deploy Preview
+name: Deploy Admin to Cloudflare Pages
 
 on:
-  pull_request:
-    branches: [main]
+  push:
+    branches: [main, admin]
+    paths:
+      - 'sites/admin/**'
+  workflow_dispatch:
 
 jobs:
-  deploy-preview:
+  deploy-admin:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       deployments: write
-      pull-requests: write
-    name: Deploy Preview to Cloudflare Pages
+    name: Deploy Admin to Cloudflare Pages
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,14 +29,15 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Build site
-        run: yarn build
+      - name: Build admin
+        run: cd sites/admin && yarn build
 
-      - name: Deploy Preview
+      - name: Deploy Admin to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: web-dev
-          directory: sites/tennis-stringing
+          projectName: tennis-admin
+          directory: sites/admin/dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          wranglerVersion: 3
