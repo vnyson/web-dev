@@ -725,3 +725,23 @@ body {
   color: var(--color-gray-400);
   line-height: var(--line-height-small);
 }
+/* Service GIF Container */
+.service-gif-container {
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto var(--space-md);
+  position: relative;
+}
+.service-gif {
+  width: 100%;
+  height: auto;
+  display: block;
+  opacity: 1;
+  transition: opacity var(--transition-normal);
+}
+.service-gif--playing {
+  opacity: 1;
+}
+.service-gif--paused {
+  opacity: 1;
+}
