@@ -5,7 +5,8 @@
   "description": "Personal brand monorepo with shared design system and multiple sites",
   "workspaces": [
     "packages/*",
-    "sites/*"
+    "sites/*",
+    "workers/*"
   ],
   "packageManager": "yarn@4.5.0",
   "scripts": {
