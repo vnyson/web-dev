@@ -427,6 +427,7 @@
     --border-size: 4px;
     --border-color: #000;
     --border-inset-color: false;
+    --pb-border-width: 6px;
   }
 
   .panel-pixel h1,
