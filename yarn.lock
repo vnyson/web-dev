@@ -699,13 +699,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"atropos@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "atropos@npm:2.0.2"
-  checksum: 10c0/a798d78396f967e822110a16ce7331542796348fbf2380590423c3ffd9ac169aa13e02ad2754481143cceaa59b46d92d2097006f887f6a18431d2f6baffd64b5
-  languageName: node
-  linkType: hard
-
 "balanced-match@npm:^1.0.0":
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
@@ -1803,13 +1796,6 @@ __metadata:
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11"
   checksum: 10c0/386d011a553e02bc594ac2ca0bd6d9e4c22d7fa8cfbfc448a6d148c59ea881b092db9dbe3547ae4b88e55f1b01f7c4a2ecc53b310c042793e63aa44cf6c257f2
-  languageName: node
-  linkType: hard
-
-"gsap@npm:^3.15.0":
-  version: 3.15.0
-  resolution: "gsap@npm:3.15.0"
-  checksum: 10c0/5d86de72cb0bd6b20502c34c329a83a7d679979731bb465164407b7a5225aa61d612beee740eea36258622897c116cd2ca35320d530b7cf68bad62522361fcf7
   languageName: node
   linkType: hard
 
@@ -3303,10 +3289,8 @@ __metadata:
   resolution: "tennis-stringing-site@workspace:sites/tennis-stringing"
   dependencies:
     "@vnyson/design-system": "workspace:*"
-    atropos: "npm:^2.0.2"
     browser-sync: "npm:^3.0.2"
     esbuild: "npm:^0.28.0"
-    gsap: "npm:^3.15.0"
     postcss: "npm:^8.4.35"
     postcss-cli: "npm:^11.0.0"
     postcss-import: "npm:^16.0.1"

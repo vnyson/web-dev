@@ -13,9 +13,7 @@
     "dev:hard": "node -e \"console.clear(); console.log('Clearing sessionStorage...'); console.log('Starting dev server with hard refresh...')\" && browser-sync start --server --files '.' --watch --no-notify --port 8080 --startPath '/?clear-splash=true'"
   },
   "dependencies": {
-    "@vnyson/design-system": "workspace:*",
-    "atropos": "^2.0.2",
-    "gsap": "^3.15.0"
+    "@vnyson/design-system": "workspace:*"
   },
   "devDependencies": {
     "browser-sync": "^3.0.2",
