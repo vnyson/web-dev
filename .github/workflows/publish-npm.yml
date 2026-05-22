@@ -1,35 +1,48 @@
 name: Publish to npm
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'packages/design-system/**'
+  workflow_run:
+    workflows: ["Deploy to Cloudflare Pages"]
+    types:
+      - completed
   workflow_dispatch:
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Check if design system changed
+        id: check-changes
+        run: |
+          git diff --name-only ${{ github.event.workflow_run.head_sha }}~1 ${{ github.event.workflow_run.head_sha }} | grep -q 'packages/design-system/' && echo "changed=true" >> $GITHUB_OUTPUT || echo "changed=false" >> $GITHUB_OUTPUT
 
       - name: Setup Node.js
+        if: steps.check-changes.outputs.changed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Enable Yarn
+        if: steps.check-changes.outputs.changed == 'true'
         run: corepack enable && corepack prepare yarn@4.5.0 --activate
 
       - name: Install dependencies
+        if: steps.check-changes.outputs.changed == 'true'
         run: yarn install
 
       - name: Build design system
+        if: steps.check-changes.outputs.changed == 'true'
         run: yarn workspace @vnyson/design-system build
 
       - name: Publish to npm
+        if: steps.check-changes.outputs.changed == 'true'
         run: yarn workspace @vnyson/design-system npm publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
