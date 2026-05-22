@@ -11,17 +11,35 @@ body {
   background: #ffffff;
 }
 
-/* Grass Background Patterns */
-body.bg-grass-1 {
-  background: url('../assets/images/soft-green-low-grass-1.png') repeat center !important;
+/* Grass Background Tiles */
+.grass-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(200px, 1fr));
+  pointer-events: none;
 }
 
-body.bg-grass-2 {
-  background: url('../assets/images/soft-green-low-grass-2.png') repeat center !important;
+.grass-tile {
+  background-size: cover;
+  background-position: center;
 }
 
-body.bg-grass-3 {
-  background: url('../assets/images/soft-green-low-grass-3.png') repeat center !important;
+.grass-tile--1 {
+  background-image: url('../assets/images/soft-green-low-grass-1.png');
+}
+
+.grass-tile--2 {
+  background-image: url('../assets/images/soft-green-low-grass-2.png');
+}
+
+.grass-tile--3 {
+  background-image: url('../assets/images/soft-green-low-grass-3.png');
 }
 
 .main-container {

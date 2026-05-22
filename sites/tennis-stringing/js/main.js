@@ -16,18 +16,39 @@ document.addEventListener('DOMContentLoaded', () => {
     animationMode: 'bike',
   });
 
-  // Random Grass Background Pattern (per session)
-  const grassPatterns = ['bg-grass-1', 'bg-grass-2', 'bg-grass-3'];
-  const sessionKey = 'tennis-stringing-grass-pattern';
+  // Random Grass Background Tiles (per session)
+  const grassBackground = document.querySelector('.grass-background');
+  if (grassBackground) {
+    const sessionKey = 'tennis-stringing-grass-tiles';
+    const tileSize = 200; // Match CSS minmax value
 
-  let selectedPattern = sessionStorage.getItem(sessionKey);
+    let tileConfig = sessionStorage.getItem(sessionKey);
 
-  if (!selectedPattern) {
-    selectedPattern = grassPatterns[Math.floor(Math.random() * grassPatterns.length)];
-    sessionStorage.setItem(sessionKey, selectedPattern);
+    if (!tileConfig) {
+      // Calculate how many tiles needed to cover viewport
+      const cols = Math.ceil(window.innerWidth / tileSize) + 1;
+      const rows = Math.ceil(window.innerHeight / tileSize) + 1;
+      const totalTiles = cols * rows;
+
+      // Generate random pattern for each tile
+      tileConfig = [];
+      for (let i = 0; i < totalTiles; i++) {
+        const pattern = Math.floor(Math.random() * 3) + 1;
+        tileConfig.push(pattern);
+      }
+
+      sessionStorage.setItem(sessionKey, JSON.stringify(tileConfig));
+    } else {
+      tileConfig = JSON.parse(tileConfig);
+    }
+
+    // Create tile elements with random patterns
+    tileConfig.forEach((pattern) => {
+      const tile = document.createElement('div');
+      tile.className = `grass-tile grass-tile--${pattern}`;
+      grassBackground.appendChild(tile);
+    });
   }
-
-  document.body.classList.add(selectedPattern);
 
   // Rotating String Display
   const stringNameElement = document.querySelector('.string-name');
