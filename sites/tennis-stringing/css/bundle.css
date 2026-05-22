@@ -3,7 +3,7 @@
 /* Design Tokens - Personal Brand */
 @font-face {
   font-family: 'PKMN';
-  src: url('../../assets/fonts/PKMN RBYGSC.ttf') format('truetype');
+  src: url('../assets/fonts/PKMN RBYGSC.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -135,7 +135,7 @@
 /* Component Styles - Reusable UI Components */
 @font-face {
   font-family: "Press Start 2P";
-  src: url("../fonts/press-start-2p.woff2") format("woff2");
+  src: url("../assets/fonts/press-start-2p.woff2") format("woff2");
   display: swap;
 }
 .pixel-borders {
@@ -693,14 +693,14 @@ body.bg-grass-3 {
   margin-bottom: var(--space-xs);
 }
 .contact-header__info.tagline {
-  font-size: calc(var(--font-size-md) - 4px);
+  font-size: calc(var(--font-size-md) - 6px);
   margin-bottom: 0;
 }
 .contact-header__info.tagline:first-of-type {
-  margin-top: var(--space-md);
+  margin-top: var(--space-lg);
 }
 .contact-header__string-display {
-  font-size: calc(var(--font-size-sm) - 4px);
+  font-size: calc(var(--font-size-sm) - 6px);
   color: var(--color-gray-800);
   margin: var(--space-xs) 0;
   text-align: center;
