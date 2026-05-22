@@ -16,6 +16,53 @@ document.addEventListener('DOMContentLoaded', () => {
     animationMode: 'bike',
   });
 
+  // Random Grass Background Pattern (per session)
+  const grassPatterns = ['bg-grass-1', 'bg-grass-2', 'bg-grass-3'];
+  const sessionKey = 'tennis-stringing-grass-pattern';
+
+  let selectedPattern = sessionStorage.getItem(sessionKey);
+
+  if (!selectedPattern) {
+    selectedPattern = grassPatterns[Math.floor(Math.random() * grassPatterns.length)];
+    sessionStorage.setItem(sessionKey, selectedPattern);
+  }
+
+  document.body.classList.add(selectedPattern);
+
+  // Rotating String Display
+  const stringNameElement = document.querySelector('.string-name');
+  if (stringNameElement) {
+    const strings = ['ReString Zero 1.23mm', 'Tourna Big Hitter Silver 17g', 'Golden Set Snake Bit 17g'];
+    let currentIndex = 0;
+    const rotationInterval = 7000; // 7 seconds
+
+    const rotateString = () => {
+      console.log('Rotating string, current index:', currentIndex);
+      // Fade out
+      stringNameElement.classList.add('string-name--fading-out');
+
+      setTimeout(() => {
+        // Change text while hidden
+        currentIndex = (currentIndex + 1) % strings.length;
+        stringNameElement.textContent = strings[currentIndex];
+        console.log('New string:', strings[currentIndex]);
+
+        // Fade in by removing the fade-out class
+        stringNameElement.classList.remove('string-name--fading-out');
+      }, 250); // Match transition duration
+    };
+
+    // Set initial string
+    stringNameElement.textContent = strings[0];
+    console.log('Initial string set:', strings[0]);
+
+    // Start rotation interval
+    console.log('Starting rotation interval');
+    setInterval(rotateString, rotationInterval);
+  } else {
+    console.log('String name element not found');
+  }
+
   // Service GIF Animation Control
   const serviceGif = document.querySelector('.service-gif');
   if (serviceGif) {

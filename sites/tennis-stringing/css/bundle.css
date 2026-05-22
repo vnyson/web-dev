@@ -653,6 +653,16 @@
 body {
   background: #ffffff;
 }
+/* Grass Background Patterns */
+body.bg-grass-1 {
+  background: url('../assets/images/soft-green-low-grass-1.png') repeat center !important;
+}
+body.bg-grass-2 {
+  background: url('../assets/images/soft-green-low-grass-2.png') repeat center !important;
+}
+body.bg-grass-3 {
+  background: url('../assets/images/soft-green-low-grass-3.png') repeat center !important;
+}
 .main-container {
   width: 100%;
   display: flex;
@@ -681,6 +691,28 @@ body {
   font-size: var(--font-size-md);
   color: var(--color-gray-700);
   margin-bottom: var(--space-xs);
+}
+.contact-header__info.tagline {
+  font-size: calc(var(--font-size-md) - 4px);
+  margin-bottom: 0;
+}
+.contact-header__info.tagline:first-of-type {
+  margin-top: var(--space-md);
+}
+.contact-header__string-display {
+  font-size: calc(var(--font-size-sm) - 4px);
+  color: var(--color-gray-800);
+  margin: var(--space-xs) 0;
+  text-align: center;
+  min-height: 1.5em;
+  font-weight: var(--font-weight-semibold);
+}
+.string-name {
+  opacity: 1;
+  transition: opacity var(--transition-normal);
+}
+.string-name--fading-out {
+  opacity: 0;
 }
 /* Services Section */
 .services {
