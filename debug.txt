@@ -1,0 +1,363 @@
+2026-05-22T15:39:58.2117730Z Current runner version: '2.334.0'
+2026-05-22T15:39:58.2142888Z ##[group]Runner Image Provisioner
+2026-05-22T15:39:58.2144135Z Hosted Compute Agent
+2026-05-22T15:39:58.2144823Z Version: 20260213.493
+2026-05-22T15:39:58.2145517Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+2026-05-22T15:39:58.2146285Z Build Date: 2026-02-13T00:28:41Z
+2026-05-22T15:39:58.2147021Z Worker ID: {73f8fbc2-375d-4505-8649-2ad39d887f6c}
+2026-05-22T15:39:58.2147814Z Azure Region: westus3
+2026-05-22T15:39:58.2148441Z ##[endgroup]
+2026-05-22T15:39:58.2150442Z ##[group]Operating System
+2026-05-22T15:39:58.2151114Z Ubuntu
+2026-05-22T15:39:58.2151684Z 24.04.4
+2026-05-22T15:39:58.2152255Z LTS
+2026-05-22T15:39:58.2153022Z ##[endgroup]
+2026-05-22T15:39:58.2153648Z ##[group]Runner Image
+2026-05-22T15:39:58.2154312Z Image: ubuntu-24.04
+2026-05-22T15:39:58.2154907Z Version: 20260518.149.1
+2026-05-22T15:39:58.2156256Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260518.149/images/ubuntu/Ubuntu2404-Readme.md
+2026-05-22T15:39:58.2157879Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260518.149
+2026-05-22T15:39:58.2158979Z ##[endgroup]
+2026-05-22T15:39:58.2160393Z ##[group]GITHUB_TOKEN Permissions
+2026-05-22T15:39:58.2162587Z Contents: read
+2026-05-22T15:39:58.2163419Z Deployments: write
+2026-05-22T15:39:58.2164162Z Metadata: read
+2026-05-22T15:39:58.2164736Z PullRequests: write
+2026-05-22T15:39:58.2165421Z ##[endgroup]
+2026-05-22T15:39:58.2167575Z Secret source: Actions
+2026-05-22T15:39:58.2168677Z Prepare workflow directory
+2026-05-22T15:39:58.2519919Z Prepare all required actions
+2026-05-22T15:39:58.2559490Z Getting action download info
+2026-05-22T15:39:58.7211619Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-05-22T15:39:58.8352006Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-05-22T15:39:58.9330252Z Download action repository 'cloudflare/pages-action@v1' (SHA:f0a1cd58cd66095dee69bfa18fa5efd1dde93bca)
+2026-05-22T15:39:59.5085752Z Complete job name: Deploy Preview to Cloudflare Pages
+2026-05-22T15:39:59.5877076Z ##[group]Run actions/checkout@v4
+2026-05-22T15:39:59.5878066Z with:
+2026-05-22T15:39:59.5878573Z   repository: vnyson/web-dev
+2026-05-22T15:39:59.5884082Z   token: ***
+2026-05-22T15:39:59.5884668Z   ssh-strict: true
+2026-05-22T15:39:59.5885178Z   ssh-user: git
+2026-05-22T15:39:59.5885679Z   persist-credentials: true
+2026-05-22T15:39:59.5886221Z   clean: true
+2026-05-22T15:39:59.5886736Z   sparse-checkout-cone-mode: true
+2026-05-22T15:39:59.5887318Z   fetch-depth: 1
+2026-05-22T15:39:59.5887808Z   fetch-tags: false
+2026-05-22T15:39:59.5888312Z   show-progress: true
+2026-05-22T15:39:59.5888812Z   lfs: false
+2026-05-22T15:39:59.5889271Z   submodules: false
+2026-05-22T15:39:59.5889787Z   set-safe-directory: true
+2026-05-22T15:39:59.5890656Z ##[endgroup]
+2026-05-22T15:39:59.6998985Z Syncing repository: vnyson/web-dev
+2026-05-22T15:39:59.7001118Z ##[group]Getting Git version info
+2026-05-22T15:39:59.7001971Z Working directory is '/home/runner/work/web-dev/web-dev'
+2026-05-22T15:39:59.7003555Z [command]/usr/bin/git version
+2026-05-22T15:39:59.7074997Z git version 2.54.0
+2026-05-22T15:39:59.7101608Z ##[endgroup]
+2026-05-22T15:39:59.7116963Z Temporarily overriding HOME='/home/runner/work/_temp/795046b7-3f0a-44d1-9bcc-c5e4c7945d63' before making global git config changes
+2026-05-22T15:39:59.7118485Z Adding repository directory to the temporary git global config as a safe directory
+2026-05-22T15:39:59.7122099Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/web-dev/web-dev
+2026-05-22T15:39:59.7167189Z Deleting the contents of '/home/runner/work/web-dev/web-dev'
+2026-05-22T15:39:59.7170856Z ##[group]Initializing the repository
+2026-05-22T15:39:59.7174893Z [command]/usr/bin/git init /home/runner/work/web-dev/web-dev
+2026-05-22T15:39:59.7274638Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-05-22T15:39:59.7276544Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-05-22T15:39:59.7278334Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-05-22T15:39:59.7279328Z hint: call:
+2026-05-22T15:39:59.7279808Z hint:
+2026-05-22T15:39:59.7280586Z hint: 	git config --global init.defaultBranch <name>
+2026-05-22T15:39:59.7281679Z hint:
+2026-05-22T15:39:59.7283083Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-05-22T15:39:59.7284888Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-05-22T15:39:59.7286106Z hint:
+2026-05-22T15:39:59.7286613Z hint: 	git branch -m <name>
+2026-05-22T15:39:59.7287609Z hint:
+2026-05-22T15:39:59.7288823Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-05-22T15:39:59.7290729Z Initialized empty Git repository in /home/runner/work/web-dev/web-dev/.git/
+2026-05-22T15:39:59.7293842Z [command]/usr/bin/git remote add origin https://github.com/vnyson/web-dev
+2026-05-22T15:39:59.7333458Z ##[endgroup]
+2026-05-22T15:39:59.7334421Z ##[group]Disabling automatic garbage collection
+2026-05-22T15:39:59.7337203Z [command]/usr/bin/git config --local gc.auto 0
+2026-05-22T15:39:59.7365863Z ##[endgroup]
+2026-05-22T15:39:59.7367500Z ##[group]Setting up auth
+2026-05-22T15:39:59.7374156Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-05-22T15:39:59.7409985Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-05-22T15:39:59.7740603Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-05-22T15:39:59.7769664Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-05-22T15:39:59.7990793Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-05-22T15:39:59.8033584Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-05-22T15:39:59.8258006Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-05-22T15:39:59.8291628Z ##[endgroup]
+2026-05-22T15:39:59.8292527Z ##[group]Fetching the repository
+2026-05-22T15:39:59.8301239Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +27c4cfdd08ab5001fb51910437d46243decc5471:refs/remotes/pull/8/merge
+2026-05-22T15:40:00.5565980Z From https://github.com/vnyson/web-dev
+2026-05-22T15:40:00.5567777Z  * [new ref]         27c4cfdd08ab5001fb51910437d46243decc5471 -> pull/8/merge
+2026-05-22T15:40:00.5603826Z ##[endgroup]
+2026-05-22T15:40:00.5605746Z ##[group]Determining the checkout info
+2026-05-22T15:40:00.5607560Z ##[endgroup]
+2026-05-22T15:40:00.5612399Z [command]/usr/bin/git sparse-checkout disable
+2026-05-22T15:40:00.5673965Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-05-22T15:40:00.5704835Z ##[group]Checking out the ref
+2026-05-22T15:40:00.5708566Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/8/merge
+2026-05-22T15:40:00.5824254Z Note: switching to 'refs/remotes/pull/8/merge'.
+2026-05-22T15:40:00.5826384Z 
+2026-05-22T15:40:00.5828023Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-05-22T15:40:00.5831905Z changes and commit them, and you can discard any commits you make in this
+2026-05-22T15:40:00.5835877Z state without impacting any branches by switching back to a branch.
+2026-05-22T15:40:00.5838323Z 
+2026-05-22T15:40:00.5839728Z If you want to create a new branch to retain commits you create, you may
+2026-05-22T15:40:00.5843707Z do so (now or later) by using -c with the switch command. Example:
+2026-05-22T15:40:00.5845860Z 
+2026-05-22T15:40:00.5847359Z   git switch -c <new-branch-name>
+2026-05-22T15:40:00.5848944Z 
+2026-05-22T15:40:00.5849938Z Or undo this operation with:
+2026-05-22T15:40:00.5851398Z 
+2026-05-22T15:40:00.5852343Z   git switch -
+2026-05-22T15:40:00.5853957Z 
+2026-05-22T15:40:00.5855719Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-05-22T15:40:00.5858329Z 
+2026-05-22T15:40:00.5861036Z HEAD is now at 27c4cfd Merge d6bc2aedb6712fbee5dd4fc355809e6894ad598d into 98e14ff9d9747ac21ab63fde0523068f146a45ae
+2026-05-22T15:40:00.5869631Z ##[endgroup]
+2026-05-22T15:40:00.5875255Z [command]/usr/bin/git log -1 --format=%H
+2026-05-22T15:40:00.5899034Z 27c4cfdd08ab5001fb51910437d46243decc5471
+2026-05-22T15:40:00.6329765Z ##[group]Run actions/setup-node@v4
+2026-05-22T15:40:00.6330982Z with:
+2026-05-22T15:40:00.6331836Z   node-version: 20
+2026-05-22T15:40:00.6333110Z   always-auth: false
+2026-05-22T15:40:00.6334116Z   check-latest: false
+2026-05-22T15:40:00.6346792Z   token: ***
+2026-05-22T15:40:00.6347692Z ##[endgroup]
+2026-05-22T15:40:00.8173576Z Attempting to download 20...
+2026-05-22T15:40:01.8360064Z Acquiring 20.20.2 - x64 from https://github.com/actions/node-versions/releases/download/20.20.2-23521894959/node-20.20.2-linux-x64.tar.gz
+2026-05-22T15:40:02.4286399Z Extracting ...
+2026-05-22T15:40:02.4392947Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/de3f0757-d548-4e6d-a5e5-18c27d8eb68f -f /home/runner/work/_temp/0c04de2c-4d67-476a-a17e-1831ed026a82
+2026-05-22T15:40:03.4433872Z Adding to the cache ...
+2026-05-22T15:40:05.2341167Z ##[group]Environment details
+2026-05-22T15:40:05.4633415Z node: v20.20.2
+2026-05-22T15:40:05.4634026Z npm: 10.8.2
+2026-05-22T15:40:05.4634378Z yarn: 1.22.22
+2026-05-22T15:40:05.4635156Z ##[endgroup]
+2026-05-22T15:40:05.4801479Z ##[group]Run corepack enable && corepack prepare yarn@4.5.0 --activate
+2026-05-22T15:40:05.4802072Z [36;1mcorepack enable && corepack prepare yarn@4.5.0 --activate[0m
+2026-05-22T15:40:05.4843577Z shell: /usr/bin/bash -e {0}
+2026-05-22T15:40:05.4843908Z ##[endgroup]
+2026-05-22T15:40:05.6162632Z Preparing yarn@4.5.0 for immediate activation...
+2026-05-22T15:40:05.9522170Z ##[group]Run yarn install
+2026-05-22T15:40:05.9522515Z [36;1myarn install[0m
+2026-05-22T15:40:05.9557021Z shell: /usr/bin/bash -e {0}
+2026-05-22T15:40:05.9557310Z ##[endgroup]
+2026-05-22T15:40:06.2933609Z [93m➤[39m YN0000: Yarn detected that the current workflow is executed from a public pull request. For safety the hardened mode has been enabled.
+2026-05-22T15:40:06.2935307Z [93m➤[39m YN0000: It will prevent malicious lockfile manipulations, in exchange for a slower install time. You can opt-out if necessary; check our documentation for more details.
+2026-05-22T15:40:06.2936256Z 
+2026-05-22T15:40:06.2936518Z [94m➤[39m YN0000: · Yarn 4.5.0
+2026-05-22T15:40:06.3196982Z [94m➤[39m [90mYN0000[39m: ┌ Resolution step
+2026-05-22T15:40:06.3197685Z ##[group]Resolution step
+2026-05-22T15:40:08.1068532Z ##[endgroup]
+2026-05-22T15:40:08.1069613Z [94m➤[39m [90mYN0000[39m: └ Completed in 1s 788ms
+2026-05-22T15:40:08.1240160Z [94m➤[39m [90mYN0000[39m: ┌ Fetch step
+2026-05-22T15:40:08.1241299Z ##[group]Fetch step
+2026-05-22T15:40:09.9905613Z [94m➤[39m YN0013: │ [38;5;220m358[39m packages were added to the project ([38;5;160m+ 111.48 MiB[39m).
+2026-05-22T15:40:09.9906928Z ##[endgroup]
+2026-05-22T15:40:09.9907632Z [94m➤[39m [90mYN0000[39m: └ Completed in 1s 867ms
+2026-05-22T15:40:10.0066647Z [94m➤[39m [90mYN0000[39m: ┌ Link step
+2026-05-22T15:40:10.0067584Z ##[group]Link step
+2026-05-22T15:40:11.3561238Z [94m➤[39m YN0007: │ [38;5;173mstylelint-standard[39m[38;5;111m@[39m[38;5;111mnpm:1.2.3[39m must be built because it never has been before or the last one failed
+2026-05-22T15:40:11.3566201Z [94m➤[39m YN0007: │ [38;5;173mesbuild[39m[38;5;111m@[39m[38;5;111mnpm:0.28.0[39m must be built because it never has been before or the last one failed
+2026-05-22T15:40:26.0023140Z ##[endgroup]
+2026-05-22T15:40:26.0024289Z [94m➤[39m [90mYN0000[39m: └ Completed in 15s 996ms
+2026-05-22T15:40:26.0309305Z [94m➤[39m YN0000: · Done in 19s 737ms
+2026-05-22T15:40:26.1156246Z ##[group]Run yarn build
+2026-05-22T15:40:26.1156570Z [36;1myarn build[0m
+2026-05-22T15:40:26.1190664Z shell: /usr/bin/bash -e {0}
+2026-05-22T15:40:26.1190940Z ##[endgroup]
+2026-05-22T15:40:26.5121527Z 
+2026-05-22T15:40:26.5122110Z Attention:
+2026-05-22T15:40:26.5123445Z Turborepo now collects completely anonymous telemetry regarding usage.
+2026-05-22T15:40:26.5124643Z This information is used to shape the Turborepo roadmap and prioritize features.
+2026-05-22T15:40:26.5126251Z You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+2026-05-22T15:40:26.5127440Z https://turborepo.dev/docs/telemetry
+2026-05-22T15:40:26.5127807Z 
+2026-05-22T15:40:26.5690576Z 
+2026-05-22T15:40:26.5704309Z    • Packages in scope: @vnyson/design-system, tennis-stringing-site
+2026-05-22T15:40:26.5714275Z    • Running build in 2 packages
+2026-05-22T15:40:26.5715052Z    • Remote caching disabled
+2026-05-22T15:40:26.5715539Z 
+2026-05-22T15:40:26.8703714Z ##[group]@vnyson/design-system:build
+2026-05-22T15:40:26.8704308Z cache miss, executing 5a706786ce0ef88e
+2026-05-22T15:40:26.8704678Z No build step for static CSS
+2026-05-22T15:40:26.8705138Z ##[endgroup]
+2026-05-22T15:40:27.8783013Z ##[group]tennis-stringing-site:build
+2026-05-22T15:40:27.8783913Z cache miss, executing 6831eea6777b19a9
+2026-05-22T15:40:27.8784292Z 
+2026-05-22T15:40:27.8784611Z > tennis-stringing-site@1.0.0 build:css
+2026-05-22T15:40:27.8785424Z > postcss css/style.css --output css/bundle.css
+2026-05-22T15:40:27.8785832Z 
+2026-05-22T15:40:27.8785841Z 
+2026-05-22T15:40:27.8786147Z > tennis-stringing-site@1.0.0 copy-assets
+2026-05-22T15:40:27.8790009Z > node -e "const fs=require('fs'),p=require('path');const src=p.resolve('../../packages/design-system/assets');const dest=p.resolve('assets');const copyDir=(srcDir,destDir)=>{fs.mkdirSync(destDir,{recursive:true});fs.readdirSync(srcDir).forEach(f=>{const srcPath=p.join(srcDir,f);const destPath=p.join(destDir,f);fs.statSync(srcPath).isDirectory()?copyDir(srcPath,destPath):fs.copyFileSync(srcPath,destPath)})};copyDir(src,dest);console.log('Assets copied')"
+2026-05-22T15:40:27.8791681Z 
+2026-05-22T15:40:27.8791842Z Assets copied
+2026-05-22T15:40:27.8791982Z 
+2026-05-22T15:40:27.8792218Z > tennis-stringing-site@1.0.0 build:js
+2026-05-22T15:40:27.8792956Z > esbuild js/main.js --bundle --outfile=js/bundle.js --minify
+2026-05-22T15:40:27.8793264Z 
+2026-05-22T15:40:27.8793270Z 
+2026-05-22T15:40:27.8793390Z   js/bundle.js  3.3kb
+2026-05-22T15:40:27.8793543Z 
+2026-05-22T15:40:27.8793856Z ⚡ Done in 2ms
+2026-05-22T15:40:27.8794322Z ##[endgroup]
+2026-05-22T15:40:27.8831934Z 
+2026-05-22T15:40:27.8832262Z  Tasks:    2 successful, 2 total
+2026-05-22T15:40:27.8833122Z Cached:    0 cached, 2 total
+2026-05-22T15:40:27.8833554Z   Time:    1.37s 
+2026-05-22T15:40:27.8833719Z 
+2026-05-22T15:40:27.8851738Z  WARNING  no output files found for task @vnyson/design-system#build. Please check your `outputs` key in `turbo.json`
+2026-05-22T15:40:27.8853783Z  WARNING  no output files found for task tennis-stringing-site#build. Please check your `outputs` key in `turbo.json`
+2026-05-22T15:40:27.9056457Z ##[group]Run cloudflare/pages-action@v1
+2026-05-22T15:40:27.9056777Z with:
+2026-05-22T15:40:27.9057414Z   apiToken: ***
+2026-05-22T15:40:27.9057689Z   accountId: ***
+2026-05-22T15:40:27.9057924Z   projectName: web-dev
+2026-05-22T15:40:27.9058172Z   directory: sites/tennis-stringing
+2026-05-22T15:40:27.9061379Z   gitHubToken: ***
+2026-05-22T15:40:27.9061624Z   wranglerVersion: 2
+2026-05-22T15:40:27.9061865Z ##[endgroup]
+2026-05-22T15:40:30.3094235Z npm warn exec The following package was not found and will be installed: wrangler@2.21.3
+2026-05-22T15:40:35.2174491Z npm warn deprecated rollup-plugin-inject@3.0.2: This package has been deprecated and is no longer maintained. Please use @rollup/plugin-inject.
+2026-05-22T15:40:35.2336647Z npm warn deprecated sourcemap-codec@1.4.8: Please use @jridgewell/sourcemap-codec instead
+2026-05-22T15:40:35.2473734Z npm warn deprecated @miniflare/sites@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.2520902Z npm warn deprecated @miniflare/r2@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.2526809Z npm warn deprecated @miniflare/scheduler@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.2747247Z npm warn deprecated @miniflare/runner-vm@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.2877723Z npm warn deprecated @miniflare/kv@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.2880486Z npm warn deprecated @miniflare/storage-file@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.3036576Z npm warn deprecated @miniflare/web-sockets@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.3349781Z npm warn deprecated @miniflare/html-rewriter@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.3576549Z npm warn deprecated @miniflare/storage-memory@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.3649059Z npm warn deprecated @miniflare/cli-parser@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.3845744Z npm warn deprecated @miniflare/watcher@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.4032445Z npm warn deprecated @miniflare/queues@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.4215501Z npm warn deprecated @miniflare/http-server@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.4514611Z npm warn deprecated @miniflare/cache@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.4667935Z npm warn deprecated @miniflare/durable-objects@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.4738249Z npm warn deprecated @miniflare/d1@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.4754009Z npm warn deprecated miniflare@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.4779645Z npm warn deprecated @miniflare/shared@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:35.5087740Z npm warn deprecated @miniflare/core@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:40:36.3746313Z npm warn deprecated wrangler@2.21.3: Wrangler v2 is no longer supported. Please upgrade to Wrangler v4
+2026-05-22T15:40:39.8346074Z [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mWarning: Your working directory is a git repo and has uncommitted changes[0m
+2026-05-22T15:40:39.8347028Z 
+2026-05-22T15:40:39.8347685Z   To silence this warning, pass in --commit-dirty=true
+2026-05-22T15:40:39.8348153Z 
+2026-05-22T15:40:39.8348162Z 
+2026-05-22T15:40:40.8464145Z Uploading... (16/17)
+2026-05-22T15:41:55.5473378Z ✨ Success! Uploaded 1 files (16 already uploaded) (74.89 sec)
+2026-05-22T15:41:55.5473819Z 
+2026-05-22T15:41:55.5499901Z /home/runner/.npm/_npx/9ed62f6a27f08a8d/node_modules/wrangler/wrangler-dist/cli.js:30601
+2026-05-22T15:41:55.5500797Z             throw a;
+2026-05-22T15:41:55.5504414Z             ^
+2026-05-22T15:41:55.5504663Z 
+2026-05-22T15:41:55.5507479Z FatalError: Failed to upload files. Please try again. Error: {"text":"Received a malformed response from the API","notes":[{"text":"<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if I... (length = 4673)"},{"text":"POST /pages/assets/upload -> 500 Internal Server Error"}],"kind":"error","name":"ParseError"})
+2026-05-22T15:41:55.5511042Z     at /home/runner/.npm/_npx/9ed62f6a27f08a8d/node_modules/wrangler/wrangler-dist/cli.js:146379:13
+2026-05-22T15:41:55.5512421Z     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-05-22T15:41:55.5513941Z     at async run (/home/runner/.npm/_npx/9ed62f6a27f08a8d/node_modules/wrangler/wrangler-dist/cli.js:145985:26) {
+2026-05-22T15:41:55.5514833Z   code: 1
+2026-05-22T15:41:55.5515208Z }
+2026-05-22T15:41:55.5515382Z 
+2026-05-22T15:41:55.5515600Z Node.js v20.20.2
+2026-05-22T15:41:55.5622415Z npm notice
+2026-05-22T15:41:55.5623357Z npm notice New major version of npm available! 10.8.2 -> 11.15.0
+2026-05-22T15:41:55.5624399Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.15.0
+2026-05-22T15:41:55.5625104Z npm notice To update run: npm install -g npm@11.15.0
+2026-05-22T15:41:55.5625632Z npm notice
+2026-05-22T15:41:55.5760988Z EXIT WHEN NOT EXPECTED
+2026-05-22T15:41:55.5761297Z 
+2026-05-22T15:41:55.5761504Z SHELLAC COMMAND FAILED!
+2026-05-22T15:41:55.5763065Z Executing: npx wrangler@2 pages publish "sites/tennis-stringing" --project-name="web-dev" --branch="" in /home/runner/work/web-dev/web-dev
+2026-05-22T15:41:55.5763986Z 
+2026-05-22T15:41:55.5764093Z STDOUT:
+2026-05-22T15:41:55.5764280Z 
+2026-05-22T15:41:55.5764430Z Uploading... (16/17)
+2026-05-22T15:41:55.5765129Z ✨ Success! Uploaded 1 files (16 already uploaded) (74.89 sec)
+2026-05-22T15:41:55.5765402Z 
+2026-05-22T15:41:55.5765408Z 
+2026-05-22T15:41:55.5765414Z 
+2026-05-22T15:41:55.5765505Z STDERR:
+2026-05-22T15:41:55.5765613Z 
+2026-05-22T15:41:55.5765973Z npm warn exec The following package was not found and will be installed: wrangler@2.21.3
+2026-05-22T15:41:55.5766937Z npm warn deprecated rollup-plugin-inject@3.0.2: This package has been deprecated and is no longer maintained. Please use @rollup/plugin-inject.
+2026-05-22T15:41:55.5767854Z npm warn deprecated sourcemap-codec@1.4.8: Please use @jridgewell/sourcemap-codec instead
+2026-05-22T15:41:55.5768671Z npm warn deprecated @miniflare/sites@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5769519Z npm warn deprecated @miniflare/r2@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5770375Z npm warn deprecated @miniflare/scheduler@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5771264Z npm warn deprecated @miniflare/runner-vm@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5772095Z npm warn deprecated @miniflare/kv@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5773324Z npm warn deprecated @miniflare/storage-file@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5774248Z npm warn deprecated @miniflare/web-sockets@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5775148Z npm warn deprecated @miniflare/html-rewriter@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5776076Z npm warn deprecated @miniflare/storage-memory@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5777297Z npm warn deprecated @miniflare/cli-parser@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5778182Z npm warn deprecated @miniflare/watcher@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5779027Z npm warn deprecated @miniflare/queues@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5779898Z npm warn deprecated @miniflare/http-server@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5780748Z npm warn deprecated @miniflare/cache@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5781628Z npm warn deprecated @miniflare/durable-objects@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5783160Z npm warn deprecated @miniflare/d1@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5784757Z npm warn deprecated miniflare@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5786369Z npm warn deprecated @miniflare/shared@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5787980Z npm warn deprecated @miniflare/core@2.14.4: Miniflare v2 is no longer supported. Please upgrade to Miniflare v4
+2026-05-22T15:41:55.5789325Z npm warn deprecated wrangler@2.21.3: Wrangler v2 is no longer supported. Please upgrade to Wrangler v4
+2026-05-22T15:41:55.5791054Z [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mWarning: Your working directory is a git repo and has uncommitted changes[0m
+2026-05-22T15:41:55.5791779Z 
+2026-05-22T15:41:55.5792054Z   To silence this warning, pass in --commit-dirty=true
+2026-05-22T15:41:55.5792465Z 
+2026-05-22T15:41:55.5792473Z 
+2026-05-22T15:41:55.5793327Z /home/runner/.npm/_npx/9ed62f6a27f08a8d/node_modules/wrangler/wrangler-dist/cli.js:30601
+2026-05-22T15:41:55.5794052Z             throw a;
+2026-05-22T15:41:55.5794392Z             ^
+2026-05-22T15:41:55.5794580Z 
+2026-05-22T15:41:55.5796461Z FatalError: Failed to upload files. Please try again. Error: {"text":"Received a malformed response from the API","notes":[{"text":"<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if I... (length = 4673)"},{"text":"POST /pages/assets/upload -> 500 Internal Server Error"}],"kind":"error","name":"ParseError"})
+2026-05-22T15:41:55.5797964Z     at /home/runner/.npm/_npx/9ed62f6a27f08a8d/node_modules/wrangler/wrangler-dist/cli.js:146379:13
+2026-05-22T15:41:55.5798632Z     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-05-22T15:41:55.5799340Z     at async run (/home/runner/.npm/_npx/9ed62f6a27f08a8d/node_modules/wrangler/wrangler-dist/cli.js:145985:26) {
+2026-05-22T15:41:55.5799852Z   code: 1
+2026-05-22T15:41:55.5800052Z }
+2026-05-22T15:41:55.5800161Z 
+2026-05-22T15:41:55.5800258Z Node.js v20.20.2
+2026-05-22T15:41:55.5800479Z npm notice
+2026-05-22T15:41:55.5800834Z npm notice New major version of npm available! 10.8.2 -> 11.15.0
+2026-05-22T15:41:55.5801378Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.15.0
+2026-05-22T15:41:55.5801871Z npm notice To update run: npm install -g npm@11.15.0
+2026-05-22T15:41:55.5802190Z npm notice
+2026-05-22T15:41:55.5802308Z 
+2026-05-22T15:41:55.5802314Z 
+2026-05-22T15:41:55.5802495Z node:internal/process/promises:389
+2026-05-22T15:41:55.5803201Z       new UnhandledPromiseRejection(reason);
+2026-05-22T15:41:55.5803803Z       ^
+2026-05-22T15:41:55.5804014Z 
+2026-05-22T15:41:55.5805649Z UnhandledPromiseRejection: This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). The promise rejected with the reason "#<Object>".
+2026-05-22T15:41:55.5806831Z     at throwUnhandledRejectionsMode (node:internal/process/promises:389:7)
+2026-05-22T15:41:55.5807568Z     at processPromiseRejections (node:internal/process/promises:470:17)
+2026-05-22T15:41:55.5808189Z     at process.processTicksAndRejections (node:internal/process/task_queues:96:32) {
+2026-05-22T15:41:55.5808677Z   code: 'ERR_UNHANDLED_REJECTION'
+2026-05-22T15:41:55.5808939Z }
+2026-05-22T15:41:55.5809045Z 
+2026-05-22T15:41:55.5809136Z Node.js v20.20.2
+2026-05-22T15:41:55.5908998Z Post job cleanup.
+2026-05-22T15:41:55.6892003Z [command]/usr/bin/git version
+2026-05-22T15:41:55.6929552Z git version 2.54.0
+2026-05-22T15:41:55.6981565Z Temporarily overriding HOME='/home/runner/work/_temp/15d63bfa-7858-4b17-a204-9d528602705c' before making global git config changes
+2026-05-22T15:41:55.6983432Z Adding repository directory to the temporary git global config as a safe directory
+2026-05-22T15:41:55.6987891Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/web-dev/web-dev
+2026-05-22T15:41:55.7021961Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-05-22T15:41:55.7053923Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-05-22T15:41:55.7279360Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-05-22T15:41:55.7303905Z http.https://github.com/.extraheader
+2026-05-22T15:41:55.7317478Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-05-22T15:41:55.7347914Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-05-22T15:41:55.7563383Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-05-22T15:41:55.7593439Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-05-22T15:41:55.7930259Z Cleaning up orphan processes
+2026-05-22T15:41:55.8230231Z Terminate orphan process: pid (2365) (PM2 v7.0.1: God)
+2026-05-22T15:41:55.8260735Z Terminate orphan process: pid (2410) (node /home/runn)
+2026-05-22T15:41:55.8285375Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, actions/setup-node@v4, cloudflare/pages-action@v1. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
