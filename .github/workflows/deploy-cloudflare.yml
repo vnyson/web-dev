@@ -38,5 +38,3 @@ jobs:
           projectName: web-dev
           directory: sites/tennis-stringing
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          wranglerVersion: 3
-          command: pages publish sites/tennis-stringing --project-name=web-dev --commit-dirty=true
