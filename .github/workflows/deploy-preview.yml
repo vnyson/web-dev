@@ -3,6 +3,9 @@ name: Deploy Preview
 on:
   pull_request:
     branches: [main]
+    paths:
+      - 'sites/tennis-stringing/**'
+      - 'packages/design-system/**'
 
 jobs:
   deploy-preview:

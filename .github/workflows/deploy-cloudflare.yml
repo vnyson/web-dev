@@ -3,6 +3,9 @@ name: Deploy to Cloudflare Pages
 on:
   push:
     branches: [main]
+    paths:
+      - 'sites/tennis-stringing/**'
+      - 'packages/design-system/**'
   workflow_dispatch:
 
 jobs:

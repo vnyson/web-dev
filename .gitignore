@@ -5,8 +5,9 @@ node_modules/
 .pnp.loader.mjs
 .eslintcache
 *.log
+debug.txt
 dist/
 .DS_Store
 Thumbs.db
 .turbo/cache
-.yarn/install-state.gz
+.wrangler/

@@ -1,14 +1,5 @@
 ---
 import '../styles/global.css';
-import { fetchStringing } from '../lib/api';
-
-let stringing = [];
-
-try {
-  stringing = await fetchStringing();
-} catch (e) {
-  console.error('Failed to fetch stringing jobs:', e);
-}
 ---
 
 <html lang="en">
@@ -63,29 +54,12 @@ try {
 										<th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
 									</tr>
 								</thead>
-								<tbody class="bg-white divide-y divide-gray-200">
-									{stringing.length === 0 ? (
-										<tr>
-											<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-												No stringing jobs yet. Create your first drop-off to get started.
-											</td>
-										</tr>
-									) : (
-										stringing.map((job: any) => (
-											<tr>
-												<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{job.player_id}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{job.racquet}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{job.string_mains || job.string}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{job.tension_mains || job.tension}{job.tension_unit || ''}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{job.status}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(job.created_at).toLocaleDateString()}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-													<button class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-													<button class="text-red-600 hover:text-red-900">Delete</button>
-												</td>
-											</tr>
-										))
-									)}
+								<tbody class="bg-white divide-y divide-gray-200" id="jobs-table">
+									<tr>
+										<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+											Loading jobs...
+										</td>
+									</tr>
 								</tbody>
 							</table>
 						</div>
@@ -93,5 +67,56 @@ try {
 				</div>
 			</main>
 		</div>
+
+		<script>
+			const API_URL = import.meta.env.PUBLIC_API_URL || 'https://tennis-admin-api.vnyson.workers.dev';
+			
+			async function loadJobs() {
+				try {
+					const response = await fetch(`${API_URL}/api/stringing`);
+					if (!response.ok) throw new Error('Failed to fetch jobs');
+					const jobs = await response.json();
+					
+					const tbody = document.getElementById('jobs-table');
+					if (jobs.length === 0) {
+						tbody.innerHTML = `
+							<tr>
+								<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+									No stringing jobs yet. Create your first drop-off to get started.
+								</td>
+							</tr>
+						`;
+					} else {
+						tbody.innerHTML = jobs.map(job => `
+							<tr>
+								<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${job.player_name || job.player_id}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${job.racquet || '-'}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${job.string_mains || job.string || '-'}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${job.tension_mains || job.tension || '-'}${job.tension_unit || ''}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${job.status}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(job.created_at).toLocaleDateString()}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+									<button class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+									<button class="text-red-600 hover:text-red-900">Delete</button>
+								</td>
+							</tr>
+						`).join('');
+					}
+				} catch (error) {
+					console.error('Failed to load jobs:', error);
+					const tbody = document.getElementById('jobs-table');
+					tbody.innerHTML = `
+						<tr>
+							<td colspan="7" class="px-6 py-4 text-center text-sm text-red-500">
+								Failed to load jobs. Please try again later.
+							</td>
+						</tr>
+					`;
+				}
+			}
+
+			// Load jobs when page loads
+			loadJobs();
+		</script>
 	</body>
 </html>

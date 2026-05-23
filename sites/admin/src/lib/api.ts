@@ -1,4 +1,4 @@
-const API_URL = (globalThis as any).PUBLIC_API_URL || 'http://localhost:8787';
+const API_URL = 'https://tennis-admin-api.vnyson.workers.dev';
 
 export async function fetchPlayers() {
   const response = await fetch(`${API_URL}/api/players`);

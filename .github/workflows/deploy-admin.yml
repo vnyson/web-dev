@@ -41,3 +41,5 @@ jobs:
           directory: sites/admin/dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           wranglerVersion: 3
+        env:
+          PUBLIC_API_URL: ${{ secrets.PUBLIC_API_URL }}

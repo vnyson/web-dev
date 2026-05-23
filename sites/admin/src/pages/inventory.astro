@@ -1,14 +1,5 @@
 ---
 import '../styles/global.css';
-import { fetchInventory } from '../lib/api';
-
-let inventory = [];
-
-try {
-  inventory = await fetchInventory();
-} catch (e) {
-  console.error('Failed to fetch inventory:', e);
-}
 ---
 
 <html lang="en">
@@ -63,29 +54,12 @@ try {
 										<th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
 									</tr>
 								</thead>
-								<tbody class="bg-white divide-y divide-gray-200">
-									{inventory.length === 0 ? (
-										<tr>
-											<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-												No inventory items yet. Add your first item to get started.
-											</td>
-										</tr>
-									) : (
-										inventory.map((item: any) => (
-											<tr>
-												<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.brand || '-'}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.category || '-'}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.price ? `$${item.price}` : '-'}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.quantity}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.status}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-													<button class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-													<button class="text-red-600 hover:text-red-900">Delete</button>
-												</td>
-											</tr>
-										))
-									)}
+								<tbody class="bg-white divide-y divide-gray-200" id="inventory-table">
+									<tr>
+										<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+											Loading inventory...
+										</td>
+									</tr>
 								</tbody>
 							</table>
 						</div>
@@ -93,5 +67,56 @@ try {
 				</div>
 			</main>
 		</div>
+
+		<script>
+			const API_URL = import.meta.env.PUBLIC_API_URL || 'https://tennis-admin-api.vnyson.workers.dev';
+			
+			async function loadInventory() {
+				try {
+					const response = await fetch(`${API_URL}/api/inventory`);
+					if (!response.ok) throw new Error('Failed to fetch inventory');
+					const inventory = await response.json();
+					
+					const tbody = document.getElementById('inventory-table');
+					if (inventory.length === 0) {
+						tbody.innerHTML = `
+							<tr>
+								<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+									No inventory items yet. Add your first item to get started.
+								</td>
+							</tr>
+						`;
+					} else {
+						tbody.innerHTML = inventory.map(item => `
+							<tr>
+								<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.brand || '-'}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.category || '-'}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.price ? `$${item.price}` : '-'}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.quantity}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.status}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+									<button class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+									<button class="text-red-600 hover:text-red-900">Delete</button>
+								</td>
+							</tr>
+						`).join('');
+					}
+				} catch (error) {
+					console.error('Failed to load inventory:', error);
+					const tbody = document.getElementById('inventory-table');
+					tbody.innerHTML = `
+						<tr>
+							<td colspan="7" class="px-6 py-4 text-center text-sm text-red-500">
+								Failed to load inventory. Please try again later.
+							</td>
+						</tr>
+					`;
+				}
+			}
+
+			// Load inventory when page loads
+			loadInventory();
+		</script>
 	</body>
 </html>
