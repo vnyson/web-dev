@@ -6,6 +6,7 @@ on:
     paths:
       - 'sites/tennis-stringing/**'
       - 'packages/design-system/**'
+      - '.github/workflows/deploy-preview.yml'
 
 jobs:
   deploy-preview:
