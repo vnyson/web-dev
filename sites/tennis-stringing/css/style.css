@@ -1,9 +1,9 @@
 /* Tennis Stringing Site - Site-specific styles */
-/* Imports the shared design system from npm package */
+/* Imports the shared design system from workspace */
 
-@import '@vnyson/design-system/css/tokens.css';
-@import '@vnyson/design-system/css/base.css';
-@import '@vnyson/design-system/css/components.css';
+@import '../../../packages/design-system/css/tokens.css';
+@import '../../../packages/design-system/css/base.css';
+@import '../../../packages/design-system/css/components.css';
 
 /* Site-specific overrides and additions */
 
