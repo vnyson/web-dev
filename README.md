@@ -134,3 +134,56 @@ See [PUBLISHING.md](PUBLISHING.md) for setup instructions.
 - Currently on GitHub Pages (public repo required for free tier)
 - Can migrate to Cloudflare Pages later for private repo + better performance
 - Custom domain can be added to either platform
+
+## Contributing
+
+### Branch Protection
+
+The `main` and `admin` branches are protected:
+
+- Direct pushes are blocked
+- Pull requests are required
+- CI checks must pass before merge
+- Branch must be up-to-date before merging
+
+### CI Checks
+
+All pull requests and pushes to protected branches run CI checks:
+
+- `yarn format:check` - Validates code formatting with Prettier
+- `yarn lint` - Runs ESLint, Stylelint, and HTMLHint
+- `yarn build` - Builds all workspaces to ensure no build errors
+
+These checks must pass before merging.
+
+### Pull Request Process
+
+1. Create a feature branch from `main` or `admin`
+2. Make your changes
+3. Run `yarn format` to fix formatting issues
+4. Run `yarn lint` to check for linting errors
+5. Run `yarn build` to ensure everything builds
+6. Manually test your changes in the browser
+7. Open a pull request using the provided template
+8. Wait for CI checks to pass
+9. Merge when ready
+
+### Manual Testing
+
+Since automated tests are not yet implemented, all changes must be manually tested:
+
+- Visual regression: Check that styling changes match expectations
+- Functional testing: Verify all interactive elements work correctly
+- Cross-browser: Test in multiple browsers if possible
+- Responsive: Test on different screen sizes
+
+### Design System Changes
+
+When modifying the design system (`packages/design-system`):
+
+- Check which sites consume the changed tokens/components
+- Test all affected sites
+- Consider whether a npm publish is needed
+- Document breaking changes in the PR description
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.

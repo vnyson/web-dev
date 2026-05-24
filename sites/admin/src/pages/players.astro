@@ -35,9 +35,83 @@ import '../styles/global.css';
 				<div class="px-4 py-6 sm:px-0">
 					<div class="flex justify-between items-center mb-6">
 						<h2 class="text-2xl font-bold text-gray-900">Players</h2>
-						<button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+						<button id="add-player-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
 							Add Player
 						</button>
+					</div>
+
+					<!-- Add/Edit Player Modal -->
+					<div id="player-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden items-center justify-center z-50">
+						<div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+							<div class="px-6 py-4 border-b border-gray-200">
+								<h3 id="modal-title" class="text-lg font-medium text-gray-900">Add Player</h3>
+							</div>
+							<form id="player-form" class="px-6 py-4 space-y-4">
+								<input type="hidden" id="player-id" name="id" />
+								<div class="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2">
+									<div class="sm:col-span-2">
+										<label for="name" class="block text-sm font-medium text-gray-700">Name *</label>
+										<input type="text" name="name" id="name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+										<input type="email" name="email" id="email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
+										<input type="text" name="phone" id="phone" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="club" class="block text-sm font-medium text-gray-700">Club</label>
+										<input type="text" name="club" id="club" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="level" class="block text-sm font-medium text-gray-700">Level</label>
+										<input type="text" name="level" id="level" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="style" class="block text-sm font-medium text-gray-700">Style</label>
+										<input type="text" name="style" id="style" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="grip" class="block text-sm font-medium text-gray-700">Grip</label>
+										<input type="text" name="grip" id="grip" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="string_pref" class="block text-sm font-medium text-gray-700">String Preference</label>
+										<input type="text" name="string_pref" id="string_pref" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="tension" class="block text-sm font-medium text-gray-700">Tension</label>
+										<input type="text" name="tension" id="tension" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="racquet" class="block text-sm font-medium text-gray-700">Racquet</label>
+										<input type="text" name="racquet" id="racquet" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="restring_interval_weeks" class="block text-sm font-medium text-gray-700">Restring Interval (weeks)</label>
+										<input type="number" name="restring_interval_weeks" id="restring_interval_weeks" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div class="sm:col-span-2">
+										<label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+										<textarea name="notes" id="notes" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+									</div>
+									<div class="sm:col-span-2">
+										<label for="inventory_preferences" class="block text-sm font-medium text-gray-700">Inventory Preferences</label>
+										<textarea name="inventory_preferences" id="inventory_preferences" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Preferred strings, grips, overgrips, etc."></textarea>
+									</div>
+								</div>
+								<div class="flex justify-end space-x-3 mt-6">
+									<button type="button" id="cancel-btn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+										Cancel
+									</button>
+									<button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+										Save
+									</button>
+								</div>
+							</form>
+						</div>
 					</div>
 
 					<div class="bg-white shadow rounded-lg">
@@ -70,6 +144,75 @@ import '../styles/global.css';
 		<script>
 			const API_URL = import.meta.env.PUBLIC_API_URL || 'https://tennis-admin-api.vnyson.workers.dev';
 			
+			// Modal elements
+			const modal = document.getElementById('player-modal');
+		 const addPlayerBtn = document.getElementById('add-player-btn');
+		 const cancelBtn = document.getElementById('cancel-btn');
+		 const playerForm = document.getElementById('player-form');
+		 const modalTitle = document.getElementById('modal-title');
+		 const playerIdInput = document.getElementById('player-id');
+			
+			// Open modal for adding player
+			addPlayerBtn.addEventListener('click', () => {
+				modalTitle.textContent = 'Add Player';
+				playerForm.reset();
+				playerIdInput.value = '';
+				modal.classList.remove('hidden');
+				modal.classList.add('flex');
+			});
+			
+			// Close modal
+			cancelBtn.addEventListener('click', () => {
+				modal.classList.add('hidden');
+				modal.classList.remove('flex');
+			});
+			
+			// Close modal on backdrop click
+			modal.addEventListener('click', (e) => {
+				if (e.target === modal) {
+					modal.classList.add('hidden');
+					modal.classList.remove('flex');
+				}
+			});
+			
+			// Handle form submission
+			playerForm.addEventListener('submit', async (e) => {
+				e.preventDefault();
+				
+				const formData = new FormData(playerForm);
+				const data = Object.fromEntries(formData.entries());
+				const playerId = playerIdInput.value;
+				
+				try {
+					let response;
+					if (playerId) {
+						// Update existing player
+						response = await fetch(`${API_URL}/api/players/${playerId}`, {
+							method: 'PUT',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(data),
+						});
+					} else {
+						// Create new player
+						response = await fetch(`${API_URL}/api/players`, {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(data),
+						});
+					}
+					
+					if (!response.ok) throw new Error('Failed to save player');
+					
+					// Close modal and reload players
+					modal.classList.add('hidden');
+					modal.classList.remove('flex');
+					loadPlayers();
+				} catch (error) {
+					console.error('Failed to save player:', error);
+					alert('Failed to save player. Please try again.');
+				}
+			});
+			
 			async function loadPlayers() {
 				try {
 					const response = await fetch(`${API_URL}/api/players`);
@@ -87,18 +230,111 @@ import '../styles/global.css';
 						`;
 					} else {
 						tbody.innerHTML = players.map(player => `
-							<tr>
-								<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${player.name}</td>
+							<tr class="player-row cursor-pointer hover:bg-gray-50" data-id="${player.id}">
+								<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+									<span class="expand-icon mr-2 text-gray-400">▶</span>${player.name}
+								</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${player.club || '-'}</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${player.level || '-'}</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${player.style || '-'}</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${player.phone || '-'}</td>
 								<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-									<button class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-									<button class="text-red-600 hover:text-red-900">Delete</button>
+									<button class="edit-btn text-indigo-600 hover:text-indigo-900 mr-3" data-id="${player.id}">Edit</button>
+									<button class="delete-btn text-red-600 hover:text-red-900" data-id="${player.id}">Delete</button>
+								</td>
+							</tr>
+							<tr class="player-details hidden" data-player-id="${player.id}">
+								<td colspan="6" class="px-6 py-4 bg-gray-50">
+									<div class="grid grid-cols-2 gap-4 text-sm mb-4">
+										<div><span class="font-medium text-gray-700">Email:</span> ${player.email || '-'}</div>
+										<div><span class="font-medium text-gray-700">Phone:</span> ${player.phone || '-'}</div>
+										<div><span class="font-medium text-gray-700">Grip:</span> ${player.grip || '-'}</div>
+										<div><span class="font-medium text-gray-700">String Preference:</span> ${player.string_pref || '-'}</div>
+										<div><span class="font-medium text-gray-700">Tension:</span> ${player.tension || '-'}</div>
+										<div><span class="font-medium text-gray-700">Racquet:</span> ${player.racquet || '-'}</div>
+										<div><span class="font-medium text-gray-700">Restring Interval:</span> ${player.restring_interval_weeks ? `${player.restring_interval_weeks} weeks` : '-'}</div>
+										<div><span class="font-medium text-gray-700">Inventory Preferences:</span> ${player.inventory_preferences || '-'}</div>
+										${player.notes ? `<div class="col-span-2"><span class="font-medium text-gray-700">Notes:</span> ${player.notes}</div>` : ''}
+									</div>
+									<div class="border-t pt-4">
+										<div class="flex justify-between items-center mb-2">
+											<h4 class="font-medium text-gray-900">Rackets</h4>
+											<button class="add-racket-btn text-indigo-600 hover:text-indigo-900 text-sm" data-player-id="${player.id}">+ Add Racket</button>
+										</div>
+										<div class="rackets-list" data-player-id="${player.id}">
+											<p class="text-sm text-gray-500">Loading rackets...</p>
+										</div>
+									</div>
+									<div class="border-t pt-4 mt-4">
+										<h4 class="font-medium text-gray-900 mb-2">Last Jobs</h4>
+										<div class="last-jobs-list" data-player-id="${player.id}">
+											<p class="text-sm text-gray-500">Loading jobs...</p>
+										</div>
+									</div>
 								</td>
 							</tr>
 						`).join('');
+						
+						// Add event listeners for expand/collapse
+						tbody.querySelectorAll('.player-row').forEach(row => {
+							row.addEventListener('click', (e) => {
+								// Don't expand if clicking on edit/delete buttons
+								if (e.target.classList.contains('edit-btn') || e.target.classList.contains('delete-btn')) {
+									return;
+								}
+								
+								const playerId = row.dataset.id;
+								const detailsRow = tbody.querySelector(`.player-details[data-player-id="${playerId}"]`);
+								const icon = row.querySelector('.expand-icon');
+								
+								if (detailsRow) {
+									const isHidden = detailsRow.classList.contains('hidden');
+									detailsRow.classList.toggle('hidden');
+									icon.textContent = detailsRow.classList.contains('hidden') ? '▶' : '▼';
+									
+									// Load rackets and last jobs when expanding
+									if (isHidden) {
+										loadRackets(playerId);
+										loadLastJobs(playerId);
+									}
+								}
+							});
+						});
+						
+						// Add event listeners for edit buttons
+						tbody.querySelectorAll('.edit-btn').forEach(btn => {
+							btn.addEventListener('click', async (e) => {
+								e.stopPropagation();
+								const playerId = e.target.dataset.id;
+								await loadPlayerForEdit(playerId);
+							});
+						});
+						
+						// Add event listeners for delete buttons
+						tbody.querySelectorAll('.delete-btn').forEach(btn => {
+							btn.addEventListener('click', async (e) => {
+								e.stopPropagation();
+								const playerId = e.target.dataset.id;
+								if (confirm('Are you sure you want to delete this player?')) {
+									await deletePlayer(playerId);
+								}
+							});
+						});
+						
+						// Add event listeners for add racket buttons
+						tbody.querySelectorAll('.add-racket-btn').forEach(btn => {
+							btn.addEventListener('click', async (e) => {
+								e.stopPropagation();
+								const playerId = e.target.dataset.playerId;
+								const brand = prompt('Enter racket brand:');
+								if (brand) {
+									const model = prompt('Enter racket model:');
+									const year = prompt('Enter racket year:');
+									const notes = prompt('Enter racket notes:');
+									await addRacket(playerId, { brand, model, year: year ? parseInt(year) : null, notes });
+								}
+							});
+						});
 					}
 				} catch (error) {
 					console.error('Failed to load players:', error);
@@ -112,7 +348,142 @@ import '../styles/global.css';
 					`;
 				}
 			}
-
+			
+			async function loadPlayerForEdit(playerId) {
+				try {
+					const response = await fetch(`${API_URL}/api/players/${playerId}`);
+					if (!response.ok) throw new Error('Failed to fetch player');
+					const player = await response.json();
+					
+					// Populate form with player data
+					modalTitle.textContent = 'Edit Player';
+					playerIdInput.value = player.id;
+					document.getElementById('name').value = player.name || '';
+					document.getElementById('email').value = player.email || '';
+					document.getElementById('phone').value = player.phone || '';
+					document.getElementById('club').value = player.club || '';
+					document.getElementById('level').value = player.level || '';
+					document.getElementById('style').value = player.style || '';
+					document.getElementById('grip').value = player.grip || '';
+					document.getElementById('string_pref').value = player.string_pref || '';
+					document.getElementById('tension').value = player.tension || '';
+					document.getElementById('racquet').value = player.racquet || '';
+					document.getElementById('restring_interval_weeks').value = player.restring_interval_weeks || '';
+					document.getElementById('notes').value = player.notes || '';
+					document.getElementById('inventory_preferences').value = player.inventory_preferences || '';
+					
+					// Show modal
+					modal.classList.remove('hidden');
+					modal.classList.add('flex');
+				} catch (error) {
+					console.error('Failed to load player for edit:', error);
+					alert('Failed to load player. Please try again.');
+				}
+			}
+			
+			async function deletePlayer(playerId) {
+				try {
+					const response = await fetch(`${API_URL}/api/players/${playerId}`, {
+						method: 'DELETE',
+					});
+					if (!response.ok) throw new Error('Failed to delete player');
+					loadPlayers();
+				} catch (error) {
+					console.error('Failed to delete player:', error);
+					alert('Failed to delete player. Please try again.');
+				}
+			}
+			
+			async function loadRackets(playerId) {
+				try {
+					const response = await fetch(`${API_URL}/api/rackets?player_id=${playerId}`);
+					if (!response.ok) throw new Error('Failed to fetch rackets');
+					const rackets = await response.json();
+					
+					const racketsList = document.querySelector(`.rackets-list[data-player-id="${playerId}"]`);
+					if (rackets.length === 0) {
+						racketsList.innerHTML = '<p class="text-sm text-gray-500">No rackets yet.</p>';
+					} else {
+						racketsList.innerHTML = rackets.map(racket => `
+							<div class="flex justify-between items-center py-1 border-b last:border-0">
+								<span class="text-sm">${racket.brand || ''} ${racket.model || ''} ${racket.year ? `(${racket.year})` : ''}</span>
+								<div class="flex space-x-2">
+									<button class="delete-racket-btn text-red-600 hover:text-red-900 text-xs" data-racket-id="${racket.id}" data-player-id="${playerId}">Delete</button>
+								</div>
+							</div>
+						`).join('');
+						
+						// Add event listeners for delete racket buttons
+						racketsList.querySelectorAll('.delete-racket-btn').forEach(btn => {
+							btn.addEventListener('click', async (e) => {
+								e.stopPropagation();
+								const racketId = e.target.dataset.racketId;
+								const playerId = e.target.dataset.playerId;
+								if (confirm('Are you sure you want to delete this racket?')) {
+									await deleteRacket(racketId, playerId);
+								}
+							});
+						});
+					}
+				} catch (error) {
+					console.error('Failed to load rackets:', error);
+					const racketsList = document.querySelector(`.rackets-list[data-player-id="${playerId}"]`);
+					racketsList.innerHTML = '<p class="text-sm text-red-500">Failed to load rackets.</p>';
+				}
+			}
+			
+			async function addRacket(playerId, data) {
+				try {
+					const response = await fetch(`${API_URL}/api/rackets`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ player_id: playerId, ...data }),
+					});
+					if (!response.ok) throw new Error('Failed to add racket');
+					loadRackets(playerId);
+				} catch (error) {
+					console.error('Failed to add racket:', error);
+					alert('Failed to add racket. Please try again.');
+				}
+			}
+			
+			async function deleteRacket(racketId, playerId) {
+				try {
+					const response = await fetch(`${API_URL}/api/rackets/${racketId}`, {
+						method: 'DELETE',
+					});
+					if (!response.ok) throw new Error('Failed to delete racket');
+					loadRackets(playerId);
+				} catch (error) {
+					console.error('Failed to delete racket:', error);
+					alert('Failed to delete racket. Please try again.');
+				}
+			}
+			
+			async function loadLastJobs(playerId) {
+				try {
+					const response = await fetch(`${API_URL}/api/players?last_jobs=${playerId}`);
+					if (!response.ok) throw new Error('Failed to fetch last jobs');
+					const jobs = await response.json();
+					
+					const lastJobsList = document.querySelector(`.last-jobs-list[data-player-id="${playerId}"]`);
+					if (jobs.length === 0) {
+						lastJobsList.innerHTML = '<p class="text-sm text-gray-500">No jobs yet.</p>';
+					} else {
+						lastJobsList.innerHTML = jobs.map(job => `
+							<div class="flex justify-between items-center py-1 border-b last:border-0">
+								<span class="text-sm">${job.racquet || 'Unknown'} - ${job.string_mains || job.string || 'Unknown'} @ ${job.tension_mains || job.tension || '-'}${job.tension_unit || ''}</span>
+								<span class="text-xs text-gray-500">${new Date(job.created_at).toLocaleDateString()}</span>
+							</div>
+						`).join('');
+					}
+				} catch (error) {
+					console.error('Failed to load last jobs:', error);
+					const lastJobsList = document.querySelector(`.last-jobs-list[data-player-id="${playerId}"]`);
+					lastJobsList.innerHTML = '<p class="text-sm text-red-500">Failed to load jobs.</p>';
+				}
+			}
+			
 			// Load players when page loads
 			loadPlayers();
 		</script>
