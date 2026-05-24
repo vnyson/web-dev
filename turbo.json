@@ -13,6 +13,16 @@
     "lint:html": {},
     "format": {},
     "format:check": {},
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "test:ui": {
+      "dependsOn": ["^build"],
+      "persistent": true
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"]
+    },
     "dev": {
       "cache": false,
       "persistent": true

@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, admin]
+  push:
+    branches: [main, admin]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    name: Run CI checks
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Yarn
+        run: corepack enable && corepack prepare yarn@4.5.0 --activate
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Check formatting
+        run: yarn format:check
+
+      - name: Run linters
+        run: yarn lint
+
+      - name: Build all workspaces
+        run: yarn build

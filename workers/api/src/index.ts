@@ -32,13 +32,16 @@ export default {
     if (path.startsWith('/api/history')) {
       return handleHistory(request, env, corsHeaders);
     }
+    if (path.startsWith('/api/rackets')) {
+      return handleRackets(request, env, corsHeaders);
+    }
 
     // 404 for unknown routes
     return new Response('Not Found', { status: 404, headers: corsHeaders });
   },
 };
 
-async function handlePlayers(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
+export async function handlePlayers(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
   const url = new URL(request.url);
   const id = url.pathname.split('/').pop();
 
@@ -54,11 +57,18 @@ async function handlePlayers(request: Request, env: Env, corsHeaders: HeadersIni
     return new Response(JSON.stringify(result.results), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 
+  // Get player's last jobs
+  if (request.method === 'GET' && url.searchParams.has('last_jobs')) {
+    const playerId = url.searchParams.get('last_jobs');
+    const result = await env.DB.prepare('SELECT * FROM stringing WHERE player_id = ? ORDER BY created_at DESC LIMIT 5').bind(playerId).all();
+    return new Response(JSON.stringify(result.results), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+
   if (request.method === 'POST') {
     const body = await request.json();
     const stmt = env.DB.prepare(`
-      INSERT INTO players (id, name, club, level, style, grip, string_pref, tension, racquet, notes, email, phone, restring_interval_weeks, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO players (id, name, club, level, style, grip, string_pref, tension, racquet, notes, email, phone, restring_interval_weeks, inventory_preferences, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     await stmt.bind(
       body.id || crypto.randomUUID(),
@@ -74,6 +84,7 @@ async function handlePlayers(request: Request, env: Env, corsHeaders: HeadersIni
       body.email || null,
       body.phone || null,
       body.restring_interval_weeks || null,
+      body.inventory_preferences || null,
       body.created_at || new Date().toISOString(),
       body.updated_at || new Date().toISOString()
     ).run();
@@ -83,7 +94,7 @@ async function handlePlayers(request: Request, env: Env, corsHeaders: HeadersIni
   if (request.method === 'PUT') {
     const body = await request.json();
     const stmt = env.DB.prepare(`
-      UPDATE players SET name = ?, club = ?, level = ?, style = ?, grip = ?, string_pref = ?, tension = ?, racquet = ?, notes = ?, email = ?, phone = ?, restring_interval_weeks = ?, updated_at = ?
+      UPDATE players SET name = ?, club = ?, level = ?, style = ?, grip = ?, string_pref = ?, tension = ?, racquet = ?, notes = ?, email = ?, phone = ?, restring_interval_weeks = ?, inventory_preferences = ?, updated_at = ?
       WHERE id = ?
     `);
     await stmt.bind(
@@ -99,6 +110,7 @@ async function handlePlayers(request: Request, env: Env, corsHeaders: HeadersIni
       body.email || null,
       body.phone || null,
       body.restring_interval_weeks || null,
+      body.inventory_preferences || null,
       new Date().toISOString(),
       id
     ).run();
@@ -113,7 +125,7 @@ async function handlePlayers(request: Request, env: Env, corsHeaders: HeadersIni
   return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
 }
 
-async function handleStringing(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
+export async function handleStringing(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
   const url = new URL(request.url);
   const id = url.pathname.split('/').pop();
 
@@ -193,7 +205,7 @@ async function handleStringing(request: Request, env: Env, corsHeaders: HeadersI
   return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
 }
 
-async function handleInventory(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
+export async function handleInventory(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
   const url = new URL(request.url);
   const id = url.pathname.split('/').pop();
 
@@ -256,7 +268,7 @@ async function handleInventory(request: Request, env: Env, corsHeaders: HeadersI
   return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
 }
 
-async function handleHistory(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
+export async function handleHistory(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
   const url = new URL(request.url);
   const id = url.pathname.split('/').pop();
 
@@ -306,6 +318,69 @@ async function handleHistory(request: Request, env: Env, corsHeaders: HeadersIni
 
   if (request.method === 'DELETE') {
     await env.DB.prepare('DELETE FROM history WHERE id = ?').bind(id).run();
+    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+
+  return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+}
+
+export async function handleRackets(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
+  const url = new URL(request.url);
+  const id = url.pathname.split('/').pop();
+  const playerId = url.searchParams.get('player_id');
+
+  if (request.method === 'GET') {
+    if (id && id !== 'rackets') {
+      const result = await env.DB.prepare('SELECT * FROM rackets WHERE id = ?').bind(id).first();
+      if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
+      return new Response(JSON.stringify(result), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    if (playerId) {
+      const result = await env.DB.prepare('SELECT * FROM rackets WHERE player_id = ? ORDER BY created_at DESC').bind(playerId).all();
+      return new Response(JSON.stringify(result.results), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const result = await env.DB.prepare('SELECT * FROM rackets ORDER BY created_at DESC').all();
+    return new Response(JSON.stringify(result.results), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+
+  if (request.method === 'POST') {
+    const body = await request.json();
+    const stmt = env.DB.prepare(`
+      INSERT INTO rackets (id, player_id, brand, model, year, notes, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    await stmt.bind(
+      body.id || crypto.randomUUID(),
+      body.player_id,
+      body.brand || null,
+      body.model || null,
+      body.year || null,
+      body.notes || null,
+      body.created_at || new Date().toISOString(),
+      body.updated_at || new Date().toISOString()
+    ).run();
+    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+
+  if (request.method === 'PUT') {
+    const body = await request.json();
+    const stmt = env.DB.prepare(`
+      UPDATE rackets SET brand = ?, model = ?, year = ?, notes = ?, updated_at = ?
+      WHERE id = ?
+    `);
+    await stmt.bind(
+      body.brand || null,
+      body.model || null,
+      body.year || null,
+      body.notes || null,
+      new Date().toISOString(),
+      id
+    ).run();
+    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+
+  if (request.method === 'DELETE') {
+    await env.DB.prepare('DELETE FROM rackets WHERE id = ?').bind(id).run();
     return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 

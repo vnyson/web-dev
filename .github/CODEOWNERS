@@ -1,0 +1,27 @@
+# Code Owners
+# This file defines code ownership for automatic PR review assignments
+
+# Design system - shared CSS tokens and components
+packages/design-system/** @vnyson
+
+# Tennis stringing site
+sites/tennis-stringing/** @vnyson
+
+# Admin site
+sites/admin/** @vnyson
+
+# Workers API
+workers/api/** @vnyson
+
+# GitHub workflows and CI/CD
+.github/workflows/** @vnyson
+
+# Root configuration files
+*.json @vnyson
+*.cjs @vnyson
+*.yml @vnyson
+.eslintrc* @vnyson
+.prettierrc* @vnyson
+.stylelintrc* @vnyson
+.editorconfig @vnyson
+turbo.json @vnyson
