@@ -9,14 +9,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'dist/',
-        '.turbo/',
-        '**/*.config.*',
-        '**/*.astro',
-        'test/',
-      ],
+      exclude: ['node_modules/', 'dist/', '.turbo/', '**/*.config.*', '**/*.astro', 'test/'],
     },
   },
   resolve: {

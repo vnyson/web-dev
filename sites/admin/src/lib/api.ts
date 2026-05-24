@@ -73,3 +73,28 @@ export async function updateInventoryItem(id: string, data: any) {
   if (!response.ok) throw new Error('Failed to update inventory item');
   return response.json();
 }
+
+export async function fetchRackets(playerId?: string) {
+  const url = playerId ? `${API_URL}/api/rackets?player_id=${playerId}` : `${API_URL}/api/rackets`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Failed to fetch rackets');
+  return response.json();
+}
+
+export async function createRacket(data: any) {
+  const response = await fetch(`${API_URL}/api/rackets`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to create racket');
+  return response.json();
+}
+
+export async function deleteRacket(id: string) {
+  const response = await fetch(`${API_URL}/api/rackets/${id}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) throw new Error('Failed to delete racket');
+  return response.json();
+}

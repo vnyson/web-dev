@@ -29,7 +29,7 @@ describe('API Client - Players', () => {
     const result = await fetchPlayers();
     expect(result).toEqual(mockPlayers);
     expect(global.fetch).toHaveBeenCalledWith(
-      'https://tennis-admin-api.vnyson.workers.dev/api/players'
+      'https://tennis-admin-api.vnyson.workers.dev/api/players',
     );
   });
 
@@ -55,7 +55,7 @@ describe('API Client - Players', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ name: 'Jane Doe' }),
-      })
+      }),
     );
   });
 
@@ -83,7 +83,7 @@ describe('API Client - Stringing', () => {
     const result = await fetchStringing();
     expect(result).toEqual(mockJobs);
     expect(global.fetch).toHaveBeenCalledWith(
-      'https://tennis-admin-api.vnyson.workers.dev/api/stringing'
+      'https://tennis-admin-api.vnyson.workers.dev/api/stringing',
     );
   });
 
@@ -102,14 +102,17 @@ describe('API Client - Stringing', () => {
       json: async () => mockResponse,
     });
 
-    const result = await createStringingJob({ player_name: 'Jane Doe', racquet: 'Wilson Pro Staff' });
+    const result = await createStringingJob({
+      player_name: 'Jane Doe',
+      racquet: 'Wilson Pro Staff',
+    });
     expect(result).toEqual(mockResponse);
     expect(global.fetch).toHaveBeenCalledWith(
       'https://tennis-admin-api.vnyson.workers.dev/api/stringing',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ player_name: 'Jane Doe', racquet: 'Wilson Pro Staff' }),
-      })
+      }),
     );
   });
 
@@ -120,7 +123,10 @@ describe('API Client - Stringing', () => {
       json: async () => mockResponse,
     });
 
-    const result = await createStringingJob({ player_name: 'Jane Doe', racquet: 'Wilson Pro Staff' });
+    const result = await createStringingJob({
+      player_name: 'Jane Doe',
+      racquet: 'Wilson Pro Staff',
+    });
     expect(result).toEqual(mockResponse);
     const callArgs = (global.fetch as any).mock.calls[0];
     const body = JSON.parse(callArgs[1].body);
@@ -134,7 +140,11 @@ describe('API Client - Stringing', () => {
       json: async () => mockResponse,
     });
 
-    const result = await createStringingJob({ player_name: 'Jane Doe', racquet: 'Wilson Pro Staff', priority: 'rush' });
+    const result = await createStringingJob({
+      player_name: 'Jane Doe',
+      racquet: 'Wilson Pro Staff',
+      priority: 'rush',
+    });
     expect(result).toEqual(mockResponse);
     const callArgs = (global.fetch as any).mock.calls[0];
     const body = JSON.parse(callArgs[1].body);
@@ -148,7 +158,11 @@ describe('API Client - Stringing', () => {
       json: async () => mockResponse,
     });
 
-    const result = await createStringingJob({ player_id: 'player-123', player_name: 'Jane Doe', racquet: 'Wilson Pro Staff' });
+    const result = await createStringingJob({
+      player_id: 'player-123',
+      player_name: 'Jane Doe',
+      racquet: 'Wilson Pro Staff',
+    });
     expect(result).toEqual(mockResponse);
     const callArgs = (global.fetch as any).mock.calls[0];
     const body = JSON.parse(callArgs[1].body);
@@ -183,17 +197,17 @@ describe('Queue Ordering Logic', () => {
       { id: '4', status: 'waiting_for_pickup', priority: 'normal' },
     ];
 
-    const queueJobs = jobs.filter(job => job.status === 'in_queue');
+    const queueJobs = jobs.filter((job) => job.status === 'in_queue');
 
     expect(queueJobs.length).toBe(2);
-    expect(queueJobs.map(j => j.id)).toEqual(['1', '3']);
+    expect(queueJobs.map((j) => j.id)).toEqual(['1', '3']);
   });
 
   it('should calculate ETA based on queue position', () => {
     const AVERAGE_TIME_PER_JOB_MINUTES = 30;
     const position = 3;
     const etaMinutes = position * AVERAGE_TIME_PER_JOB_MINUTES;
-    
+
     expect(etaMinutes).toBe(90);
   });
 
@@ -201,10 +215,9 @@ describe('Queue Ordering Logic', () => {
     const etaMinutes = 90;
     const etaHours = Math.floor(etaMinutes / 60);
     const etaRemainingMinutes = etaMinutes % 60;
-    const etaString = etaHours > 0 
-      ? `${etaHours}h ${etaRemainingMinutes}m`
-      : `${etaRemainingMinutes}m`;
-    
+    const etaString =
+      etaHours > 0 ? `${etaHours}h ${etaRemainingMinutes}m` : `${etaRemainingMinutes}m`;
+
     expect(etaString).toBe('1h 30m');
   });
 
@@ -212,10 +225,9 @@ describe('Queue Ordering Logic', () => {
     const etaMinutes = 30;
     const etaHours = Math.floor(etaMinutes / 60);
     const etaRemainingMinutes = etaMinutes % 60;
-    const etaString = etaHours > 0 
-      ? `${etaHours}h ${etaRemainingMinutes}m`
-      : `${etaRemainingMinutes}m`;
-    
+    const etaString =
+      etaHours > 0 ? `${etaHours}h ${etaRemainingMinutes}m` : `${etaRemainingMinutes}m`;
+
     expect(etaString).toBe('30m');
   });
 });
@@ -225,28 +237,28 @@ describe('Inventory Consumption Logic', () => {
     const initialQuantity = 10;
     const consumed = 1;
     const remaining = initialQuantity - consumed;
-    
+
     expect(remaining).toBe(9);
   });
 
   it('should identify low stock when quantity <= 5', () => {
     const quantity = 5;
     const isLowStock = quantity <= 5;
-    
+
     expect(isLowStock).toBe(true);
   });
 
   it('should not identify low stock when quantity > 5', () => {
     const quantity = 6;
     const isLowStock = quantity <= 5;
-    
+
     expect(isLowStock).toBe(false);
   });
 
   it('should calculate rollback quantity', () => {
     const consumedQuantity = 2;
     const rollbackQuantity = consumedQuantity;
-    
+
     expect(rollbackQuantity).toBe(2);
   });
 
@@ -256,7 +268,7 @@ describe('Inventory Consumption Logic', () => {
     });
 
     await expect(createStringingJob({ player_name: 'Jane Doe' })).rejects.toThrow(
-      'Failed to create stringing job'
+      'Failed to create stringing job',
     );
   });
 
@@ -274,7 +286,7 @@ describe('Inventory Consumption Logic', () => {
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ status: 'completed' }),
-      })
+      }),
     );
   });
 
@@ -284,7 +296,7 @@ describe('Inventory Consumption Logic', () => {
     });
 
     await expect(updateStringingJob('1', { status: 'completed' })).rejects.toThrow(
-      'Failed to update stringing job'
+      'Failed to update stringing job',
     );
   });
 });
@@ -304,7 +316,7 @@ describe('API Client - Inventory', () => {
     const result = await fetchInventory();
     expect(result).toEqual(mockInventory);
     expect(global.fetch).toHaveBeenCalledWith(
-      'https://tennis-admin-api.vnyson.workers.dev/api/inventory'
+      'https://tennis-admin-api.vnyson.workers.dev/api/inventory',
     );
   });
 
@@ -330,7 +342,7 @@ describe('API Client - Inventory', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ name: 'Babolat RPM', quantity: 10 }),
-      })
+      }),
     );
   });
 
@@ -340,7 +352,7 @@ describe('API Client - Inventory', () => {
     });
 
     await expect(createInventoryItem({ name: 'Babolat RPM' })).rejects.toThrow(
-      'Failed to create inventory item'
+      'Failed to create inventory item',
     );
   });
 
@@ -358,7 +370,7 @@ describe('API Client - Inventory', () => {
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ quantity: 5 }),
-      })
+      }),
     );
   });
 
@@ -368,7 +380,7 @@ describe('API Client - Inventory', () => {
     });
 
     await expect(updateInventoryItem('1', { quantity: 5 })).rejects.toThrow(
-      'Failed to update inventory item'
+      'Failed to update inventory item',
     );
   });
 });
@@ -388,7 +400,7 @@ describe('API Client - History', () => {
     const result = await fetchHistory();
     expect(result).toEqual(mockHistory);
     expect(global.fetch).toHaveBeenCalledWith(
-      'https://tennis-admin-api.vnyson.workers.dev/api/history'
+      'https://tennis-admin-api.vnyson.workers.dev/api/history',
     );
   });
 

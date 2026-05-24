@@ -41,7 +41,11 @@ export default {
   },
 };
 
-export async function handlePlayers(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
+export async function handlePlayers(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
   const url = new URL(request.url);
   const id = url.pathname.split('/').pop();
 
@@ -50,18 +54,28 @@ export async function handlePlayers(request: Request, env: Env, corsHeaders: Hea
       // Get single player
       const result = await env.DB.prepare('SELECT * FROM players WHERE id = ?').bind(id).first();
       if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
-      return new Response(JSON.stringify(result), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
     // Get all players
     const result = await env.DB.prepare('SELECT * FROM players ORDER BY name').all();
-    return new Response(JSON.stringify(result.results), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify(result.results), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   // Get player's last jobs
   if (request.method === 'GET' && url.searchParams.has('last_jobs')) {
     const playerId = url.searchParams.get('last_jobs');
-    const result = await env.DB.prepare('SELECT * FROM stringing WHERE player_id = ? ORDER BY created_at DESC LIMIT 5').bind(playerId).all();
-    return new Response(JSON.stringify(result.results), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    const result = await env.DB.prepare(
+      'SELECT * FROM stringing WHERE player_id = ? ORDER BY created_at DESC LIMIT 5',
+    )
+      .bind(playerId)
+      .all();
+    return new Response(JSON.stringify(result.results), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'POST') {
@@ -70,25 +84,29 @@ export async function handlePlayers(request: Request, env: Env, corsHeaders: Hea
       INSERT INTO players (id, name, club, level, style, grip, string_pref, tension, racquet, notes, email, phone, restring_interval_weeks, inventory_preferences, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    await stmt.bind(
-      body.id || crypto.randomUUID(),
-      body.name,
-      body.club || null,
-      body.level || null,
-      body.style || null,
-      body.grip || null,
-      body.string_pref || null,
-      body.tension || null,
-      body.racquet || null,
-      body.notes || null,
-      body.email || null,
-      body.phone || null,
-      body.restring_interval_weeks || null,
-      body.inventory_preferences || null,
-      body.created_at || new Date().toISOString(),
-      body.updated_at || new Date().toISOString()
-    ).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    await stmt
+      .bind(
+        body.id || crypto.randomUUID(),
+        body.name,
+        body.club || null,
+        body.level || null,
+        body.style || null,
+        body.grip || null,
+        body.string_pref || null,
+        body.tension || null,
+        body.racquet || null,
+        body.notes || null,
+        body.email || null,
+        body.phone || null,
+        body.restring_interval_weeks || null,
+        body.inventory_preferences || null,
+        body.created_at || new Date().toISOString(),
+        body.updated_at || new Date().toISOString(),
+      )
+      .run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'PUT') {
@@ -97,35 +115,45 @@ export async function handlePlayers(request: Request, env: Env, corsHeaders: Hea
       UPDATE players SET name = ?, club = ?, level = ?, style = ?, grip = ?, string_pref = ?, tension = ?, racquet = ?, notes = ?, email = ?, phone = ?, restring_interval_weeks = ?, inventory_preferences = ?, updated_at = ?
       WHERE id = ?
     `);
-    await stmt.bind(
-      body.name,
-      body.club || null,
-      body.level || null,
-      body.style || null,
-      body.grip || null,
-      body.string_pref || null,
-      body.tension || null,
-      body.racquet || null,
-      body.notes || null,
-      body.email || null,
-      body.phone || null,
-      body.restring_interval_weeks || null,
-      body.inventory_preferences || null,
-      new Date().toISOString(),
-      id
-    ).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    await stmt
+      .bind(
+        body.name,
+        body.club || null,
+        body.level || null,
+        body.style || null,
+        body.grip || null,
+        body.string_pref || null,
+        body.tension || null,
+        body.racquet || null,
+        body.notes || null,
+        body.email || null,
+        body.phone || null,
+        body.restring_interval_weeks || null,
+        body.inventory_preferences || null,
+        new Date().toISOString(),
+        id,
+      )
+      .run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'DELETE') {
     await env.DB.prepare('DELETE FROM players WHERE id = ?').bind(id).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
 }
 
-export async function handleStringing(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
+export async function handleStringing(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
   const url = new URL(request.url);
   const id = url.pathname.split('/').pop();
 
@@ -133,79 +161,95 @@ export async function handleStringing(request: Request, env: Env, corsHeaders: H
     if (id && id !== 'stringing') {
       const result = await env.DB.prepare('SELECT * FROM stringing WHERE id = ?').bind(id).first();
       if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
-      return new Response(JSON.stringify(result), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
     const result = await env.DB.prepare('SELECT * FROM stringing ORDER BY created_at DESC').all();
-    return new Response(JSON.stringify(result.results), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify(result.results), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'POST') {
     const body = await request.json();
     const jobId = body.id || crypto.randomUUID();
-    
+
     // Insert stringing job
     const stmt = env.DB.prepare(`
       INSERT INTO stringing (id, player_id, racquet, string_mains, string_crosses, gauge_mains, gauge_crosses, tension_mains, tension_crosses, tension_unit, tension_unit_crosses, prestretch, prestretch_crosses, strung_at, notes, status, priority, created_at, player_own_string, labour_cost, material_cost, charge_total, string_tier, service_label, regrip, logo_color, pickup_time, picked_up_at, stringer_name, knots, player_name)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    await stmt.bind(
-      jobId,
-      body.player_id || null,
-      body.racquet || null,
-      body.string_mains || null,
-      body.string_crosses || null,
-      body.gauge_mains || null,
-      body.gauge_crosses || null,
-      body.tension_mains || null,
-      body.tension_crosses || null,
-      body.tension_unit || null,
-      body.tension_unit_crosses || null,
-      body.prestretch || null,
-      body.prestretch_crosses || null,
-      body.strung_at || null,
-      body.notes || null,
-      body.status || 'in_queue',
-      body.priority || 'normal',
-      body.created_at || new Date().toISOString(),
-      body.player_own_string || 0,
-      body.labour_cost || null,
-      body.material_cost || null,
-      body.charge_total || null,
-      body.string_tier || 'regular',
-      body.service_label || null,
-      body.regrip || 0,
-      body.logo_color || null,
-      body.pickup_time || null,
-      body.picked_up_at || null,
-      body.stringer_name || null,
-      body.knots || null,
-      body.player_name || null
-    ).run();
+    await stmt
+      .bind(
+        jobId,
+        body.player_id || null,
+        body.racquet || null,
+        body.string_mains || null,
+        body.string_crosses || null,
+        body.gauge_mains || null,
+        body.gauge_crosses || null,
+        body.tension_mains || null,
+        body.tension_crosses || null,
+        body.tension_unit || null,
+        body.tension_unit_crosses || null,
+        body.prestretch || null,
+        body.prestretch_crosses || null,
+        body.strung_at || null,
+        body.notes || null,
+        body.status || 'in_queue',
+        body.priority || 'normal',
+        body.created_at || new Date().toISOString(),
+        body.player_own_string || 0,
+        body.labour_cost || null,
+        body.material_cost || null,
+        body.charge_total || null,
+        body.string_tier || 'regular',
+        body.service_label || null,
+        body.regrip || 0,
+        body.logo_color || null,
+        body.pickup_time || null,
+        body.picked_up_at || null,
+        body.stringer_name || null,
+        body.knots || null,
+        body.player_name || null,
+      )
+      .run();
 
     // Consume inventory if strings are provided and player doesn't own strings
     if (body.string_mains && !body.player_own_string) {
       try {
         // Find inventory item by string name
-        const inventoryItem = await env.DB.prepare('SELECT * FROM inventory WHERE name = ? AND category = ?').bind(body.string_mains, 'string').first();
-        
+        const inventoryItem = await env.DB.prepare(
+          'SELECT * FROM inventory WHERE name = ? AND category = ?',
+        )
+          .bind(body.string_mains, 'string')
+          .first();
+
         if (inventoryItem && inventoryItem.quantity > 0) {
           // Decrement inventory quantity
-          await env.DB.prepare('UPDATE inventory SET quantity = quantity - 1, updated_at = ? WHERE id = ?')
+          await env.DB.prepare(
+            'UPDATE inventory SET quantity = quantity - 1, updated_at = ? WHERE id = ?',
+          )
             .bind(new Date().toISOString(), inventoryItem.id)
             .run();
-          
+
           // Record inventory consumption
-          await env.DB.prepare(`
+          await env.DB.prepare(
+            `
             INSERT INTO inventory_consumption (id, inventory_id, stringing_job_id, quantity_consumed, consumed_at, notes)
             VALUES (?, ?, ?, ?, ?, ?)
-          `).bind(
-            crypto.randomUUID(),
-            inventoryItem.id,
-            jobId,
-            1,
-            new Date().toISOString(),
-            `Stringing job for ${body.player_name || 'player'}`
-          ).run();
+          `,
+          )
+            .bind(
+              crypto.randomUUID(),
+              inventoryItem.id,
+              jobId,
+              1,
+              new Date().toISOString(),
+              `Stringing job for ${body.player_name || 'player'}`,
+            )
+            .run();
         }
       } catch (error) {
         console.error('Error consuming inventory:', error);
@@ -215,31 +259,43 @@ export async function handleStringing(request: Request, env: Env, corsHeaders: H
 
     if (body.string_crosses && !body.player_own_string) {
       try {
-        const inventoryItem = await env.DB.prepare('SELECT * FROM inventory WHERE name = ? AND category = ?').bind(body.string_crosses, 'string').first();
-        
+        const inventoryItem = await env.DB.prepare(
+          'SELECT * FROM inventory WHERE name = ? AND category = ?',
+        )
+          .bind(body.string_crosses, 'string')
+          .first();
+
         if (inventoryItem && inventoryItem.quantity > 0) {
-          await env.DB.prepare('UPDATE inventory SET quantity = quantity - 1, updated_at = ? WHERE id = ?')
+          await env.DB.prepare(
+            'UPDATE inventory SET quantity = quantity - 1, updated_at = ? WHERE id = ?',
+          )
             .bind(new Date().toISOString(), inventoryItem.id)
             .run();
-          
-          await env.DB.prepare(`
+
+          await env.DB.prepare(
+            `
             INSERT INTO inventory_consumption (id, inventory_id, stringing_job_id, quantity_consumed, consumed_at, notes)
             VALUES (?, ?, ?, ?, ?, ?)
-          `).bind(
-            crypto.randomUUID(),
-            inventoryItem.id,
-            jobId,
-            1,
-            new Date().toISOString(),
-            `Stringing job for ${body.player_name || 'player'}`
-          ).run();
+          `,
+          )
+            .bind(
+              crypto.randomUUID(),
+              inventoryItem.id,
+              jobId,
+              1,
+              new Date().toISOString(),
+              `Stringing job for ${body.player_name || 'player'}`,
+            )
+            .run();
         }
       } catch (error) {
         console.error('Error consuming inventory:', error);
       }
     }
 
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'PUT') {
@@ -248,42 +304,54 @@ export async function handleStringing(request: Request, env: Env, corsHeaders: H
       UPDATE stringing SET status = ?, strung_at = ?, picked_up_at = ?, notes = ?
       WHERE id = ?
     `);
-    await stmt.bind(
-      body.status,
-      body.strung_at || null,
-      body.picked_up_at || null,
-      body.notes || null,
-      id
-    ).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    await stmt
+      .bind(body.status, body.strung_at || null, body.picked_up_at || null, body.notes || null, id)
+      .run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'DELETE') {
     // Rollback inventory consumption for this job
-    const consumptions = await env.DB.prepare('SELECT * FROM inventory_consumption WHERE stringing_job_id = ?').bind(id).all();
-    
+    const consumptions = await env.DB.prepare(
+      'SELECT * FROM inventory_consumption WHERE stringing_job_id = ?',
+    )
+      .bind(id)
+      .all();
+
     for (const consumption of consumptions.results) {
       try {
-        await env.DB.prepare('UPDATE inventory SET quantity = quantity + ?, updated_at = ? WHERE id = ?')
+        await env.DB.prepare(
+          'UPDATE inventory SET quantity = quantity + ?, updated_at = ? WHERE id = ?',
+        )
           .bind(consumption.quantity_consumed, new Date().toISOString(), consumption.inventory_id)
           .run();
       } catch (error) {
         console.error('Error rolling back inventory:', error);
       }
     }
-    
+
     // Delete inventory consumption records
-    await env.DB.prepare('DELETE FROM inventory_consumption WHERE stringing_job_id = ?').bind(id).run();
-    
+    await env.DB.prepare('DELETE FROM inventory_consumption WHERE stringing_job_id = ?')
+      .bind(id)
+      .run();
+
     // Delete the stringing job
     await env.DB.prepare('DELETE FROM stringing WHERE id = ?').bind(id).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
 }
 
-export async function handleInventory(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
+export async function handleInventory(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
   const url = new URL(request.url);
   const id = url.pathname.split('/').pop();
 
@@ -291,10 +359,14 @@ export async function handleInventory(request: Request, env: Env, corsHeaders: H
     if (id && id !== 'inventory') {
       const result = await env.DB.prepare('SELECT * FROM inventory WHERE id = ?').bind(id).first();
       if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
-      return new Response(JSON.stringify(result), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
     const result = await env.DB.prepare('SELECT * FROM inventory ORDER BY category, name').all();
-    return new Response(JSON.stringify(result.results), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify(result.results), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'POST') {
@@ -303,19 +375,23 @@ export async function handleInventory(request: Request, env: Env, corsHeaders: H
       INSERT INTO inventory (id, name, brand, category, price, quantity, status, notes, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    await stmt.bind(
-      body.id || crypto.randomUUID(),
-      body.name,
-      body.brand || null,
-      body.category || null,
-      body.price || null,
-      body.quantity || 0,
-      body.status || 'in_stock',
-      body.notes || null,
-      body.created_at || new Date().toISOString(),
-      body.updated_at || new Date().toISOString()
-    ).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    await stmt
+      .bind(
+        body.id || crypto.randomUUID(),
+        body.name,
+        body.brand || null,
+        body.category || null,
+        body.price || null,
+        body.quantity || 0,
+        body.status || 'in_stock',
+        body.notes || null,
+        body.created_at || new Date().toISOString(),
+        body.updated_at || new Date().toISOString(),
+      )
+      .run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'PUT') {
@@ -324,29 +400,39 @@ export async function handleInventory(request: Request, env: Env, corsHeaders: H
       UPDATE inventory SET name = ?, brand = ?, category = ?, price = ?, quantity = ?, status = ?, notes = ?, updated_at = ?
       WHERE id = ?
     `);
-    await stmt.bind(
-      body.name,
-      body.brand || null,
-      body.category || null,
-      body.price || null,
-      body.quantity || 0,
-      body.status || 'in_stock',
-      body.notes || null,
-      new Date().toISOString(),
-      id
-    ).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    await stmt
+      .bind(
+        body.name,
+        body.brand || null,
+        body.category || null,
+        body.price || null,
+        body.quantity || 0,
+        body.status || 'in_stock',
+        body.notes || null,
+        new Date().toISOString(),
+        id,
+      )
+      .run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'DELETE') {
     await env.DB.prepare('DELETE FROM inventory WHERE id = ?').bind(id).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
 }
 
-export async function handleHistory(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
+export async function handleHistory(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
   const url = new URL(request.url);
   const id = url.pathname.split('/').pop();
 
@@ -354,10 +440,14 @@ export async function handleHistory(request: Request, env: Env, corsHeaders: Hea
     if (id && id !== 'history') {
       const result = await env.DB.prepare('SELECT * FROM history WHERE id = ?').bind(id).first();
       if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
-      return new Response(JSON.stringify(result), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
     const result = await env.DB.prepare('SELECT * FROM history ORDER BY created_at DESC').all();
-    return new Response(JSON.stringify(result.results), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify(result.results), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'POST') {
@@ -366,43 +456,53 @@ export async function handleHistory(request: Request, env: Env, corsHeaders: Hea
       INSERT INTO history (id, player_id, racquet, notes, current_weight, target_weight, current_balance, target_balance, mass_added, mass_location, sw_delta, sw_result, created_at, price_currency, price_overgrip, price_specs_measurement, price_specs_matching, price_grip_replacement, price_bumper_grommet, price_other, price_other_label, price_total, player_name)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    await stmt.bind(
-      body.id || crypto.randomUUID(),
-      body.player_id || null,
-      body.racquet || null,
-      body.notes || null,
-      body.current_weight || null,
-      body.target_weight || null,
-      body.current_balance || null,
-      body.target_balance || null,
-      body.mass_added || null,
-      body.mass_location || null,
-      body.sw_delta || null,
-      body.sw_result || null,
-      body.created_at || new Date().toISOString(),
-      body.price_currency || null,
-      body.price_overgrip || null,
-      body.price_specs_measurement || null,
-      body.price_specs_matching || null,
-      body.price_grip_replacement || null,
-      body.price_bumper_grommet || null,
-      body.price_other || null,
-      body.price_other_label || null,
-      body.price_total || null,
-      body.player_name || null
-    ).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    await stmt
+      .bind(
+        body.id || crypto.randomUUID(),
+        body.player_id || null,
+        body.racquet || null,
+        body.notes || null,
+        body.current_weight || null,
+        body.target_weight || null,
+        body.current_balance || null,
+        body.target_balance || null,
+        body.mass_added || null,
+        body.mass_location || null,
+        body.sw_delta || null,
+        body.sw_result || null,
+        body.created_at || new Date().toISOString(),
+        body.price_currency || null,
+        body.price_overgrip || null,
+        body.price_specs_measurement || null,
+        body.price_specs_matching || null,
+        body.price_grip_replacement || null,
+        body.price_bumper_grommet || null,
+        body.price_other || null,
+        body.price_other_label || null,
+        body.price_total || null,
+        body.player_name || null,
+      )
+      .run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'DELETE') {
     await env.DB.prepare('DELETE FROM history WHERE id = ?').bind(id).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
 }
 
-export async function handleRackets(request: Request, env: Env, corsHeaders: HeadersInit): Promise<Response> {
+export async function handleRackets(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
   const url = new URL(request.url);
   const id = url.pathname.split('/').pop();
   const playerId = url.searchParams.get('player_id');
@@ -411,14 +511,24 @@ export async function handleRackets(request: Request, env: Env, corsHeaders: Hea
     if (id && id !== 'rackets') {
       const result = await env.DB.prepare('SELECT * FROM rackets WHERE id = ?').bind(id).first();
       if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
-      return new Response(JSON.stringify(result), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
     if (playerId) {
-      const result = await env.DB.prepare('SELECT * FROM rackets WHERE player_id = ? ORDER BY created_at DESC').bind(playerId).all();
-      return new Response(JSON.stringify(result.results), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      const result = await env.DB.prepare(
+        'SELECT * FROM rackets WHERE player_id = ? ORDER BY created_at DESC',
+      )
+        .bind(playerId)
+        .all();
+      return new Response(JSON.stringify(result.results), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
     const result = await env.DB.prepare('SELECT * FROM rackets ORDER BY created_at DESC').all();
-    return new Response(JSON.stringify(result.results), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify(result.results), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'POST') {
@@ -427,17 +537,21 @@ export async function handleRackets(request: Request, env: Env, corsHeaders: Hea
       INSERT INTO rackets (id, player_id, brand, model, year, notes, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    await stmt.bind(
-      body.id || crypto.randomUUID(),
-      body.player_id,
-      body.brand || null,
-      body.model || null,
-      body.year || null,
-      body.notes || null,
-      body.created_at || new Date().toISOString(),
-      body.updated_at || new Date().toISOString()
-    ).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    await stmt
+      .bind(
+        body.id || crypto.randomUUID(),
+        body.player_id,
+        body.brand || null,
+        body.model || null,
+        body.year || null,
+        body.notes || null,
+        body.created_at || new Date().toISOString(),
+        body.updated_at || new Date().toISOString(),
+      )
+      .run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'PUT') {
@@ -446,20 +560,26 @@ export async function handleRackets(request: Request, env: Env, corsHeaders: Hea
       UPDATE rackets SET brand = ?, model = ?, year = ?, notes = ?, updated_at = ?
       WHERE id = ?
     `);
-    await stmt.bind(
-      body.brand || null,
-      body.model || null,
-      body.year || null,
-      body.notes || null,
-      new Date().toISOString(),
-      id
-    ).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    await stmt
+      .bind(
+        body.brand || null,
+        body.model || null,
+        body.year || null,
+        body.notes || null,
+        new Date().toISOString(),
+        id,
+      )
+      .run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   if (request.method === 'DELETE') {
     await env.DB.prepare('DELETE FROM rackets WHERE id = ?').bind(id).run();
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });

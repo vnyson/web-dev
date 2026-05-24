@@ -140,6 +140,7 @@ See [PUBLISHING.md](PUBLISHING.md) for setup instructions.
 ### Branch Protection
 
 The `main` and `admin` branches are protected:
+
 - Direct pushes are blocked
 - Pull requests are required
 - CI checks must pass before merge
@@ -148,6 +149,7 @@ The `main` and `admin` branches are protected:
 ### CI Checks
 
 All pull requests and pushes to protected branches run CI checks:
+
 - `yarn format:check` - Validates code formatting with Prettier
 - `yarn lint` - Runs ESLint, Stylelint, and HTMLHint
 - `yarn build` - Builds all workspaces to ensure no build errors
@@ -169,6 +171,7 @@ These checks must pass before merging.
 ### Manual Testing
 
 Since automated tests are not yet implemented, all changes must be manually tested:
+
 - Visual regression: Check that styling changes match expectations
 - Functional testing: Verify all interactive elements work correctly
 - Cross-browser: Test in multiple browsers if possible
@@ -177,6 +180,7 @@ Since automated tests are not yet implemented, all changes must be manually test
 ### Design System Changes
 
 When modifying the design system (`packages/design-system`):
+
 - Check which sites consume the changed tokens/components
 - Test all affected sites
 - Consider whether a npm publish is needed

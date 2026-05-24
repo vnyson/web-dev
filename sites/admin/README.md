@@ -5,6 +5,7 @@ Admin dashboard for tennis stringing services, built with Astro and Tailwind CSS
 ## 🚀 Setup
 
 ### Prerequisites
+
 - Node.js 20+
 - Yarn 4.5.0
 - Cloudflare account with API token
@@ -13,13 +14,16 @@ Admin dashboard for tennis stringing services, built with Astro and Tailwind CSS
 ### Database Setup
 
 1. **Create Cloudflare D1 database:**
+
    ```bash
    cd workers/api
    yarn d1:create
    ```
+
    This will create a database and output a database ID. Update `workers/api/wrangler.toml` with the database ID.
 
 2. **Run migrations:**
+
    ```bash
    cd workers/api
    yarn d1:migrate
@@ -36,15 +40,18 @@ Admin dashboard for tennis stringing services, built with Astro and Tailwind CSS
 ### Workers API Setup
 
 1. **Install dependencies:**
+
    ```bash
    cd workers/api
    yarn install
    ```
 
 2. **Run locally:**
+
    ```bash
    yarn dev
    ```
+
    The API will be available at `http://localhost:8787`
 
 3. **Deploy to Cloudflare:**
@@ -55,18 +62,22 @@ Admin dashboard for tennis stringing services, built with Astro and Tailwind CSS
 ### Admin App Setup
 
 1. **Install dependencies:**
+
    ```bash
    cd sites/admin
    yarn install
    ```
 
 2. **Run locally:**
+
    ```bash
    yarn dev
    ```
+
    The admin app will be available at `http://localhost:4321`
 
 3. **Build for production:**
+
    ```bash
    yarn build
    ```
@@ -101,21 +112,23 @@ web-dev/
 ## 🧞 Commands
 
 ### Admin App (sites/admin)
-| Command | Action |
-|---------|--------|
-| `yarn install` | Install dependencies |
-| `yarn dev` | Start local dev server at `localhost:4321` |
-| `yarn build` | Build production site to `./dist/` |
-| `yarn preview` | Preview build locally |
+
+| Command        | Action                                     |
+| -------------- | ------------------------------------------ |
+| `yarn install` | Install dependencies                       |
+| `yarn dev`     | Start local dev server at `localhost:4321` |
+| `yarn build`   | Build production site to `./dist/`         |
+| `yarn preview` | Preview build locally                      |
 
 ### Workers API (workers/api)
-| Command | Action |
-|---------|--------|
-| `yarn install` | Install dependencies |
-| `yarn dev` | Start local dev server at `localhost:8787` |
-| `yarn deploy` | Deploy to Cloudflare Workers |
-| `yarn d1:create` | Create D1 database |
-| `yarn d1:migrate` | Run database migrations |
+
+| Command           | Action                                     |
+| ----------------- | ------------------------------------------ |
+| `yarn install`    | Install dependencies                       |
+| `yarn dev`        | Start local dev server at `localhost:8787` |
+| `yarn deploy`     | Deploy to Cloudflare Workers               |
+| `yarn d1:create`  | Create D1 database                         |
+| `yarn d1:migrate` | Run database migrations                    |
 
 ## 🔧 Configuration
 
@@ -149,5 +162,6 @@ The project uses GitHub Actions for automatic deployment:
 - **Workers API**: Deployed to Cloudflare Workers on push to main (when workers files change)
 
 Configure the following secrets in your GitHub repository:
+
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`

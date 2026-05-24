@@ -176,7 +176,7 @@
     font-family: var(--font-family-brand) !important;
     --corner-size: 1px;
     --border-size: 4px;
-    --border-color: #000;
+    --border-color: #000000;
     --border-inset-color: false;
     --pb-border-width: 6px;
   }
