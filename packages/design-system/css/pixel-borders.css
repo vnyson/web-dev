@@ -1,6 +1,6 @@
 @font-face {
-  font-family: "Press Start 2P";
-  src: url("../fonts/press-start-2p.woff2") format("woff2");
+  font-family: 'Press Start 2P';
+  src: url('../fonts/press-start-2p.woff2') format('woff2');
   display: swap;
 }
 .pixel-borders {
@@ -9,14 +9,23 @@
   --pb-border-color: #999999;
   --pb-border-image-width: calc(var(--pb-size) + 1);
   --pb-background-color: #ffffff;
-  --pb-border-inset-size: round(up, calc(100% - (var(--pb-border-width) * ((var(--pb-size) - 1) * 2))), 1px);
+  --pb-border-inset-size: round(
+    up,
+    calc(100% - (var(--pb-border-width) * ((var(--pb-size) - 1) * 2))),
+    1px
+  );
   --pb-border-inset-highlight-color: color-mix(in oklch, var(--pb-background-color), #ffffff 10%);
   --pb-border-inset-shadow-color: color-mix(in oklch, var(--pb-background-color), #000000 10%);
   display: inline-block;
   padding: 16px;
   font-size: 1rem;
   text-transform: uppercase;
-  font-family: "Press Start 2P", Arial Black, Arial Bold, Arial, sans-serif;
+  font-family:
+    'Press Start 2P',
+    Arial Black,
+    Arial Bold,
+    Arial,
+    sans-serif;
   color: #000000;
   text-decoration: none;
   background-color: var(--pb-background-color);
@@ -27,7 +36,8 @@
   border-image-width: var(--pb-border-image-width);
   border-image-slice: var(--pb-border-image-width);
   border-radius: round(var(--pb-border-width) * var(--pb-border-image-width) * 1.7, 1px);
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: color-mix(in oklch, var(--pb-background-color), #000000 5%);
   }
 }
@@ -40,8 +50,9 @@
 
 .pixel-borders--inset {
   position: relative;
-  &::before, &::after {
-    content: "";
+  &::before,
+  &::after {
+    content: '';
     position: absolute;
     inset: 0;
     place-self: center;
@@ -79,24 +90,60 @@
 }
 
 .pixel-borders--inset-hightlight::before {
-  background-image: linear-gradient(90deg, var(--pb-border-inset-highlight-color) 0% var(--pb-border-width), transparent var(--pb-border-width) 100%);
+  background-image: linear-gradient(
+    90deg,
+    var(--pb-border-inset-highlight-color) 0% var(--pb-border-width),
+    transparent var(--pb-border-width) 100%
+  );
 }
 .pixel-borders--inset-hightlight::after {
-  background-image: linear-gradient(180deg, var(--pb-border-inset-highlight-color) 0% var(--pb-border-width), transparent var(--pb-border-width) 100%);
+  background-image: linear-gradient(
+    180deg,
+    var(--pb-border-inset-highlight-color) 0% var(--pb-border-width),
+    transparent var(--pb-border-width) 100%
+  );
 }
 
 .pixel-borders--inset-shadow::before {
-  background-image: linear-gradient(270deg, var(--pb-border-inset-shadow-color) 0% var(--pb-border-width), transparent var(--pb-border-width) 100%);
+  background-image: linear-gradient(
+    270deg,
+    var(--pb-border-inset-shadow-color) 0% var(--pb-border-width),
+    transparent var(--pb-border-width) 100%
+  );
 }
 .pixel-borders--inset-shadow::after {
-  background-image: linear-gradient(0deg, var(--pb-border-inset-shadow-color) 0% var(--pb-border-width), transparent var(--pb-border-width) 100%);
+  background-image: linear-gradient(
+    0deg,
+    var(--pb-border-inset-shadow-color) 0% var(--pb-border-width),
+    transparent var(--pb-border-width) 100%
+  );
 }
 
 .pixel-borders--inset-all::before {
-  background-image: linear-gradient(270deg, var(--pb-border-inset-shadow-color) 0% var(--pb-border-width), transparent var(--pb-border-width) 100%), linear-gradient(90deg, var(--pb-border-inset-highlight-color) 0% var(--pb-border-width), transparent var(--pb-border-width) 100%);
+  background-image:
+    linear-gradient(
+      270deg,
+      var(--pb-border-inset-shadow-color) 0% var(--pb-border-width),
+      transparent var(--pb-border-width) 100%
+    ),
+    linear-gradient(
+      90deg,
+      var(--pb-border-inset-highlight-color) 0% var(--pb-border-width),
+      transparent var(--pb-border-width) 100%
+    );
 }
 .pixel-borders--inset-all::after {
-  background-image: linear-gradient(0deg, var(--pb-border-inset-shadow-color) 0% var(--pb-border-width), transparent var(--pb-border-width) 100%), linear-gradient(180deg, var(--pb-border-inset-highlight-color) 0% var(--pb-border-width), transparent var(--pb-border-width) 100%);
+  background-image:
+    linear-gradient(
+      0deg,
+      var(--pb-border-inset-shadow-color) 0% var(--pb-border-width),
+      transparent var(--pb-border-width) 100%
+    ),
+    linear-gradient(
+      180deg,
+      var(--pb-border-inset-highlight-color) 0% var(--pb-border-width),
+      transparent var(--pb-border-width) 100%
+    );
 }
 
 .pixel-border-theme--primary {

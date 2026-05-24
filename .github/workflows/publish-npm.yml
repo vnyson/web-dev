@@ -2,7 +2,7 @@ name: Publish to npm
 
 on:
   workflow_run:
-    workflows: ["Deploy to Cloudflare Pages"]
+    workflows: ['Deploy to Cloudflare Pages']
     types:
       - completed
   workflow_dispatch:
