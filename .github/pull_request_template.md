@@ -45,8 +45,7 @@ Does this change require deployment?
 Since automated tests are not yet implemented, describe manual testing performed:
 
 - Tested on: [browser/device]
-- Tested scenarios:
-  -
+- ## Tested scenarios:
   -
 
 ## Additional Notes
