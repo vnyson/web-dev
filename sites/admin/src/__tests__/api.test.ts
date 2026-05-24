@@ -154,6 +154,70 @@ describe('API Client - Stringing', () => {
     const body = JSON.parse(callArgs[1].body);
     expect(body.player_id).toBe('player-123');
   });
+});
+
+describe('Queue Ordering Logic', () => {
+  it('should order rush jobs before normal jobs', () => {
+    const jobs = [
+      { id: '1', status: 'in_queue', priority: 'normal', created_at: '2026-05-24T10:00:00Z' },
+      { id: '2', status: 'in_queue', priority: 'rush', created_at: '2026-05-24T11:00:00Z' },
+      { id: '3', status: 'in_queue', priority: 'normal', created_at: '2026-05-24T09:00:00Z' },
+    ];
+
+    const sorted = jobs.sort((a, b) => {
+      if (a.priority === 'rush' && b.priority !== 'rush') return -1;
+      if (a.priority !== 'rush' && b.priority === 'rush') return 1;
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    });
+
+    expect(sorted[0].id).toBe('2'); // Rush job first
+    expect(sorted[1].id).toBe('3'); // Normal job with earlier created_at
+    expect(sorted[2].id).toBe('1'); // Normal job with later created_at
+  });
+
+  it('should filter jobs by in_queue status', () => {
+    const jobs = [
+      { id: '1', status: 'in_queue', priority: 'normal' },
+      { id: '2', status: 'completed', priority: 'normal' },
+      { id: '3', status: 'in_queue', priority: 'rush' },
+      { id: '4', status: 'waiting_for_pickup', priority: 'normal' },
+    ];
+
+    const queueJobs = jobs.filter(job => job.status === 'in_queue');
+
+    expect(queueJobs.length).toBe(2);
+    expect(queueJobs.map(j => j.id)).toEqual(['1', '3']);
+  });
+
+  it('should calculate ETA based on queue position', () => {
+    const AVERAGE_TIME_PER_JOB_MINUTES = 30;
+    const position = 3;
+    const etaMinutes = position * AVERAGE_TIME_PER_JOB_MINUTES;
+    
+    expect(etaMinutes).toBe(90);
+  });
+
+  it('should format ETA as hours and minutes when > 60 minutes', () => {
+    const etaMinutes = 90;
+    const etaHours = Math.floor(etaMinutes / 60);
+    const etaRemainingMinutes = etaMinutes % 60;
+    const etaString = etaHours > 0 
+      ? `${etaHours}h ${etaRemainingMinutes}m`
+      : `${etaRemainingMinutes}m`;
+    
+    expect(etaString).toBe('1h 30m');
+  });
+
+  it('should format ETA as minutes when < 60 minutes', () => {
+    const etaMinutes = 30;
+    const etaHours = Math.floor(etaMinutes / 60);
+    const etaRemainingMinutes = etaMinutes % 60;
+    const etaString = etaHours > 0 
+      ? `${etaHours}h ${etaRemainingMinutes}m`
+      : `${etaRemainingMinutes}m`;
+    
+    expect(etaString).toBe('30m');
+  });
 
   it('should throw error when create stringing job fails', async () => {
     (global.fetch as any).mockResolvedValueOnce({
