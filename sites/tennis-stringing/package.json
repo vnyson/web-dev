@@ -4,9 +4,8 @@
   "private": true,
   "description": "Tennis Stringing & Racket Services - static site",
   "scripts": {
-    "build": "npm run build:css && npm run copy-assets && npm run build:js",
+    "build": "npm run build:css && npm run build:js",
     "build:css": "postcss css/style.css --output css/bundle.css",
-    "copy-assets": "node -e \"const fs=require('fs'),p=require('path');const src=p.resolve('../../packages/design-system/assets');const dest=p.resolve('assets');const copyDir=(srcDir,destDir)=>{fs.mkdirSync(destDir,{recursive:true});fs.readdirSync(srcDir).forEach(f=>{const srcPath=p.join(srcDir,f);const destPath=p.join(destDir,f);fs.statSync(srcPath).isDirectory()?copyDir(srcPath,destPath):fs.copyFileSync(srcPath,destPath)})};copyDir(src,dest);console.log('Assets copied')\"",
     "build:js": "esbuild js/main.js --bundle --outfile=js/bundle.js --minify",
     "dev": "npm run build:css && browser-sync start --server --files '.' --watch --no-notify --port 8080",
     "lint": "eslint js/main.js",

@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     duration: 2000,
     mode: 'crossfade',
     animationMode: 'bike',
+    animationPaths: [
+      'assets/images/splash-loading/bike-animation-side-large.gif',
+      'assets/images/splash-loading/bike-antimation-front-large.gif',
+    ],
   });
 
   // Random Grass Background Tiles (per session)
