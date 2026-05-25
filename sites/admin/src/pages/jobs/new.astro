@@ -11,7 +11,9 @@ import '../../styles/global.css';
 
   async function loadPlayers() {
     try {
-      const response = await fetch(`${API_URL}/api/players`);
+      const response = await fetch(`${API_URL}/api/players`, {
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error('Failed to fetch players');
       players = await response.json();
       populatePlayerDropdown();
@@ -22,7 +24,9 @@ import '../../styles/global.css';
 
   async function loadInventory() {
     try {
-      const response = await fetch(`${API_URL}/api/inventory`);
+      const response = await fetch(`${API_URL}/api/inventory`, {
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error('Failed to fetch inventory');
       inventory = await response.json();
     } catch (error) {
@@ -46,7 +50,7 @@ import '../../styles/global.css';
   function handlePlayerChange(event) {
     const playerId = event.target.value;
     selectedPlayer = players.find(p => p.id === playerId);
-    
+
     if (selectedPlayer) {
       document.getElementById('player_name').value = selectedPlayer.name || '';
       document.getElementById('phone').value = selectedPlayer.phone || '';
@@ -109,7 +113,7 @@ import '../../styles/global.css';
 
   async function handleSubmit(event) {
     event.preventDefault();
-    
+
     const formData = new FormData(event.target);
     const data = {
       player_id: selectedPlayer?.id || null,
@@ -130,11 +134,12 @@ import '../../styles/global.css';
       const response = await fetch(`${API_URL}/api/stringing`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(data),
       });
 
       if (!response.ok) throw new Error('Failed to create job');
-      
+
       window.location.href = '/jobs';
     } catch (error) {
       console.error('Error creating job:', error);
@@ -197,6 +202,11 @@ import '../../styles/global.css';
 								<a href="/jobs" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Jobs</a>
 								<a href="/players" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Players</a>
 							</div>
+						</div>
+						<div class="flex items-center">
+							<a href="/login" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+								Login with Google
+							</a>
 						</div>
 					</div>
 				</div>

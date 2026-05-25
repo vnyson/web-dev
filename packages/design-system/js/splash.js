@@ -18,6 +18,7 @@ const DEFAULTS = {
   mode: 'default', // 'default' | 'crossfade'
   animationMode: 'none', // 'none' | 'bike' for cycling animations
   animationDuration: 2000, // Duration per animation frame (ms)
+  animationPaths: [], // Array of animation image paths (for bike mode)
 };
 
 /**
@@ -57,10 +58,13 @@ export function initSplash(options = {}) {
   if (config.animationMode === 'bike') {
     const animationImg = splash.querySelector('.splash__animation');
     if (animationImg) {
-      const animations = [
-        'assets/images/bike-animation-side-large.gif',
-        'assets/images/bike-antimation-front-large.gif',
-      ];
+      const animations =
+        config.animationPaths.length > 0
+          ? config.animationPaths
+          : [
+              'assets/images/splash-loading/bike-animation-side-large.gif',
+              'assets/images/splash-loading/bike-antimation-front-large.gif',
+            ];
       const randomIndex = Math.floor(Math.random() * animations.length);
       animationImg.src = animations[randomIndex];
     }

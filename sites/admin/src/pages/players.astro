@@ -27,6 +27,11 @@ import '../styles/global.css';
 								<a href="/players" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Players</a>
 							</div>
 						</div>
+						<div class="flex items-center">
+							<a href="/login" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+								Login with Google
+							</a>
+						</div>
 					</div>
 				</div>
 			</nav>
@@ -271,6 +276,14 @@ import '../styles/global.css';
 											<p class="text-sm text-gray-500">Loading jobs...</p>
 										</div>
 									</div>
+									<div class="border-t pt-4 mt-4">
+										<h4 class="font-medium text-gray-900 mb-2">Player Portal</h4>
+										<button class="generate-link-btn text-indigo-600 hover:text-indigo-900 text-sm" data-player-id="${player.id}">Generate Shareable Link</button>
+										<div class="shareable-link-container mt-2 hidden" data-player-id="${player.id}">
+											<input type="text" class="shareable-link-input w-full text-sm border border-gray-300 rounded px-2 py-1" readonly />
+											<button class="copy-link-btn text-xs text-gray-600 hover:text-gray-900 mt-1" data-player-id="${player.id}">Copy Link</button>
+										</div>
+									</div>
 								</td>
 							</tr>
 						`).join('');
@@ -332,6 +345,32 @@ import '../styles/global.css';
 									const year = prompt('Enter racket year:');
 									const notes = prompt('Enter racket notes:');
 									await addRacket(playerId, { brand, model, year: year ? parseInt(year) : null, notes });
+								}
+							});
+						});
+
+						// Add event listeners for generate link buttons
+						tbody.querySelectorAll('.generate-link-btn').forEach(btn => {
+							btn.addEventListener('click', async (e) => {
+								e.stopPropagation();
+								const playerId = e.target.dataset.playerId;
+								await generateShareableLink(playerId);
+							});
+						});
+
+						// Add event listeners for copy link buttons
+						tbody.querySelectorAll('.copy-link-btn').forEach(btn => {
+							btn.addEventListener('click', async (e) => {
+								e.stopPropagation();
+								const playerId = e.target.dataset.playerId;
+								const input = document.querySelector(`.shareable-link-input[data-player-id="${playerId}"]`);
+								if (input) {
+									input.select();
+									document.execCommand('copy');
+									e.target.textContent = 'Copied!';
+									setTimeout(() => {
+										e.target.textContent = 'Copy Link';
+									}, 2000);
 								}
 							});
 						});
@@ -465,7 +504,7 @@ import '../styles/global.css';
 					const response = await fetch(`${API_URL}/api/players?last_jobs=${playerId}`);
 					if (!response.ok) throw new Error('Failed to fetch last jobs');
 					const jobs = await response.json();
-					
+
 					const lastJobsList = document.querySelector(`.last-jobs-list[data-player-id="${playerId}"]`);
 					if (jobs.length === 0) {
 						lastJobsList.innerHTML = '<p class="text-sm text-gray-500">No jobs yet.</p>';
@@ -481,6 +520,29 @@ import '../styles/global.css';
 					console.error('Failed to load last jobs:', error);
 					const lastJobsList = document.querySelector(`.last-jobs-list[data-player-id="${playerId}"]`);
 					lastJobsList.innerHTML = '<p class="text-sm text-red-500">Failed to load jobs.</p>';
+				}
+			}
+
+			async function generateShareableLink(playerId) {
+				try {
+					const response = await fetch(`${API_URL}/api/regenerate-token`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						credentials: 'include',
+						body: JSON.stringify({ player_id: playerId }),
+					});
+					if (!response.ok) throw new Error('Failed to generate link');
+					const data = await response.json();
+
+					const container = document.querySelector(`.shareable-link-container[data-player-id="${playerId}"]`);
+					const input = document.querySelector(`.shareable-link-input[data-player-id="${playerId}"]`);
+					if (container && input) {
+						input.value = data.shareableLink;
+						container.classList.remove('hidden');
+					}
+				} catch (error) {
+					console.error('Failed to generate shareable link:', error);
+					alert('Failed to generate shareable link. Please try again.');
 				}
 			}
 			

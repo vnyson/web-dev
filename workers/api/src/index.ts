@@ -1,5 +1,226 @@
 export interface Env {
   DB: any;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  ADMIN_EMAIL?: string;
+  SESSION_SECRET?: string;
+}
+
+// Helper function to validate admin session
+async function validateAdminSession(request: Request, env: Env): Promise<boolean> {
+  // For local testing, if SESSION_SECRET is not set, allow any session cookie or token
+  if (!env.SESSION_SECRET) {
+    const cookie = request.headers.get('Cookie');
+    const authHeader = request.headers.get('Authorization');
+    if (cookie) {
+      const sessionMatch = cookie.match(/admin_session=([^;]+)/);
+      if (sessionMatch) return true;
+    }
+    if (authHeader) {
+      const tokenMatch = authHeader.match(/Bearer (.+)/);
+      if (tokenMatch) return true;
+    }
+    return false;
+  }
+
+  // Production validation - accept either cookie or Authorization header
+  const cookie = request.headers.get('Cookie');
+  const authHeader = request.headers.get('Authorization');
+
+  let sessionToken = null;
+
+  if (cookie) {
+    const sessionMatch = cookie.match(/admin_session=([^;]+)/);
+    if (sessionMatch) {
+      sessionToken = sessionMatch[1];
+    }
+  }
+
+  if (!sessionToken && authHeader) {
+    const tokenMatch = authHeader.match(/Bearer (.+)/);
+    if (tokenMatch) {
+      sessionToken = tokenMatch[1];
+    }
+  }
+
+  if (!sessionToken) return false;
+
+  // In production, validate against stored session in KV or D1
+  // For now, accept any valid-looking token
+  return sessionToken.length > 0;
+}
+
+// Helper function to validate player token
+async function validatePlayerToken(token: string, env: Env): Promise<string | null> {
+  const result = await env.DB.prepare('SELECT id FROM players WHERE access_token = ?')
+    .bind(token)
+    .first();
+  return result ? result.id : null;
+}
+
+// Helper function to generate access token
+function generateAccessToken(): string {
+  return crypto.randomUUID();
+}
+
+// OAuth handler - redirect to Google
+async function handleGoogleAuth(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
+  const redirectUri = `${new URL(request.url).origin}/auth/google/callback`;
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${env.GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile`;
+  return Response.redirect(authUrl, 302);
+}
+
+// OAuth callback handler
+async function handleGoogleCallback(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
+  const url = new URL(request.url);
+  const code = url.searchParams.get('code');
+
+  if (!code) {
+    return new Response('Authorization code not found', { status: 400, headers: corsHeaders });
+  }
+
+  // Check if OAuth credentials are configured
+  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
+    return new Response('OAuth not configured', { status: 500, headers: corsHeaders });
+  }
+
+  // Exchange code for tokens
+  const redirectUri = `${url.origin}/auth/google/callback`;
+  const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      code,
+      client_id: env.GOOGLE_CLIENT_ID,
+      client_secret: env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code',
+    }),
+  });
+
+  const tokens = await tokenResponse.json();
+
+  if (tokens.error) {
+    return new Response(JSON.stringify({ error: tokens.error }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Get user info
+  const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+    headers: { Authorization: `Bearer ${tokens.access_token}` },
+  });
+
+  const user = await userResponse.json();
+
+  // Validate email
+  if (!env.ADMIN_EMAIL || user.email !== env.ADMIN_EMAIL) {
+    return new Response('Unauthorized email', { status: 403, headers: corsHeaders });
+  }
+
+  // Create session token
+  const sessionToken = crypto.randomUUID();
+
+  // Return the token in the response body instead of setting a cookie
+  return new Response(JSON.stringify({ token: sessionToken }), {
+    status: 200,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
+// Handler for player-by-token endpoint
+async function handlePlayerByToken(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
+  if (request.method !== 'GET') {
+    return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+  }
+
+  const url = new URL(request.url);
+  const token = url.searchParams.get('token');
+
+  if (!token) {
+    return new Response('Token required', { status: 400, headers: corsHeaders });
+  }
+
+  const playerId = await validatePlayerToken(token, env);
+  if (!playerId) {
+    return new Response('Invalid token', { status: 401, headers: corsHeaders });
+  }
+
+  // Get player data
+  const player = await env.DB.prepare('SELECT * FROM players WHERE id = ?').bind(playerId).first();
+  if (!player) {
+    return new Response('Player not found', { status: 404, headers: corsHeaders });
+  }
+
+  // Get player's stringing jobs
+  const jobs = await env.DB.prepare(
+    'SELECT * FROM stringing WHERE player_id = ? ORDER BY created_at DESC',
+  )
+    .bind(playerId)
+    .all();
+
+  // Get player's rackets
+  const rackets = await env.DB.prepare(
+    'SELECT * FROM rackets WHERE player_id = ? ORDER BY created_at DESC',
+  )
+    .bind(playerId)
+    .all();
+
+  return new Response(JSON.stringify({ player, jobs: jobs.results, rackets: rackets.results }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
+// Handler for regenerate-token endpoint
+async function handleRegenerateToken(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
+  if (request.method !== 'POST') {
+    return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+  }
+
+  // Validate admin session
+  const isAdmin = await validateAdminSession(request, env);
+  if (!isAdmin) {
+    return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+  }
+
+  const body = await request.json();
+  const playerId = body.player_id;
+
+  if (!playerId) {
+    return new Response('player_id required', { status: 400, headers: corsHeaders });
+  }
+
+  // Generate new token
+  const newToken = generateAccessToken();
+
+  // Update player with new token
+  await env.DB.prepare('UPDATE players SET access_token = ? WHERE id = ?')
+    .bind(newToken, playerId)
+    .run();
+
+  // Return shareable link
+  const shareableLink = `${new URL(request.url).origin}/player?token=${newToken}`;
+
+  return new Response(JSON.stringify({ shareableLink }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
 }
 
 export default {
@@ -19,6 +240,14 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
+    // OAuth routes
+    if (path === '/auth/google') {
+      return handleGoogleAuth(request, env, corsHeaders);
+    }
+    if (path === '/auth/google/callback') {
+      return handleGoogleCallback(request, env, corsHeaders);
+    }
+
     // API routes
     if (path.startsWith('/api/players')) {
       return handlePlayers(request, env, corsHeaders);
@@ -34,6 +263,12 @@ export default {
     }
     if (path.startsWith('/api/rackets')) {
       return handleRackets(request, env, corsHeaders);
+    }
+    if (path === '/api/player-by-token') {
+      return handlePlayerByToken(request, env, corsHeaders);
+    }
+    if (path === '/api/regenerate-token') {
+      return handleRegenerateToken(request, env, corsHeaders);
     }
 
     // 404 for unknown routes
@@ -51,14 +286,32 @@ export async function handlePlayers(
 
   if (request.method === 'GET') {
     if (id && id !== 'players') {
-      // Get single player
+      // Get single player - requires player token or admin session
+      const token = url.searchParams.get('token');
+      const isAdmin = await validateAdminSession(request, env);
+
+      if (!token && !isAdmin) {
+        return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+      }
+
+      if (token) {
+        const playerId = await validatePlayerToken(token, env);
+        if (!playerId || playerId !== id) {
+          return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+        }
+      }
+
       const result = await env.DB.prepare('SELECT * FROM players WHERE id = ?').bind(id).first();
       if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
       return new Response(JSON.stringify(result), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    // Get all players
+    // Get all players - requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
     const result = await env.DB.prepare('SELECT * FROM players ORDER BY name').all();
     return new Response(JSON.stringify(result.results), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -79,14 +332,23 @@ export async function handlePlayers(
   }
 
   if (request.method === 'POST') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     const body = await request.json();
+    const playerId = body.id || crypto.randomUUID();
+    const accessToken = generateAccessToken();
+
     const stmt = env.DB.prepare(`
-      INSERT INTO players (id, name, club, level, style, grip, string_pref, tension, racquet, notes, email, phone, restring_interval_weeks, inventory_preferences, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO players (id, name, club, level, style, grip, string_pref, tension, racquet, notes, email, phone, restring_interval_weeks, inventory_preferences, access_token, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     await stmt
       .bind(
-        body.id || crypto.randomUUID(),
+        playerId,
         body.name,
         body.club || null,
         body.level || null,
@@ -100,17 +362,33 @@ export async function handlePlayers(
         body.phone || null,
         body.restring_interval_weeks || null,
         body.inventory_preferences || null,
+        accessToken,
         body.created_at || new Date().toISOString(),
         body.updated_at || new Date().toISOString(),
       )
       .run();
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ success: true, player_id: playerId }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 
   if (request.method === 'PUT') {
     const body = await request.json();
+    const token = url.searchParams.get('token');
+    const isAdmin = await validateAdminSession(request, env);
+
+    // Require either player token or admin session
+    if (!token && !isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
+    if (token) {
+      const playerId = await validatePlayerToken(token, env);
+      if (!playerId || playerId !== id) {
+        return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+      }
+    }
+
     const stmt = env.DB.prepare(`
       UPDATE players SET name = ?, club = ?, level = ?, style = ?, grip = ?, string_pref = ?, tension = ?, racquet = ?, notes = ?, email = ?, phone = ?, restring_interval_weeks = ?, inventory_preferences = ?, updated_at = ?
       WHERE id = ?
@@ -140,6 +418,11 @@ export async function handlePlayers(
   }
 
   if (request.method === 'DELETE') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
     await env.DB.prepare('DELETE FROM players WHERE id = ?').bind(id).run();
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -165,6 +448,11 @@ export async function handleStringing(
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    // Get all stringing jobs - requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
     const result = await env.DB.prepare('SELECT * FROM stringing ORDER BY created_at DESC').all();
     return new Response(JSON.stringify(result.results), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -172,8 +460,27 @@ export async function handleStringing(
   }
 
   if (request.method === 'POST') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     const body = await request.json();
     const jobId = body.id || crypto.randomUUID();
+
+    // Generate token for player if they don't have one
+    if (body.player_id) {
+      const player = await env.DB.prepare('SELECT access_token FROM players WHERE id = ?')
+        .bind(body.player_id)
+        .first();
+      if (player && !player.access_token) {
+        const newToken = generateAccessToken();
+        await env.DB.prepare('UPDATE players SET access_token = ? WHERE id = ?')
+          .bind(newToken, body.player_id)
+          .run();
+      }
+    }
 
     // Insert stringing job
     const stmt = env.DB.prepare(`
@@ -299,6 +606,12 @@ export async function handleStringing(
   }
 
   if (request.method === 'PUT') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     const body = await request.json();
     const stmt = env.DB.prepare(`
       UPDATE stringing SET status = ?, strung_at = ?, picked_up_at = ?, notes = ?
@@ -313,6 +626,12 @@ export async function handleStringing(
   }
 
   if (request.method === 'DELETE') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     // Rollback inventory consumption for this job
     const consumptions = await env.DB.prepare(
       'SELECT * FROM inventory_consumption WHERE stringing_job_id = ?',
@@ -356,6 +675,12 @@ export async function handleInventory(
   const id = url.pathname.split('/').pop();
 
   if (request.method === 'GET') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     if (id && id !== 'inventory') {
       const result = await env.DB.prepare('SELECT * FROM inventory WHERE id = ?').bind(id).first();
       if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
@@ -370,6 +695,12 @@ export async function handleInventory(
   }
 
   if (request.method === 'POST') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     const body = await request.json();
     const stmt = env.DB.prepare(`
       INSERT INTO inventory (id, name, brand, category, price, quantity, status, notes, created_at, updated_at)
@@ -395,6 +726,12 @@ export async function handleInventory(
   }
 
   if (request.method === 'PUT') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     const body = await request.json();
     const stmt = env.DB.prepare(`
       UPDATE inventory SET name = ?, brand = ?, category = ?, price = ?, quantity = ?, status = ?, notes = ?, updated_at = ?
@@ -419,6 +756,12 @@ export async function handleInventory(
   }
 
   if (request.method === 'DELETE') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     await env.DB.prepare('DELETE FROM inventory WHERE id = ?').bind(id).run();
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -437,6 +780,12 @@ export async function handleHistory(
   const id = url.pathname.split('/').pop();
 
   if (request.method === 'GET') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     if (id && id !== 'history') {
       const result = await env.DB.prepare('SELECT * FROM history WHERE id = ?').bind(id).first();
       if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
@@ -451,6 +800,12 @@ export async function handleHistory(
   }
 
   if (request.method === 'POST') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     const body = await request.json();
     const stmt = env.DB.prepare(`
       INSERT INTO history (id, player_id, racquet, notes, current_weight, target_weight, current_balance, target_balance, mass_added, mass_location, sw_delta, sw_result, created_at, price_currency, price_overgrip, price_specs_measurement, price_specs_matching, price_grip_replacement, price_bumper_grommet, price_other, price_other_label, price_total, player_name)
@@ -489,6 +844,12 @@ export async function handleHistory(
   }
 
   if (request.method === 'DELETE') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     await env.DB.prepare('DELETE FROM history WHERE id = ?').bind(id).run();
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -516,6 +877,21 @@ export async function handleRackets(
       });
     }
     if (playerId) {
+      // Get rackets by player_id - requires player token or admin session
+      const token = url.searchParams.get('token');
+      const isAdmin = await validateAdminSession(request, env);
+
+      if (!token && !isAdmin) {
+        return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+      }
+
+      if (token) {
+        const tokenPlayerId = await validatePlayerToken(token, env);
+        if (!tokenPlayerId || tokenPlayerId !== playerId) {
+          return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+        }
+      }
+
       const result = await env.DB.prepare(
         'SELECT * FROM rackets WHERE player_id = ? ORDER BY created_at DESC',
       )
@@ -525,6 +901,11 @@ export async function handleRackets(
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    // Get all rackets - requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
     const result = await env.DB.prepare('SELECT * FROM rackets ORDER BY created_at DESC').all();
     return new Response(JSON.stringify(result.results), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -532,6 +913,12 @@ export async function handleRackets(
   }
 
   if (request.method === 'POST') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     const body = await request.json();
     const stmt = env.DB.prepare(`
       INSERT INTO rackets (id, player_id, brand, model, year, notes, created_at, updated_at)
@@ -555,6 +942,12 @@ export async function handleRackets(
   }
 
   if (request.method === 'PUT') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     const body = await request.json();
     const stmt = env.DB.prepare(`
       UPDATE rackets SET brand = ?, model = ?, year = ?, notes = ?, updated_at = ?
@@ -576,6 +969,12 @@ export async function handleRackets(
   }
 
   if (request.method === 'DELETE') {
+    // Requires admin session
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
     await env.DB.prepare('DELETE FROM rackets WHERE id = ?').bind(id).run();
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

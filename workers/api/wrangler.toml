@@ -2,6 +2,13 @@ name = "tennis-admin-api"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 
+[vars]
+# Google OAuth configuration - set these in Cloudflare dashboard or wrangler secret
+# GOOGLE_CLIENT_ID = "your-google-client-id"
+# GOOGLE_CLIENT_SECRET = "your-google-client-secret"
+# ADMIN_EMAIL = "your-email@example.com"
+# SESSION_SECRET = "your-random-session-secret"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "tennis-admin-db"

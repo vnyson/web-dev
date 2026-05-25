@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     duration: 2000,
     mode: 'crossfade',
     animationMode: 'bike',
+    animationPaths: [
+      'assets/images/splash-loading/bike-animation-side-large.gif',
+      'assets/images/splash-loading/bike-antimation-front-large.gif',
+    ],
   });
 
   // Random Grass Background Tiles (per session)
@@ -62,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const rotationInterval = 7000; // 7 seconds
 
     const rotateString = () => {
-      console.log('Rotating string, current index:', currentIndex);
       // Fade out
       stringNameElement.classList.add('string-name--fading-out');
 
@@ -70,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Change text while hidden
         currentIndex = (currentIndex + 1) % strings.length;
         stringNameElement.textContent = strings[currentIndex];
-        console.log('New string:', strings[currentIndex]);
 
         // Fade in by removing the fade-out class
         stringNameElement.classList.remove('string-name--fading-out');
@@ -79,13 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Set initial string
     stringNameElement.textContent = strings[0];
-    console.log('Initial string set:', strings[0]);
 
     // Start rotation interval
-    console.log('Starting rotation interval');
     setInterval(rotateString, rotationInterval);
-  } else {
-    console.log('String name element not found');
   }
 
   // Service GIF Animation Control

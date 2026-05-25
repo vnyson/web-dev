@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Player Portal - Tennis Stringing</title>
+    <link rel="icon" type="image/png" href="assets/images/tennis-ball-large.png" />
+    <link rel="stylesheet" href="css/bundle.css" />
+    <link rel="stylesheet" href="css/player-portal.css" />
+  </head>
+  <body>
+    <div class="player-portal">
+      <div class="portal-header">
+        <h1>Player Portal</h1>
+        <p>View and update your stringing preferences and history</p>
+      </div>
+
+      <div id="loading" class="loading">Loading your data...</div>
+      <div id="error" class="error hidden"></div>
+      <div id="success" class="success hidden"></div>
+
+      <div id="portal-content" class="hidden">
+        <!-- Player Profile Section -->
+        <div class="portal-section">
+          <h3>Your Profile</h3>
+          <form id="profile-form">
+            <input type="hidden" id="player-id" />
+            <input type="hidden" id="access-token" />
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" class="read-only" readonly />
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" />
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input type="tel" id="phone" />
+            </div>
+            <div class="form-group">
+              <label for="string_pref">String Preference</label>
+              <input type="text" id="string_pref" />
+            </div>
+            <div class="form-group">
+              <label for="tension">Tension</label>
+              <input type="text" id="tension" />
+            </div>
+            <div class="form-group">
+              <label for="grip">Grip Size</label>
+              <input type="text" id="grip" />
+            </div>
+            <div class="form-group">
+              <label for="racquet">Racquet Model</label>
+              <input type="text" id="racquet" />
+            </div>
+            <div class="form-group">
+              <label for="notes">Notes</label>
+              <textarea id="notes"></textarea>
+            </div>
+            <button type="submit" class="btn">Update Profile</button>
+          </form>
+        </div>
+
+        <!-- Stringing Jobs Section -->
+        <div class="portal-section">
+          <h3>Stringing History</h3>
+          <div id="jobs-list"></div>
+        </div>
+
+        <!-- Rackets Section -->
+        <div class="portal-section">
+          <h3>Your Rackets</h3>
+          <div id="rackets-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_URL = 'https://tennis-admin-api.vnyson.workers.dev';
+
+      // Get token from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+
+      if (!token) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').textContent =
+          'No access token provided. Please use the link sent to you.';
+        document.getElementById('error').classList.remove('hidden');
+      } else {
+        loadPlayerData(token);
+      }
+
+      async function loadPlayerData(token) {
+        try {
+          const response = await fetch(
+            `${API_URL}/api/player-by-token?token=${encodeURIComponent(token)}`,
+          );
+          if (!response.ok) {
+            throw new Error('Failed to load player data');
+          }
+          const data = await response.json();
+
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('portal-content').classList.remove('hidden');
+
+          // Populate profile form
+          document.getElementById('player-id').value = data.player.id;
+          document.getElementById('access-token').value = token;
+          document.getElementById('name').value = data.player.name || '';
+          document.getElementById('email').value = data.player.email || '';
+          document.getElementById('phone').value = data.player.phone || '';
+          document.getElementById('string_pref').value = data.player.string_pref || '';
+          document.getElementById('tension').value = data.player.tension || '';
+          document.getElementById('grip').value = data.player.grip || '';
+          document.getElementById('racquet').value = data.player.racquet || '';
+          document.getElementById('notes').value = data.player.notes || '';
+
+          // Populate jobs list
+          const jobsList = document.getElementById('jobs-list');
+          if (data.jobs.length === 0) {
+            jobsList.innerHTML = '<p>No stringing jobs yet.</p>';
+          } else {
+            jobsList.innerHTML = data.jobs
+              .map(
+                (job) => `
+              <div class="job-item">
+                <div><strong>Racquet:</strong> ${job.racquet || 'N/A'}</div>
+                <div><strong>String:</strong> ${job.string_mains || job.string || 'N/A'} ${job.string_crosses ? `/ ${job.string_crosses}` : ''}</div>
+                <div><strong>Tension:</strong> ${job.tension_mains || job.tension || 'N/A'}${job.tension_unit || ''} ${job.tension_crosses ? `/ ${job.tension_crosses}${job.tension_unit_crosses || ''}` : ''}</div>
+                <div><strong>Status:</strong> ${job.status || 'N/A'}</div>
+                <div><strong>Date:</strong> ${new Date(job.created_at).toLocaleDateString()}</div>
+              </div>
+            `,
+              )
+              .join('');
+          }
+
+          // Populate rackets list
+          const racketsList = document.getElementById('rackets-list');
+          if (data.rackets.length === 0) {
+            racketsList.innerHTML = '<p>No rackets on file.</p>';
+          } else {
+            racketsList.innerHTML = data.rackets
+              .map(
+                (racket) => `
+              <div class="racket-item">
+                <div><strong>Brand:</strong> ${racket.brand || 'N/A'}</div>
+                <div><strong>Model:</strong> ${racket.model || 'N/A'}</div>
+                <div><strong>Year:</strong> ${racket.year || 'N/A'}</div>
+                ${racket.notes ? `<div><strong>Notes:</strong> ${racket.notes}</div>` : ''}
+              </div>
+            `,
+              )
+              .join('');
+          }
+        } catch (error) {
+          console.error('Error loading player data:', error);
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('error').textContent =
+            'Failed to load your data. Please check your link or contact support.';
+          document.getElementById('error').classList.remove('hidden');
+        }
+      }
+
+      document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const playerId = document.getElementById('player-id').value;
+        const token = document.getElementById('access-token').value;
+
+        const data = {
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          string_pref: document.getElementById('string_pref').value,
+          tension: document.getElementById('tension').value,
+          grip: document.getElementById('grip').value,
+          racquet: document.getElementById('racquet').value,
+          notes: document.getElementById('notes').value,
+        };
+
+        try {
+          const response = await fetch(
+            `${API_URL}/api/players/${playerId}?token=${encodeURIComponent(token)}`,
+            {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error('Failed to update profile');
+          }
+
+          document.getElementById('success').textContent = 'Profile updated successfully!';
+          document.getElementById('success').classList.remove('hidden');
+          setTimeout(() => {
+            document.getElementById('success').classList.add('hidden');
+          }, 3000);
+        } catch (error) {
+          console.error('Error updating profile:', error);
+          document.getElementById('error').textContent =
+            'Failed to update profile. Please try again.';
+          document.getElementById('error').classList.remove('hidden');
+        }
+      });
+    </script>
+  </body>
+</html>
