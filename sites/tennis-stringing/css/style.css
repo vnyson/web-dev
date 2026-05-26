@@ -85,6 +85,10 @@ body {
 .stringing-card {
   padding: var(--space-md);
   text-align: center;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .queue-indicator {
