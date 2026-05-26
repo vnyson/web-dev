@@ -29,7 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
       updateQueueDisplay(data.count);
     } catch (error) {
       console.error('Error fetching queue status:', error);
-      queueText.textContent = 'Error';
+      // Default to 0 if API fails
+      updateQueueDisplay(0);
     }
   }
 
@@ -225,9 +226,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(rotateString, rotationInterval);
   }
 
-  // Service GIF Animation Control
-  const serviceGif = document.querySelector('.service-gif');
-  if (serviceGif) {
+  // Service GIF Animation Control - Reusable for all service gifs
+  const serviceGifs = document.querySelectorAll('.service-gif');
+  serviceGifs.forEach((serviceGif) => {
     const originalSrc = serviceGif.src;
     let isPlaying = false;
     let hasPlayedOnce = false;
@@ -307,5 +308,5 @@ document.addEventListener('DOMContentLoaded', () => {
       serviceGif.classList.remove('service-gif--paused');
       serviceGif.classList.add('service-gif--playing');
     }
-  }
+  });
 });
