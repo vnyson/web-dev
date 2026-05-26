@@ -25,19 +25,18 @@
 
     <!-- Contact Section -->
     <div class="main-container flex flex-col">
-      <section class="contact-header">
-        <div
-          class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all contact-header__content"
-        >
-          <h2 class="contact-header__title">rva racket services</h2>
-          <p class="contact-header__info">vinay soni</p>
-          <p class="contact-header__info">817 798 3062</p>
-        </div>
-      </section>
+      <!-- Desktop Section (hidden on mobile) -->
+      <section class="desktop-section">
+        <div class="desktop-navigation-bar">
+          <!-- Contact Card -->
+          <div
+            class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all contact-card"
+          >
+            <h2 class="contact-header__title">rva racket services</h2>
+            <p class="contact-header__info">vinay soni</p>
+            <p class="contact-header__info">817 798 3062</p>
+          </div>
 
-      <!-- Navigation Section -->
-      <section class="navigation-section">
-        <div class="navigation-bar">
           <!-- Queue Card -->
           <div
             class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all queue-card"
@@ -58,6 +57,43 @@
           <div
             class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all stringing-card"
           >
+            <div class="stringing-care-wrapper">
+              <div class="stringing-care">
+                <p class="contact-header__info tagline">stringing</p>
+                <div class="string-display-row">
+                  <p class="contact-header__string-display"><span class="string-name"></span></p>
+                  <button class="inventory-button" aria-label="View inventory">
+                    <img src="assets/images/navigation/backpack-inventory.png" alt="Inventory" />
+                  </button>
+                </div>
+                <p class="contact-header__info tagline">with care</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mobile Section (hidden on desktop) -->
+      <section class="mobile-section">
+        <div
+          class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all contact-header__content"
+        >
+          <h2 class="contact-header__title">rva racket services</h2>
+          <p class="contact-header__info">vinay soni</p>
+          <p class="contact-header__info">817 798 3062</p>
+
+          <!-- Mobile Navigation -->
+          <div class="mobile-navigation">
+            <div class="queue-indicator">
+              <p class="queue-label">QUEUE</p>
+              <img
+                class="queue-image"
+                src="assets/images/queue/Pokemon Hospital-0.png"
+                alt="Queue status"
+                data-gif-src="assets/images/queue/Pokemon Hospital.gif"
+              />
+              <p class="queue-text">Loading...</p>
+            </div>
             <div class="stringing-care-wrapper">
               <div class="stringing-care">
                 <p class="contact-header__info tagline">stringing</p>
