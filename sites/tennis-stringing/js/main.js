@@ -12,10 +12,10 @@ if (urlParams.has('clear-splash')) {
 
 document.addEventListener('DOMContentLoaded', () => {
   // Queue Data Fetching
-  const queueImage = document.querySelector('.queue-image');
-  const queueText = document.querySelector('.queue-text');
+  const queueImages = document.querySelectorAll('.queue-image');
+  const queueTexts = document.querySelectorAll('.queue-text');
 
-  if (queueImage && queueText) {
+  if (queueImages.length > 0 && queueTexts.length > 0) {
     fetchQueueStatus();
   }
 
@@ -64,25 +64,29 @@ document.addEventListener('DOMContentLoaded', () => {
       text = 'EST. 1-2 weeks';
     }
 
-    queueImage.src = `assets/images/queue/${imageName}`;
-    queueText.textContent = text;
+    queueImages.forEach((queueImage) => {
+      queueImage.src = `assets/images/queue/${imageName}`;
+    });
+    queueTexts.forEach((queueText) => {
+      queueText.textContent = text;
+    });
   }
 
   // Queue Image Hover Effect
-  if (queueImage) {
+  queueImages.forEach((queueImage) => {
     const originalSrc = queueImage.src;
     const gifSrc = queueImage.dataset.gifSrc;
 
-    queueImage.addEventListener('mouseenter', () => {
-      if (gifSrc) {
+    if (gifSrc) {
+      queueImage.addEventListener('mouseenter', () => {
         queueImage.src = gifSrc;
-      }
-    });
+      });
 
-    queueImage.addEventListener('mouseleave', () => {
-      queueImage.src = originalSrc;
-    });
-  }
+      queueImage.addEventListener('mouseleave', () => {
+        queueImage.src = originalSrc;
+      });
+    }
+  });
 
   // Inventory Overlay
   const inventoryButton = document.querySelector('.inventory-button');

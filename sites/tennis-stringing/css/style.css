@@ -129,7 +129,11 @@ body {
 
   .mobile-section {
     display: block;
-    padding: 0 var(--space-md) var(--space-md);
+    padding: var(--space-xl) var(--space-md) var(--space-md);
+  }
+
+  .contact-header__content {
+    padding: var(--space-lg);
   }
 
   .queue-indicator.mobile {
