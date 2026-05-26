@@ -134,6 +134,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
+  min-width: 180px;
 }
 
 .inventory-button {
