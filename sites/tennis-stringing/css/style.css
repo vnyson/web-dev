@@ -112,7 +112,7 @@ body {
   padding: var(--space-md);
   text-align: center;
   min-height: 120px;
-  max-height: 120px;
+  max-height: 140px;
   display: flex;
   align-items: center;
   justify-content: center;
