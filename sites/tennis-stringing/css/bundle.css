@@ -788,11 +788,13 @@ body {
   padding: var(--space-md);
   text-align: center;
   min-height: 120px;
+  max-height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 1;
   min-width: 200px;
+  max-width: 250px;
 }
 /* Mobile Responsive */
 @media (max-width: 768px) {
