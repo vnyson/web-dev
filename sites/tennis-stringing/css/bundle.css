@@ -810,6 +810,14 @@ body {
   align-items: center;
   gap: var(--space-xs);
 }
+.queue-indicator.mobile {
+  flex-direction: row;
+  gap: var(--space-xs);
+}
+.queue-label.mobile {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
 .queue-label {
   font-size: var(--font-size-xs);
   color: var(--color-gray-800);
@@ -832,6 +840,9 @@ body {
   color: var(--color-gray-600);
   font-weight: var(--font-weight-semibold);
   text-transform: none !important;
+}
+.queue-text.mobile {
+  writing-mode: horizontal-tb;
 }
 .stringing-care-wrapper {
   display: flex;

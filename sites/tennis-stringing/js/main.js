@@ -195,8 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Rotating String Display
-  const stringNameElement = document.querySelector('.string-name');
-  if (stringNameElement) {
+  const stringNameElements = document.querySelectorAll('.string-name');
+  if (stringNameElements.length > 0) {
     const strings = [
       'ReString Zero 1.23mm',
       'Tourna Big Hitter Silver 17g',
@@ -206,21 +206,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const rotationInterval = 7000; // 7 seconds
 
     const rotateString = () => {
-      // Fade out
-      stringNameElement.classList.add('string-name--fading-out');
+      // Fade out all elements
+      stringNameElements.forEach((element) => {
+        element.classList.add('string-name--fading-out');
+      });
 
       setTimeout(() => {
         // Change text while hidden
         currentIndex = (currentIndex + 1) % strings.length;
-        stringNameElement.textContent = strings[currentIndex];
-
-        // Fade in by removing the fade-out class
-        stringNameElement.classList.remove('string-name--fading-out');
+        stringNameElements.forEach((element) => {
+          element.textContent = strings[currentIndex];
+          // Fade in by removing the fade-out class
+          element.classList.remove('string-name--fading-out');
+        });
       }, 250); // Match transition duration
     };
 
     // Set initial string
-    stringNameElement.textContent = strings[0];
+    stringNameElements.forEach((element) => {
+      element.textContent = strings[0];
+    });
 
     // Start rotation interval
     setInterval(rotateString, rotationInterval);
