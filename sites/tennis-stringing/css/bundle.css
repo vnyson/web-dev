@@ -768,6 +768,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex: 1;
+  min-width: 200px;
 }
 /* Mobile Section */
 .mobile-section {
@@ -789,6 +791,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1;
+  min-width: 200px;
 }
 /* Mobile Responsive */
 @media (max-width: 768px) {
