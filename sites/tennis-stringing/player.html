@@ -79,6 +79,28 @@
     <script>
       const API_URL = 'https://tennis-admin-api.vnyson.workers.dev';
 
+      // Racket image mapping
+      function getRacketImage(brand, model) {
+        if (!brand || !model) return 'assets/images/rackets/Wilson Pro Staff.png';
+
+        const key = `${brand} ${model}`.toLowerCase();
+        const racketMap = {
+          'babolat pure aero': 'assets/images/rackets/Babolat Pure Aero.png',
+          'babolat pure drive': 'assets/images/rackets/Babolat Pure Drive.png',
+          'babolat pure strike': 'assets/images/rackets/Babolat Pure Strike.png',
+          'head gravity': 'assets/images/rackets/Head Gravity.png',
+          'head radical': 'assets/images/rackets/Head Radical.png',
+          'head speed': 'assets/images/rackets/Head Speed.png',
+          'wilson blade': 'assets/images/rackets/Wilson Blade.png',
+          'wilson pro staff': 'assets/images/rackets/Wilson Pro Staff.png',
+          'wilson redline': 'assets/images/rackets/Wilson Redline.png',
+          'yonex ezone': 'assets/images/rackets/Yonex Ezone.png',
+          'yonex vcore': 'assets/images/rackets/Yonex VCORE.png',
+        };
+
+        return racketMap[key] || 'assets/images/rackets/Wilson Pro Staff.png';
+      }
+
       // Get token from URL
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get('token');
@@ -146,6 +168,7 @@
               .map(
                 (racket) => `
               <div class="racket-item">
+                <img src="${getRacketImage(racket.brand, racket.model)}" alt="${racket.brand} ${racket.model}" class="racket-item__image" />
                 <div><strong>Brand:</strong> ${racket.brand || 'N/A'}</div>
                 <div><strong>Model:</strong> ${racket.model || 'N/A'}</div>
                 <div><strong>Year:</strong> ${racket.year || 'N/A'}</div>
