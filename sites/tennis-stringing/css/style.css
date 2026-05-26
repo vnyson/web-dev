@@ -120,7 +120,6 @@ body {
   font-size: var(--font-size-xs);
   color: var(--color-gray-600);
   font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
 }
 
 .stringing-care-wrapper {
