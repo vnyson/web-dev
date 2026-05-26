@@ -72,21 +72,19 @@ body {
   padding: 0 var(--space-md) var(--space-md);
 }
 
-.navigation-section__content {
-  padding: var(--space-md);
-  text-align: center;
-  max-width: 600px;
-  margin: 0 auto;
-  min-height: 80px;
-}
-
 /* Navigation Bar */
 .navigation-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: var(--space-md);
   flex-wrap: wrap;
+}
+
+.queue-card,
+.stringing-card {
+  padding: var(--space-md);
+  text-align: center;
 }
 
 .queue-indicator {
@@ -143,7 +141,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  width: 180px;
+  width: 200px;
 }
 
 .inventory-button {
@@ -163,18 +161,6 @@ body {
 .inventory-button img {
   width: 24px;
   height: 24px;
-  object-fit: contain;
-}
-
-.demo-program {
-  opacity: 0.5;
-  filter: grayscale(100%);
-  pointer-events: none;
-}
-
-.demo-program img {
-  width: 48px;
-  height: 48px;
   object-fit: contain;
 }
 
