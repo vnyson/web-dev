@@ -69,11 +69,11 @@ body {
   display: flex;
   justify-content: center;
   width: 100%;
-  padding: 0 var(--space-md) var(--space-xl);
+  padding: 0 var(--space-md) var(--space-md);
 }
 
 .navigation-section__content {
-  padding: var(--space-lg);
+  padding: var(--space-md);
   text-align: center;
   max-width: 600px;
   margin: 0 auto;
@@ -116,7 +116,7 @@ body {
 .stringing-care-wrapper {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   flex: 1;
   justify-content: center;
 }
@@ -126,6 +126,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: var(--space-xs);
+  min-width: 120px;
 }
 
 .inventory-button {
@@ -135,6 +136,7 @@ body {
   cursor: pointer;
   transition: transform var(--transition-normal);
   opacity: 0.7;
+  align-self: center;
 }
 
 .inventory-button:hover {
@@ -143,8 +145,8 @@ body {
 }
 
 .inventory-button img {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 }
 
@@ -186,7 +188,7 @@ body {
   color: var(--color-gray-800);
   margin: var(--space-xs) 0;
   text-align: center;
-  min-height: 1.5em;
+  height: 1.5em;
   font-weight: var(--font-weight-semibold);
 }
 
