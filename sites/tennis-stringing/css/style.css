@@ -132,10 +132,6 @@ body {
     padding: 0 var(--space-md) var(--space-md);
   }
 
-  .queue-indicator.mobile .queue-image {
-    display: none;
-  }
-
   .queue-indicator.mobile {
     flex-direction: row;
     gap: var(--space-sm);
