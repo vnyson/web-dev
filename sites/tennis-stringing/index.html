@@ -29,12 +29,43 @@
         <div
           class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all contact-header__content"
         >
+          <!-- Navigation Bar -->
+          <div class="navigation-bar">
+            <!-- Queue Indicator -->
+            <div class="queue-indicator">
+              <img
+                class="queue-image"
+                src="assets/images/queue/Pokemon Hospital-0.png"
+                alt="Queue status"
+                data-gif-src="assets/images/queue/Pokemon Hospital.gif"
+              />
+              <p class="queue-text">Loading...</p>
+            </div>
+
+            <!-- Stringing with Care -->
+            <div class="stringing-care">
+              <p class="contact-header__info tagline">stringing</p>
+              <p class="contact-header__string-display"><span class="string-name"></span></p>
+              <p class="contact-header__info tagline">with care</p>
+            </div>
+
+            <!-- Inventory Button -->
+            <button class="inventory-button" aria-label="View inventory">
+              <img src="assets/images/navigation/backpack-inventory.png" alt="Inventory" />
+            </button>
+
+            <!-- Demo Program (disabled) -->
+            <div class="demo-program">
+              <img
+                src="assets/images/navigation/pokedex-demo.png"
+                alt="Demo program (coming soon)"
+              />
+            </div>
+          </div>
+
           <h2 class="contact-header__title">rva racket services</h2>
           <p class="contact-header__info">vinay soni</p>
           <p class="contact-header__info">817 798 3062</p>
-          <p class="contact-header__info tagline">stringing</p>
-          <p class="contact-header__string-display"><span class="string-name"></span></p>
-          <p class="contact-header__info tagline">with care</p>
         </div>
       </section>
 
@@ -73,6 +104,14 @@
             class="service-card panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all flex-1"
             data-animation="weights"
           >
+            <div class="service-gif-container">
+              <img
+                class="service-gif"
+                src="assets/images/services/racket-weight.gif"
+                alt="Racket weight customization animation"
+                data-static-src="assets/images/services/racket-weight.gif"
+              />
+            </div>
             <h3 class="service-heading">customization + matching</h3>
             <p class="service-description">add lead, new grips, match multiple sticks</p>
             <p class="service-rates">
@@ -85,12 +124,33 @@
             class="service-card panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all flex-1"
             data-animation="racquet"
           >
+            <div class="service-gif-container">
+              <img
+                class="service-gif"
+                src="assets/images/services/racket-scale.gif"
+                alt="Racket scale animation"
+                data-static-src="assets/images/services/racket-scale.gif"
+              />
+            </div>
             <h3 class="service-heading">spec-ing</h3>
             <p class="service-description">get your sticks' actual specs</p>
             <p class="service-rates">free with stringing</p>
           </div>
         </div>
       </section>
+    </div>
+
+    <!-- Inventory Overlay -->
+    <div id="inventory-overlay" class="inventory-overlay hidden">
+      <div class="inventory-overlay__content">
+        <div class="inventory-overlay__header">
+          <h2>Inventory</h2>
+          <button class="inventory-overlay__close" aria-label="Close inventory">✕</button>
+        </div>
+        <div id="inventory-grid" class="inventory-grid">
+          <p>Loading inventory...</p>
+        </div>
+      </div>
     </div>
 
     <script src="js/bundle.js" defer></script>

@@ -223,6 +223,28 @@ async function handleRegenerateToken(
   });
 }
 
+// Handler for queue-status endpoint
+async function handleQueueStatus(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
+  if (request.method !== 'GET') {
+    return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+  }
+
+  // Public read-only access - no authentication required
+  const result = await env.DB.prepare(
+    "SELECT COUNT(*) as count FROM stringing WHERE status IN ('in_queue', 'waiting')",
+  ).first();
+
+  const count = result ? (result.count as number) : 0;
+
+  return new Response(JSON.stringify({ count }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -269,6 +291,9 @@ export default {
     }
     if (path === '/api/regenerate-token') {
       return handleRegenerateToken(request, env, corsHeaders);
+    }
+    if (path === '/api/queue-status') {
+      return handleQueueStatus(request, env, corsHeaders);
     }
 
     // 404 for unknown routes
@@ -675,12 +700,7 @@ export async function handleInventory(
   const id = url.pathname.split('/').pop();
 
   if (request.method === 'GET') {
-    // Requires admin session
-    const isAdmin = await validateAdminSession(request, env);
-    if (!isAdmin) {
-      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
-    }
-
+    // Public read-only access - no authentication required
     if (id && id !== 'inventory') {
       const result = await env.DB.prepare('SELECT * FROM inventory WHERE id = ?').bind(id).first();
       if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
