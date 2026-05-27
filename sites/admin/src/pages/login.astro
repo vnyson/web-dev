@@ -1,6 +1,5 @@
 ---
 import '../styles/global.css';
-import { setAuthToken } from '../lib/api';
 ---
 
 <html lang="en">
@@ -39,29 +38,36 @@ import { setAuthToken } from '../lib/api';
 
 		<script>
 			const API_URL = 'https://tennis-admin-api.vnyson.workers.dev';
-			
+
+			// Helper function to set auth token
+			function setAuthToken(token: string): void {
+				if (typeof localStorage !== 'undefined') {
+					localStorage.setItem('admin_token', token);
+				}
+			}
+
 			const googleLoginBtn = document.getElementById('google-login-btn');
 			const loadingDiv = document.getElementById('loading');
 			const errorDiv = document.getElementById('error');
-			
+
 			// Check if we have an auth code from OAuth callback
 			const urlParams = new URLSearchParams(window.location.search);
 			const code = urlParams.get('code');
-			
+
 			if (code) {
 				// Exchange code for token
 				handleOAuthCallback(code);
 			}
-			
+
 			googleLoginBtn.addEventListener('click', () => {
 				// Redirect to Google OAuth
 				window.location.href = `${API_URL}/auth/google`;
 			});
-			
+
 			async function handleOAuthCallback(code: string) {
 				loadingDiv.classList.remove('hidden');
 				googleLoginBtn.classList.add('hidden');
-				
+
 				try {
 					const response = await fetch(`${API_URL}/auth/google/callback`, {
 						method: 'POST',
@@ -70,16 +76,16 @@ import { setAuthToken } from '../lib/api';
 						},
 						body: JSON.stringify({ code }),
 					});
-					
+
 					if (!response.ok) {
 						throw new Error('Authentication failed');
 					}
-					
+
 					const data = await response.json();
-					
+
 					// Store the token
 					setAuthToken(data.token);
-					
+
 					// Redirect to dashboard
 					window.location.href = '/';
 				} catch (error) {
