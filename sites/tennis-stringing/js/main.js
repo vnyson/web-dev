@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const strings = [
       'ReString Zero 1.23mm',
       'Tourna Big Hitter Silver 17g',
-      'Golden Set Snake Bit 17g',
+      'Golden Set Snake Bite 17g',
     ];
     let currentIndex = 0;
     const rotationInterval = 7000; // 7 seconds

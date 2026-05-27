@@ -7,7 +7,8 @@
     "build": "npm run build:css && npm run build:js",
     "build:css": "postcss css/style.css --output css/bundle.css",
     "build:js": "esbuild js/main.js --bundle --outfile=js/bundle.js --minify",
-    "dev": "npm run build:css && browser-sync start --server --files '.' --watch --no-notify --port 8080",
+    "dev": "npm run build:css && npm run watch:css & browser-sync start --server --files 'css/bundle.css, js/bundle.js, *.html' --watch --no-notify --port 8080",
+    "watch:css": "postcss css/style.css --output css/bundle.css --watch",
     "lint": "eslint js/main.js",
     "dev:hard": "node -e \"console.clear(); console.log('Clearing sessionStorage...'); console.log('Starting dev server with hard refresh...')\" && browser-sync start --server --files '.' --watch --no-notify --port 8080 --startPath '/?clear-splash=true'"
   },
