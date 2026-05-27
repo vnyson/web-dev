@@ -28,6 +28,9 @@ function getAuthHeaders(): HeadersInit {
   };
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+    console.log('Authorization header added');
+  } else {
+    console.log('No token found, Authorization header not added');
   }
   return headers;
 }
