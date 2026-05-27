@@ -150,9 +150,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 		<script>
 			// Check authentication on page load
 			const token = getAuthToken();
-			console.log('Token check on players page:', token);
 			if (!token) {
-				console.log('No token found, redirecting to login');
 				window.location.href = '/login';
 			}
 

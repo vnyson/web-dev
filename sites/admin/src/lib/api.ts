@@ -3,9 +3,7 @@ const API_URL = 'https://tennis-admin-api.vnyson.workers.dev';
 // Helper function to get auth token from localStorage
 function getAuthToken(): string | null {
   if (typeof localStorage === 'undefined') return null;
-  const token = localStorage.getItem('admin_token');
-  console.log('getAuthToken called, returning:', token);
-  return token;
+  return localStorage.getItem('admin_token');
 }
 
 // Helper function to set auth token
@@ -25,7 +23,6 @@ function clearAuthToken(): void {
 // Helper function to get auth headers
 function getAuthHeaders(): HeadersInit {
   const token = getAuthToken();
-  console.log('getAuthHeaders - token:', token);
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
