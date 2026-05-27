@@ -23,6 +23,7 @@ function clearAuthToken(): void {
 // Helper function to get auth headers
 function getAuthHeaders(): HeadersInit {
   const token = getAuthToken();
+  console.log('getAuthHeaders - token:', token);
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };

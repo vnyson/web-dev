@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, regeneratePlayerToken, getAuthToken } from '../lib/api';
 ---
 
 <html lang="en">
@@ -147,8 +148,16 @@ import '../styles/global.css';
 		</div>
 
 		<script>
-			const API_URL = import.meta.env.PUBLIC_API_URL || 'https://tennis-admin-api.vnyson.workers.dev';
-			
+			// Check authentication on page load
+			const token = getAuthToken();
+			console.log('Token check on players page:', token);
+			if (!token) {
+				console.log('No token found, redirecting to login');
+				window.location.href = '/login';
+			}
+
+			const API_URL = 'https://tennis-admin-api.vnyson.workers.dev';
+
 			// Modal elements
 			const modal = document.getElementById('player-modal');
 		 const addPlayerBtn = document.getElementById('add-player-btn');
@@ -183,31 +192,25 @@ import '../styles/global.css';
 			// Handle form submission
 			playerForm.addEventListener('submit', async (e) => {
 				e.preventDefault();
-				
+
 				const formData = new FormData(playerForm);
 				const data = Object.fromEntries(formData.entries());
 				const playerId = playerIdInput.value;
-				
+
 				try {
-					let response;
 					if (playerId) {
 						// Update existing player
-						response = await fetch(`${API_URL}/api/players/${playerId}`, {
+						const response = await fetch(`${API_URL}/api/players/${playerId}`, {
 							method: 'PUT',
-							headers: { 'Content-Type': 'application/json' },
+							headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getAuthToken()}` },
 							body: JSON.stringify(data),
 						});
+						if (!response.ok) throw new Error('Failed to save player');
 					} else {
 						// Create new player
-						response = await fetch(`${API_URL}/api/players`, {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify(data),
-						});
+						await createPlayer(data);
 					}
-					
-					if (!response.ok) throw new Error('Failed to save player');
-					
+
 					// Close modal and reload players
 					modal.classList.add('hidden');
 					modal.classList.remove('flex');
@@ -220,9 +223,7 @@ import '../styles/global.css';
 			
 			async function loadPlayers() {
 				try {
-					const response = await fetch(`${API_URL}/api/players`);
-					if (!response.ok) throw new Error('Failed to fetch players');
-					const players = await response.json();
+					const players = await fetchPlayers();
 					
 					const tbody = document.getElementById('players-table');
 					if (players.length === 0) {
@@ -390,7 +391,9 @@ import '../styles/global.css';
 			
 			async function loadPlayerForEdit(playerId) {
 				try {
-					const response = await fetch(`${API_URL}/api/players/${playerId}`);
+					const response = await fetch(`${API_URL}/api/players/${playerId}`, {
+						headers: { 'Authorization': `Bearer ${getAuthToken()}` },
+					});
 					if (!response.ok) throw new Error('Failed to fetch player');
 					const player = await response.json();
 					
@@ -424,6 +427,7 @@ import '../styles/global.css';
 				try {
 					const response = await fetch(`${API_URL}/api/players/${playerId}`, {
 						method: 'DELETE',
+						headers: { 'Authorization': `Bearer ${getAuthToken()}` },
 					});
 					if (!response.ok) throw new Error('Failed to delete player');
 					loadPlayers();
@@ -435,9 +439,7 @@ import '../styles/global.css';
 			
 			async function loadRackets(playerId) {
 				try {
-					const response = await fetch(`${API_URL}/api/rackets?player_id=${playerId}`);
-					if (!response.ok) throw new Error('Failed to fetch rackets');
-					const rackets = await response.json();
+					const rackets = await fetchRackets(playerId);
 					
 					const racketsList = document.querySelector(`.rackets-list[data-player-id="${playerId}"]`);
 					if (rackets.length === 0) {
@@ -473,12 +475,7 @@ import '../styles/global.css';
 			
 			async function addRacket(playerId, data) {
 				try {
-					const response = await fetch(`${API_URL}/api/rackets`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ player_id: playerId, ...data }),
-					});
-					if (!response.ok) throw new Error('Failed to add racket');
+					await createRacket({ player_id: playerId, ...data });
 					loadRackets(playerId);
 				} catch (error) {
 					console.error('Failed to add racket:', error);
@@ -488,10 +485,7 @@ import '../styles/global.css';
 			
 			async function deleteRacket(racketId, playerId) {
 				try {
-					const response = await fetch(`${API_URL}/api/rackets/${racketId}`, {
-						method: 'DELETE',
-					});
-					if (!response.ok) throw new Error('Failed to delete racket');
+					await deleteRacket(racketId);
 					loadRackets(playerId);
 				} catch (error) {
 					console.error('Failed to delete racket:', error);
@@ -501,7 +495,9 @@ import '../styles/global.css';
 			
 			async function loadLastJobs(playerId) {
 				try {
-					const response = await fetch(`${API_URL}/api/players?last_jobs=${playerId}`);
+					const response = await fetch(`${API_URL}/api/players?last_jobs=${playerId}`, {
+						headers: { 'Authorization': `Bearer ${getAuthToken()}` },
+					});
 					if (!response.ok) throw new Error('Failed to fetch last jobs');
 					const jobs = await response.json();
 
@@ -525,14 +521,7 @@ import '../styles/global.css';
 
 			async function generateShareableLink(playerId) {
 				try {
-					const response = await fetch(`${API_URL}/api/regenerate-token`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						credentials: 'include',
-						body: JSON.stringify({ player_id: playerId }),
-					});
-					if (!response.ok) throw new Error('Failed to generate link');
-					const data = await response.json();
+					const data = await regeneratePlayerToken(playerId);
 
 					const container = document.querySelector(`.shareable-link-container[data-player-id="${playerId}"]`);
 					const input = document.querySelector(`.shareable-link-input[data-player-id="${playerId}"]`);
