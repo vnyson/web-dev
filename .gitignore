@@ -15,3 +15,5 @@ db/*.json
 db/seed/*.sql
 db/seed/seed-from-export.js
 workers/api/*.csv
+sites/*/css/bundle.css
+sites/*/js/bundle.js
