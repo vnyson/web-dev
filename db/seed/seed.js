@@ -1,6 +1,16 @@
 // Seed script to import racquet-tracker data into Cloudflare D1
 // Run with: wrangler d1 execute tennis-admin-db --local --file=../../db/seed/seed.js
 
+let sql = '';
+
+// Clear existing data (respecting foreign key dependencies)
+sql += 'DELETE FROM inventory_consumption;\n';
+sql += 'DELETE FROM stringing;\n';
+sql += 'DELETE FROM history;\n';
+sql += 'DELETE FROM rackets;\n';
+sql += 'DELETE FROM inventory;\n';
+sql += 'DELETE FROM players;\n';
+
 const data = {
   players: [
     {
@@ -20,6 +30,8 @@ const data = {
       created_at: '2026-04-26 21:21:18',
       updated_at: '2026-04-26 21:21:18',
       restring_interval_weeks: null,
+      inventory_preferences: null,
+      access_token: 'dev-token-player-1',
     },
     {
       id: '00000000-0000-0000-0000-000000000002',
@@ -38,6 +50,8 @@ const data = {
       created_at: '2026-04-26 12:04:16',
       updated_at: '2026-04-26 12:04:16',
       restring_interval_weeks: null,
+      inventory_preferences: 'polyester',
+      access_token: 'dev-token-player-2',
     },
     {
       id: '00000000-0000-0000-0000-000000000003',
@@ -56,6 +70,8 @@ const data = {
       created_at: '2026-05-12 20:24:45',
       updated_at: '2026-05-12 20:24:45',
       restring_interval_weeks: null,
+      inventory_preferences: null,
+      access_token: 'dev-token-player-3',
     },
     {
       id: '00000000-0000-0000-0000-000000000004',
@@ -74,6 +90,8 @@ const data = {
       created_at: '2026-05-01 16:17:23',
       updated_at: '2026-05-01 16:17:23',
       restring_interval_weeks: null,
+      inventory_preferences: 'synthetic gut',
+      access_token: 'dev-token-player-4',
     },
     {
       id: '00000000-0000-0000-0000-000000000005',
@@ -92,6 +110,8 @@ const data = {
       created_at: '2026-04-26 13:13:34',
       updated_at: '2026-04-26 13:13:34',
       restring_interval_weeks: null,
+      inventory_preferences: null,
+      access_token: 'dev-token-player-5',
     },
     {
       id: '00000000-0000-0000-0000-000000000006',
@@ -110,6 +130,8 @@ const data = {
       created_at: '2026-04-26 12:05:58',
       updated_at: '2026-05-07 13:26:57',
       restring_interval_weeks: null,
+      inventory_preferences: 'hybrid',
+      access_token: 'dev-token-player-6',
     },
     {
       id: '00000000-0000-0000-0000-000000000007',
@@ -128,6 +150,8 @@ const data = {
       created_at: '2026-04-26 13:25:55',
       updated_at: '2026-04-26 13:25:55',
       restring_interval_weeks: null,
+      inventory_preferences: null,
+      access_token: 'dev-token-player-7',
     },
     {
       id: '00000000-0000-0000-0000-000000000008',
@@ -146,6 +170,8 @@ const data = {
       created_at: '2026-05-04 16:48:28',
       updated_at: '2026-05-07 15:16:17',
       restring_interval_weeks: null,
+      inventory_preferences: null,
+      access_token: 'dev-token-player-8',
     },
     {
       id: '00000000-0000-0000-0000-000000000009',
@@ -164,6 +190,8 @@ const data = {
       created_at: '2026-04-26 12:10:36',
       updated_at: '2026-04-26 12:10:36',
       restring_interval_weeks: '4',
+      inventory_preferences: 'polyester, natural gut',
+      access_token: 'dev-token-player-9',
     },
   ],
   stringing: [
@@ -183,7 +211,7 @@ const data = {
       prestretch_crosses: null,
       strung_at: '2026-05-21',
       notes: null,
-      status: 'open',
+      status: 'queued',
       priority: 'regular',
       created_at: '2026-05-21 10:16:12',
       player_own_string: '0',
@@ -199,6 +227,7 @@ const data = {
       stringer_name: null,
       knots: '4',
       player_name: 'Player Two',
+      job_type: 'stringing',
     },
     {
       id: '10000000-0000-0000-0000-000000000002',
@@ -216,7 +245,7 @@ const data = {
       prestretch_crosses: null,
       strung_at: '2026-05-16',
       notes: null,
-      status: 'picked_up',
+      status: 'done',
       priority: 'regular',
       created_at: '2026-05-16 15:01:59',
       player_own_string: '0',
@@ -232,6 +261,7 @@ const data = {
       stringer_name: null,
       knots: '4',
       player_name: 'Player Nine',
+      job_type: 'stringing',
     },
     {
       id: '10000000-0000-0000-0000-000000000003',
@@ -249,7 +279,7 @@ const data = {
       prestretch_crosses: null,
       strung_at: '2026-05-15',
       notes: null,
-      status: 'picked_up',
+      status: 'done',
       priority: 'regular',
       created_at: '2026-05-15 16:36:16',
       player_own_string: '0',
@@ -282,7 +312,7 @@ const data = {
       prestretch_crosses: null,
       strung_at: '2026-05-07',
       notes: null,
-      status: 'picked_up',
+      status: 'done',
       priority: 'regular',
       created_at: '2026-05-07 16:22:27',
       player_own_string: '0',
@@ -298,6 +328,7 @@ const data = {
       stringer_name: null,
       knots: '4',
       player_name: 'Player Nine',
+      job_type: 'stringing',
     },
     {
       id: '10000000-0000-0000-0000-000000000005',
@@ -315,7 +346,7 @@ const data = {
       prestretch_crosses: null,
       strung_at: '2026-05-07',
       notes: null,
-      status: 'strung',
+      status: 'ready_for_pickup',
       priority: 'regular',
       created_at: '2026-05-07 13:25:47',
       player_own_string: '0',
@@ -348,7 +379,7 @@ const data = {
       prestretch_crosses: null,
       strung_at: '2026-05-07',
       notes: null,
-      status: 'picked_up',
+      status: 'done',
       priority: 'regular',
       created_at: '2026-05-07 15:48:16',
       player_own_string: '0',
@@ -381,7 +412,7 @@ const data = {
       prestretch_crosses: null,
       strung_at: '2026-05-07',
       notes: null,
-      status: 'picked_up',
+      status: 'done',
       priority: 'regular',
       created_at: '2026-05-07 15:47:39',
       player_own_string: '0',
@@ -414,7 +445,7 @@ const data = {
       prestretch_crosses: null,
       strung_at: '2026-04-30',
       notes: null,
-      status: 'strung',
+      status: 'ready_for_pickup',
       priority: 'regular',
       created_at: '2026-04-30 09:55:46',
       player_own_string: '0',
@@ -447,7 +478,7 @@ const data = {
       prestretch_crosses: null,
       strung_at: '2026-04-26',
       notes: null,
-      status: 'picked_up',
+      status: 'done',
       priority: 'regular',
       created_at: '2026-04-26 13:15:06',
       player_own_string: '1',
@@ -463,6 +494,7 @@ const data = {
       stringer_name: null,
       knots: '4',
       player_name: 'Player Nine',
+      job_type: 'stringing',
     },
   ],
   history: [
@@ -490,6 +522,7 @@ const data = {
       price_other_label: null,
       price_total: null,
       player_name: 'Player Nine',
+      job_type: 'stringing',
     },
     {
       id: '20000000-0000-0000-0000-000000000002',
@@ -515,25 +548,145 @@ const data = {
       price_other_label: null,
       price_total: null,
       player_name: 'Player Nine',
+      job_type: 'stringing',
     },
   ],
-  inventory: [],
+  inventory: [
+    {
+      id: '30000000-0000-0000-0000-000000000001',
+      name: 'ReString Zero 1.23mm',
+      brand: 'ReString',
+      category: 'string',
+      price: 12.0,
+      quantity: 5,
+      status: 'in_stock',
+      notes: 'Polyester string',
+      created_at: '2026-05-01 10:00:00',
+      updated_at: '2026-05-01 10:00:00',
+    },
+    {
+      id: '30000000-0000-0000-0000-000000000002',
+      name: 'Tourna Big Hitter Silver 17g',
+      brand: 'Tourna',
+      category: 'string',
+      price: 14.0,
+      quantity: 3,
+      status: 'in_stock',
+      notes: 'Polyester string',
+      created_at: '2026-05-01 10:00:00',
+      updated_at: '2026-05-01 10:00:00',
+    },
+    {
+      id: '30000000-0000-0000-0000-000000000003',
+      name: 'Golden Set Snake Bite 17g',
+      brand: 'Golden Set',
+      category: 'string',
+      price: 10.0,
+      quantity: 8,
+      status: 'in_stock',
+      notes: 'Polyester string',
+      created_at: '2026-05-01 10:00:00',
+      updated_at: '2026-05-01 10:00:00',
+    },
+    {
+      id: '30000000-0000-0000-0000-000000000004',
+      name: 'Wilson Pro Overgrip',
+      brand: 'Wilson',
+      category: 'overgrip',
+      price: 2.5,
+      quantity: 20,
+      status: 'in_stock',
+      notes: 'Pack of 12',
+      created_at: '2026-05-01 10:00:00',
+      updated_at: '2026-05-01 10:00:00',
+    },
+    {
+      id: '30000000-0000-0000-0000-000000000005',
+      name: 'Babolat Syntech Grip',
+      brand: 'Babolat',
+      category: 'grip',
+      price: 5.0,
+      quantity: 10,
+      status: 'in_stock',
+      notes: 'Replacement grip',
+      created_at: '2026-05-01 10:00:00',
+      updated_at: '2026-05-01 10:00:00',
+    },
+  ],
+  rackets: [
+    {
+      id: '40000000-0000-0000-0000-000000000001',
+      player_id: '00000000-0000-0000-0000-000000000002',
+      brand: 'Wilson',
+      model: 'Pro Staff 97',
+      year: 2023,
+      notes: 'Main racket',
+      created_at: '2026-04-26 12:04:16',
+      updated_at: '2026-04-26 12:04:16',
+    },
+    {
+      id: '40000000-0000-0000-0000-000000000002',
+      player_id: '00000000-0000-0000-0000-000000000009',
+      brand: 'Head',
+      model: 'Gravity Pro',
+      year: 2022,
+      notes: 'Matched set of 3',
+      created_at: '2026-04-26 12:10:36',
+      updated_at: '2026-04-26 12:10:36',
+    },
+    {
+      id: '40000000-0000-0000-0000-000000000003',
+      player_id: '00000000-0000-0000-0000-000000000009',
+      brand: 'Head',
+      model: 'Gravity Pro',
+      year: 2022,
+      notes: 'Matched set of 3',
+      created_at: '2026-04-26 12:10:36',
+      updated_at: '2026-04-26 12:10:36',
+    },
+    {
+      id: '40000000-0000-0000-0000-000000000004',
+      player_id: '00000000-0000-0000-0000-000000000009',
+      brand: 'Head',
+      model: 'Gravity Pro',
+      year: 2022,
+      notes: 'Matched set of 3',
+      created_at: '2026-04-26 12:10:36',
+      updated_at: '2026-04-26 12:10:36',
+    },
+  ],
+  inventory_consumption: [
+    {
+      id: '50000000-0000-0000-0000-000000000001',
+      inventory_id: '30000000-0000-0000-0000-000000000001',
+      stringing_job_id: '10000000-0000-0000-0000-000000000001',
+      quantity_consumed: 1,
+      consumed_at: '2026-05-21 10:16:12',
+      notes: 'Stringing job for Player Two',
+    },
+    {
+      id: '50000000-0000-0000-0000-000000000002',
+      inventory_id: '30000000-0000-0000-0000-000000000002',
+      stringing_job_id: '10000000-0000-0000-0000-000000000002',
+      quantity_consumed: 1,
+      consumed_at: '2026-05-16 15:01:59',
+      notes: 'Stringing job for Player Nine',
+    },
+  ],
 };
 
 // Generate SQL INSERT statements
-let sql = '';
-
 // Insert players
 data.players.forEach((player) => {
-  sql += `INSERT INTO players (id, user_id, name, club, level, style, grip, string_pref, tension, racquet, notes, email, phone, restring_interval_weeks, created_at, updated_at)
-    VALUES ('${player.id}', '${player.user_id}', '${player.name.replace(/'/g, "''")}', '${player.club.replace(/'/g, "''")}', '${player.level.replace(/'/g, "''")}', '${player.style.replace(/'/g, "''")}', '${player.grip.replace(/'/g, "''")}', '${player.string_pref.replace(/'/g, "''")}', '${player.tension.replace(/'/g, "''")}', '${player.racquet.replace(/'/g, "''")}', '${player.notes.replace(/'/g, "''")}', '${player.email.replace(/'/g, "''")}', '${player.phone.replace(/'/g, "''")}', ${player.restring_interval_weeks || 'NULL'}, '${player.created_at}', '${player.updated_at}');
+  sql += `INSERT INTO players (id, user_id, name, club, level, style, grip, string_pref, tension, racquet, notes, email, phone, restring_interval_weeks, inventory_preferences, access_token, created_at, updated_at)
+    VALUES ('${player.id}', '${player.user_id}', '${player.name.replace(/'/g, "''")}', '${player.club.replace(/'/g, "''")}', '${player.level.replace(/'/g, "''")}', '${player.style.replace(/'/g, "''")}', '${player.grip.replace(/'/g, "''")}', '${player.string_pref.replace(/'/g, "''")}', '${player.tension.replace(/'/g, "''")}', '${player.racquet.replace(/'/g, "''")}', '${player.notes.replace(/'/g, "''")}', '${player.email.replace(/'/g, "''")}', '${player.phone.replace(/'/g, "''")}', ${player.restring_interval_weeks || 'NULL'}, ${player.inventory_preferences ? `'${player.inventory_preferences.replace(/'/g, "''")}'` : 'NULL'}, '${player.access_token}', '${player.created_at}', '${player.updated_at}');
 `;
 });
 
 // Insert stringing jobs
 data.stringing.forEach((job) => {
-  sql += `INSERT INTO stringing (id, player_id, racquet, string_mains, string_crosses, gauge_mains, gauge_crosses, tension_mains, tension_crosses, tension_unit, tension_unit_crosses, prestretch, prestretch_crosses, strung_at, notes, status, priority, created_at, player_own_string, labour_cost, material_cost, charge_total, string_tier, service_label, regrip, logo_color, pickup_time, picked_up_at, stringer_name, knots, player_name)
-    VALUES ('${job.id}', '${job.player_id}', ${job.racquet ? `'${job.racquet.replace(/'/g, "''")}'` : 'NULL'}, ${job.string_mains ? `'${job.string_mains.replace(/'/g, "''")}'` : 'NULL'}, ${job.string_crosses ? `'${job.string_crosses.replace(/'/g, "''")}'` : 'NULL'}, ${job.gauge_mains ? `'${job.gauge_mains.replace(/'/g, "''")}'` : 'NULL'}, ${job.gauge_crosses ? `'${job.gauge_crosses.replace(/'/g, "''")}'` : 'NULL'}, ${job.tension_mains ? `'${job.tension_mains.replace(/'/g, "''")}'` : 'NULL'}, ${job.tension_crosses ? `'${job.tension_crosses.replace(/'/g, "''")}'` : 'NULL'}, '${job.tension_unit}', '${job.tension_unit_crosses}', ${job.prestretch ? `'${job.prestretch.replace(/'/g, "''")}'` : 'NULL'}, ${job.prestretch_crosses ? `'${job.prestretch_crosses.replace(/'/g, "''")}'` : 'NULL'}, ${job.strung_at ? `'${job.strung_at}'` : 'NULL'}, ${job.notes ? `'${job.notes.replace(/'/g, "''")}'` : 'NULL'}, '${job.status}', '${job.priority}', '${job.created_at}', ${job.player_own_string}, ${job.labour_cost || 'NULL'}, ${job.material_cost || 'NULL'}, ${job.charge_total || 'NULL'}, '${job.string_tier}', ${job.service_label ? `'${job.service_label.replace(/'/g, "''")}'` : 'NULL'}, ${job.regrip}, ${job.logo_color ? `'${job.logo_color.replace(/'/g, "''")}'` : 'NULL'}, ${job.pickup_time ? `'${job.pickup_time}'` : 'NULL'}, ${job.picked_up_at ? `'${job.picked_up_at}'` : 'NULL'}, ${job.stringer_name ? `'${job.stringer_name.replace(/'/g, "''")}'` : 'NULL'}, ${job.knots || 'NULL'}, '${job.player_name.replace(/'/g, "''")}');
+  sql += `INSERT INTO stringing (id, player_id, racquet, string_mains, string_crosses, gauge_mains, gauge_crosses, tension_mains, tension_crosses, tension_unit, tension_unit_crosses, prestretch, prestretch_crosses, strung_at, notes, status, priority, created_at, player_own_string, labour_cost, material_cost, charge_total, string_tier, service_label, regrip, logo_color, pickup_time, picked_up_at, stringer_name, knots, player_name, job_type)
+    VALUES ('${job.id}', '${job.player_id}', ${job.racquet ? `'${job.racquet.replace(/'/g, "''")}'` : 'NULL'}, ${job.string_mains ? `'${job.string_mains.replace(/'/g, "''")}'` : 'NULL'}, ${job.string_crosses ? `'${job.string_crosses.replace(/'/g, "''")}'` : 'NULL'}, ${job.gauge_mains ? `'${job.gauge_mains.replace(/'/g, "''")}'` : 'NULL'}, ${job.gauge_crosses ? `'${job.gauge_crosses.replace(/'/g, "''")}'` : 'NULL'}, ${job.tension_mains ? `'${job.tension_mains.replace(/'/g, "''")}'` : 'NULL'}, ${job.tension_crosses ? `'${job.tension_crosses.replace(/'/g, "''")}'` : 'NULL'}, '${job.tension_unit}', '${job.tension_unit_crosses}', ${job.prestretch ? `'${job.prestretch.replace(/'/g, "''")}'` : 'NULL'}, ${job.prestretch_crosses ? `'${job.prestretch_crosses.replace(/'/g, "''")}'` : 'NULL'}, ${job.strung_at ? `'${job.strung_at}'` : 'NULL'}, ${job.notes ? `'${job.notes.replace(/'/g, "''")}'` : 'NULL'}, '${job.status}', '${job.priority}', '${job.created_at}', ${job.player_own_string}, ${job.labour_cost || 'NULL'}, ${job.material_cost || 'NULL'}, ${job.charge_total || 'NULL'}, '${job.string_tier}', ${job.service_label ? `'${job.service_label.replace(/'/g, "''")}'` : 'NULL'}, ${job.regrip}, ${job.logo_color ? `'${job.logo_color.replace(/'/g, "''")}'` : 'NULL'}, ${job.pickup_time ? `'${job.pickup_time}'` : 'NULL'}, ${job.picked_up_at ? `'${job.picked_up_at}'` : 'NULL'}, ${job.stringer_name ? `'${job.stringer_name.replace(/'/g, "''")}'` : 'NULL'}, ${job.knots || 'NULL'}, '${job.player_name.replace(/'/g, "''")}', '${job.job_type}');
 `;
 });
 
@@ -541,6 +694,27 @@ data.stringing.forEach((job) => {
 data.history.forEach((h) => {
   sql += `INSERT INTO history (id, player_id, racquet, notes, current_weight, target_weight, current_balance, target_balance, mass_added, mass_location, sw_delta, sw_result, created_at, price_currency, price_overgrip, price_specs_measurement, price_specs_matching, price_grip_replacement, price_bumper_grommet, price_other, price_other_label, price_total, player_name)
     VALUES ('${h.id}', '${h.player_id}', ${h.racquet ? `'${h.racquet.replace(/'/g, "''")}'` : 'NULL'}, '${h.notes.replace(/'/g, "''")}', ${h.current_weight || 'NULL'}, ${h.target_weight || 'NULL'}, ${h.current_balance || 'NULL'}, ${h.target_balance || 'NULL'}, ${h.mass_added || 'NULL'}, ${h.mass_location || 'NULL'}, ${h.sw_delta || 'NULL'}, ${h.sw_result || 'NULL'}, '${h.created_at}', ${h.price_currency ? `'${h.price_currency.replace(/'/g, "''")}'` : 'NULL'}, ${h.price_overgrip || 'NULL'}, ${h.price_specs_measurement || 'NULL'}, ${h.price_specs_matching || 'NULL'}, ${h.price_grip_replacement || 'NULL'}, ${h.price_bumper_grommet || 'NULL'}, ${h.price_other || 'NULL'}, ${h.price_other_label ? `'${h.price_other_label.replace(/'/g, "''")}'` : 'NULL'}, ${h.price_total || 'NULL'}, '${h.player_name.replace(/'/g, "''")}');
+`;
+});
+
+// Insert inventory
+data.inventory.forEach((item) => {
+  sql += `INSERT INTO inventory (id, name, brand, category, price, quantity, status, notes, created_at, updated_at)
+    VALUES ('${item.id}', '${item.name.replace(/'/g, "''")}', ${item.brand ? `'${item.brand.replace(/'/g, "''")}'` : 'NULL'}, ${item.category ? `'${item.category.replace(/'/g, "''")}'` : 'NULL'}, ${item.price || 'NULL'}, ${item.quantity}, '${item.status}', ${item.notes ? `'${item.notes.replace(/'/g, "''")}'` : 'NULL'}, '${item.created_at}', '${item.updated_at}');
+`;
+});
+
+// Insert rackets
+data.rackets.forEach((racket) => {
+  sql += `INSERT INTO rackets (id, player_id, brand, model, year, notes, created_at, updated_at)
+    VALUES ('${racket.id}', '${racket.player_id}', ${racket.brand ? `'${racket.brand.replace(/'/g, "''")}'` : 'NULL'}, ${racket.model ? `'${racket.model.replace(/'/g, "''")}'` : 'NULL'}, ${racket.year || 'NULL'}, ${racket.notes ? `'${racket.notes.replace(/'/g, "''")}'` : 'NULL'}, '${racket.created_at}', '${racket.updated_at}');
+`;
+});
+
+// Insert inventory consumption
+data.inventory_consumption.forEach((consumption) => {
+  sql += `INSERT INTO inventory_consumption (id, inventory_id, stringing_job_id, quantity_consumed, consumed_at, notes)
+    VALUES ('${consumption.id}', '${consumption.inventory_id}', '${consumption.stringing_job_id}', ${consumption.quantity_consumed}, '${consumption.consumed_at}', '${consumption.notes.replace(/'/g, "''")}');
 `;
 });
 

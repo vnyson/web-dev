@@ -1,4 +1,8 @@
-const API_URL = 'https://tennis-admin-api.vnyson.workers.dev';
+// Use localhost API when running locally
+export const API_URL =
+  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://127.0.0.1:8787'
+    : 'https://tennis-admin-api.vnyson.workers.dev';
 
 // Helper function to get auth token from localStorage
 function getAuthToken(): string | null {
@@ -26,7 +30,7 @@ function clearAuthToken(): void {
 }
 
 // Helper function to get auth headers
-function getAuthHeaders(): HeadersInit {
+export function getAuthHeaders(): HeadersInit {
   const token = getAuthToken();
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -122,6 +126,15 @@ export async function updateInventoryItem(id: string, data: any) {
     body: JSON.stringify(data),
   });
   if (!response.ok) throw new Error('Failed to update inventory item');
+  return response.json();
+}
+
+export async function deleteInventoryItem(id: string) {
+  const response = await fetch(`${API_URL}/api/inventory/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Failed to delete inventory item');
   return response.json();
 }
 

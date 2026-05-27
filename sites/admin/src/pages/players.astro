@@ -148,13 +148,17 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 		</div>
 
 		<script>
+			import { getAuthToken, fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket as deleteRacketApi, regeneratePlayerToken } from '../lib/api';
+
 			// Check authentication on page load
 			const token = getAuthToken();
 			if (!token) {
 				window.location.href = '/login';
 			}
 
-			const API_URL = 'https://tennis-admin-api.vnyson.workers.dev';
+			const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+				? 'http://127.0.0.1:8787'
+				: 'https://tennis-admin-api.vnyson.workers.dev';
 
 			// Modal elements
 			const modal = document.getElementById('player-modal');
@@ -483,7 +487,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 			
 			async function deleteRacket(racketId, playerId) {
 				try {
-					await deleteRacket(racketId);
+					await deleteRacketApi(racketId);
 					loadRackets(playerId);
 				} catch (error) {
 					console.error('Failed to delete racket:', error);

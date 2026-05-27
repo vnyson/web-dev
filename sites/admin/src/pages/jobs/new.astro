@@ -3,7 +3,9 @@ import '../../styles/global.css';
 ---
 
 <script>
-  const API_URL = 'https://tennis-admin-api.vnyson.workers.dev';
+  const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://127.0.0.1:8787'
+    : 'https://tennis-admin-api.vnyson.workers.dev';
 
   let players = [];
   let inventory = [];
@@ -12,7 +14,9 @@ import '../../styles/global.css';
   async function loadPlayers() {
     try {
       const response = await fetch(`${API_URL}/api/players`, {
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       if (!response.ok) throw new Error('Failed to fetch players');
       players = await response.json();
@@ -25,7 +29,9 @@ import '../../styles/global.css';
   async function loadInventory() {
     try {
       const response = await fetch(`${API_URL}/api/inventory`, {
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       if (!response.ok) throw new Error('Failed to fetch inventory');
       inventory = await response.json();
@@ -126,8 +132,9 @@ import '../../styles/global.css';
       tension_crosses: formData.get('tension_crosses'),
       tension_unit: formData.get('tension_unit'),
       notes: formData.get('notes'),
-      status: 'in_queue',
+      status: 'queued',
       priority: formData.get('rush') === 'on' ? 'rush' : 'normal',
+      job_type: formData.get('job_type') || 'stringing',
     };
 
     try {
@@ -224,6 +231,14 @@ import '../../styles/global.css';
 							<div id="inventory-warning" class="mb-4"></div>
 							<form class="space-y-6">
 								<div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+									<div class="sm:col-span-3">
+										<label for="job_type" class="block text-sm font-medium text-gray-700">Job Type</label>
+										<select name="job_type" id="job_type" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+											<option value="stringing">Stringing</option>
+											<option value="customization">Customization</option>
+										</select>
+									</div>
+
 									<div class="sm:col-span-3">
 										<label for="player_select" class="block text-sm font-medium text-gray-700">Select Player</label>
 										<select name="player_select" id="player_select" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">

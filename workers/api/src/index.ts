@@ -230,6 +230,36 @@ async function handleRegenerateToken(
   });
 }
 
+// Handler for dev-login endpoint (dev only)
+async function handleDevLogin(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
+  if (request.method !== 'POST') {
+    return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+  }
+
+  // Only allow in development (check for dev header or env var)
+  const isDev =
+    request.headers.get('X-Dev-Mode') === 'true' ||
+    !env.SESSION_SECRET ||
+    env.SESSION_SECRET === 'test_secret_for_local_dev';
+  if (!isDev) {
+    return new Response('Dev login only available in development', {
+      status: 403,
+      headers: corsHeaders,
+    });
+  }
+
+  // Generate session token
+  const sessionToken = crypto.randomUUID();
+
+  return new Response(JSON.stringify({ token: sessionToken }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
 // Handler for queue-status endpoint
 async function handleQueueStatus(
   request: Request,
@@ -242,7 +272,7 @@ async function handleQueueStatus(
 
   // Public read-only access - no authentication required
   const result = await env.DB.prepare(
-    "SELECT COUNT(*) as count FROM stringing WHERE status IN ('in_queue', 'waiting')",
+    "SELECT COUNT(*) as count FROM stringing WHERE status = 'queued'",
   ).first();
 
   const count = result ? (result.count as number) : 0;
@@ -261,7 +291,7 @@ export default {
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Dev-Mode',
     };
 
     // Handle CORS preflight requests
@@ -298,6 +328,9 @@ export default {
     }
     if (path === '/api/regenerate-token') {
       return handleRegenerateToken(request, env, corsHeaders);
+    }
+    if (path === '/api/dev-login') {
+      return handleDevLogin(request, env, corsHeaders);
     }
     if (path === '/api/queue-status') {
       return handleQueueStatus(request, env, corsHeaders);
@@ -761,7 +794,7 @@ export async function handleInventory(
 
     const body = await request.json();
     const stmt = env.DB.prepare(`
-      UPDATE inventory SET name = ?, brand = ?, category = ?, price = ?, quantity = ?, status = ?, notes = ?, updated_at = ?
+      UPDATE inventory SET name = ?, brand = ?, category = ?, price = ?, quantity = ?, status = ?, notes = ?, string_type = ?, string_characteristics = ?, updated_at = ?
       WHERE id = ?
     `);
     await stmt
@@ -773,6 +806,8 @@ export async function handleInventory(
         body.quantity || 0,
         body.status || 'in_stock',
         body.notes || null,
+        body.string_type || null,
+        body.string_characteristics || null,
         new Date().toISOString(),
         id,
       )

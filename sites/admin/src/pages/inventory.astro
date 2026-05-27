@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { fetchInventory, createInventoryItem, getAuthToken } from '../lib/api';
 ---
 
 <html lang="en">
@@ -71,10 +72,26 @@ import '../styles/global.css';
 										<label for="category" class="block text-sm font-medium text-gray-700">Category</label>
 										<select name="category" id="category" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
 											<option value="string">String</option>
-											<option value="grip">Grip</option>
+											<option value="racket">Racket</option>
 											<option value="accessory">Accessory</option>
 											<option value="other">Other</option>
 										</select>
+									</div>
+									<div id="string-fields" class="hidden">
+										<div>
+											<label for="string_type" class="block text-sm font-medium text-gray-700">String Type</label>
+											<select name="string_type" id="string_type" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+												<option value="">Select type...</option>
+												<option value="Poly">Poly</option>
+												<option value="Multi">Multi</option>
+												<option value="Synthetic Gut">Synthetic Gut</option>
+												<option value="Natural Gut">Natural Gut</option>
+											</select>
+										</div>
+										<div>
+											<label for="string_characteristics" class="block text-sm font-medium text-gray-700">Characteristics (comma-separated tags)</label>
+											<input type="text" name="string_characteristics" id="string_characteristics" placeholder="e.g. power, control, durability" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+										</div>
 									</div>
 									<div>
 										<label for="price" class="block text-sm font-medium text-gray-700">Price</label>
@@ -109,7 +126,69 @@ import '../styles/global.css';
 						</div>
 					</div>
 
+					<!-- Strings Table -->
+					<div class="bg-white shadow rounded-lg mb-6">
+						<div class="px-6 py-4 border-b border-gray-200">
+							<h2 class="text-lg font-medium text-gray-900">Strings</h2>
+						</div>
+						<div class="overflow-x-auto">
+							<table class="min-w-full divide-y divide-gray-200">
+								<thead class="bg-gray-50">
+									<tr>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">String Type</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Characteristics</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+										<th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+									</tr>
+								</thead>
+								<tbody class="bg-white divide-y divide-gray-200" id="strings-table">
+									<tr>
+										<td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
+											Loading strings...
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- Rackets Table -->
+					<div class="bg-white shadow rounded-lg mb-6">
+						<div class="px-6 py-4 border-b border-gray-200">
+							<h2 class="text-lg font-medium text-gray-900">Rackets</h2>
+						</div>
+						<div class="overflow-x-auto">
+							<table class="min-w-full divide-y divide-gray-200">
+								<thead class="bg-gray-50">
+									<tr>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+										<th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+									</tr>
+								</thead>
+								<tbody class="bg-white divide-y divide-gray-200" id="rackets-table">
+									<tr>
+										<td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+											Loading rackets...
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- Other Equipment Table -->
 					<div class="bg-white shadow rounded-lg">
+						<div class="px-6 py-4 border-b border-gray-200">
+							<h2 class="text-lg font-medium text-gray-900">Other Equipment</h2>
+						</div>
 						<div class="overflow-x-auto">
 							<table class="min-w-full divide-y divide-gray-200">
 								<thead class="bg-gray-50">
@@ -123,10 +202,10 @@ import '../styles/global.css';
 										<th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
 									</tr>
 								</thead>
-								<tbody class="bg-white divide-y divide-gray-200" id="inventory-table">
+								<tbody class="bg-white divide-y divide-gray-200" id="other-table">
 									<tr>
 										<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-											Loading inventory...
+											Loading other equipment...
 										</td>
 									</tr>
 								</tbody>
@@ -138,52 +217,149 @@ import '../styles/global.css';
 		</div>
 
 		<script>
-			const API_URL = 'https://tennis-admin-api.vnyson.workers.dev';
-			
+			import { getAuthToken, fetchInventory, createInventoryItem, updateInventoryItem, deleteInventoryItem as deleteInventoryItemApi } from '../lib/api';
+
+			// Check authentication on page load
+			if (!getAuthToken()) {
+				window.location.href = '/login';
+			}
+
 			async function loadInventory() {
 				try {
-					const response = await fetch(`${API_URL}/api/inventory`);
-					if (!response.ok) throw new Error('Failed to fetch inventory');
-					const inventory = await response.json();
-					
-					const tbody = document.getElementById('inventory-table');
-					if (inventory.length === 0) {
-						tbody.innerHTML = `
-							<tr>
-								<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-									No inventory items yet. Add your first item to get started.
-								</td>
-							</tr>
-						`;
-					} else {
-						tbody.innerHTML = inventory.map(item => {
-							const quantityClass = item.quantity <= 5 ? 'text-red-600 font-medium' : 'text-gray-500';
-							return `
-							<tr>
-								<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
-								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.brand || '-'}</td>
-								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.category || '-'}</td>
-								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.price ? `$${item.price}` : '-'}</td>
-								<td class="px-6 py-4 whitespace-nowrap text-sm ${quantityClass}">${item.quantity}</td>
-								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.status}</td>
-								<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-									<button class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-									<button class="text-red-600 hover:text-red-900">Delete</button>
-								</td>
-							</tr>
-						`;
-						}).join('');
+					console.log('Fetching inventory...');
+					const inventory = await fetchInventory();
+					console.log('Inventory data:', inventory);
+
+					// Group items by category
+					const strings = inventory.filter(item => item.category?.toLowerCase() === 'string');
+					const rackets = inventory.filter(item => item.category?.toLowerCase() === 'racket');
+					const other = inventory.filter(item => item.category?.toLowerCase() !== 'string' && item.category?.toLowerCase() !== 'racket');
+
+					// Populate strings table
+					const stringsTbody = document.getElementById('strings-table');
+					if (stringsTbody) {
+						if (strings.length === 0) {
+							stringsTbody.innerHTML = `
+								<tr>
+									<td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
+										No strings yet.
+									</td>
+								</tr>
+							`;
+						} else {
+							stringsTbody.innerHTML = strings.map(item => {
+								const quantityClass = item.quantity <= 5 ? 'text-red-600 font-medium' : 'text-gray-500';
+								const characteristics = item.string_characteristics ? JSON.parse(item.string_characteristics) : [];
+								return `
+								<tr>
+									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.brand || '-'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.string_type || '-'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${characteristics.length > 0 ? characteristics.join(', ') : '-'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.price ? `$${item.price}` : '-'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm ${quantityClass}">${item.quantity}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.status}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+										<button class="text-indigo-600 hover:text-indigo-900 mr-3" data-id="${item.id}" data-action="edit">Edit</button>
+										<button class="text-red-600 hover:text-red-900" data-id="${item.id}" data-action="delete">Delete</button>
+									</td>
+								</tr>
+							`;
+							}).join('');
+						}
 					}
+
+					// Populate rackets table
+					const racketsTbody = document.getElementById('rackets-table');
+					if (racketsTbody) {
+						if (rackets.length === 0) {
+							racketsTbody.innerHTML = `
+								<tr>
+									<td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+										No rackets yet.
+									</td>
+								</tr>
+							`;
+						} else {
+							racketsTbody.innerHTML = rackets.map(item => {
+								const quantityClass = item.quantity <= 5 ? 'text-red-600 font-medium' : 'text-gray-500';
+								return `
+								<tr>
+									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.brand || '-'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.price ? `$${item.price}` : '-'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm ${quantityClass}">${item.quantity}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.status}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+										<button class="text-indigo-600 hover:text-indigo-900 mr-3" data-id="${item.id}" data-action="edit">Edit</button>
+										<button class="text-red-600 hover:text-red-900" data-id="${item.id}" data-action="delete">Delete</button>
+									</td>
+								</tr>
+							`;
+							}).join('');
+						}
+					}
+
+					// Populate other equipment table
+					const otherTbody = document.getElementById('other-table');
+					if (otherTbody) {
+						if (other.length === 0) {
+							otherTbody.innerHTML = `
+								<tr>
+									<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+										No other equipment yet.
+									</td>
+								</tr>
+							`;
+						} else {
+							otherTbody.innerHTML = other.map(item => {
+								const quantityClass = item.quantity <= 5 ? 'text-red-600 font-medium' : 'text-gray-500';
+								return `
+								<tr>
+									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.brand || '-'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.category || '-'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.price ? `$${item.price}` : '-'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm ${quantityClass}">${item.quantity}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.status}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+										<button class="text-indigo-600 hover:text-indigo-900 mr-3" data-id="${item.id}" data-action="edit">Edit</button>
+										<button class="text-red-600 hover:text-red-900" data-id="${item.id}" data-action="delete">Delete</button>
+									</td>
+								</tr>
+							`;
+							}).join('');
+						}
+					}
+
+					// Add event listeners to all edit and delete buttons
+					document.querySelectorAll('button[data-action="edit"]').forEach(btn => {
+						btn.addEventListener('click', () => {
+							const itemId = btn.dataset.id;
+							editInventoryItem(itemId);
+						});
+					});
+
+					document.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+						btn.addEventListener('click', () => {
+							const itemId = btn.dataset.id;
+							handleDeleteInventoryItem(itemId);
+						});
+					});
 				} catch (error) {
 					console.error('Failed to load inventory:', error);
-					const tbody = document.getElementById('inventory-table');
-					tbody.innerHTML = `
-						<tr>
-							<td colspan="7" class="px-6 py-4 text-center text-sm text-red-500">
-								Failed to load inventory. Please try again later.
-							</td>
-						</tr>
-					`;
+					['strings-table', 'rackets-table', 'other-table'].forEach(tableId => {
+						const tbody = document.getElementById(tableId);
+						if (tbody) {
+							tbody.innerHTML = `
+								<tr>
+									<td colspan="8" class="px-6 py-4 text-center text-sm text-red-500">
+										Failed to load inventory. Please try again later.
+									</td>
+								</tr>
+							`;
+						}
+					});
 				}
 			}
 
@@ -193,6 +369,11 @@ import '../styles/global.css';
 			const closeModalBtn = document.getElementById('close-modal-btn');
 			const cancelBtn = document.getElementById('cancel-btn');
 			const addItemForm = document.getElementById('add-item-form');
+			const categorySelect = document.getElementById('category');
+			const stringFields = document.getElementById('string-fields');
+			
+			// Track editing state
+			let editingItemId = null;
 
 			function openModal() {
 				modal.classList.remove('hidden');
@@ -201,7 +382,28 @@ import '../styles/global.css';
 			function closeModal() {
 				modal.classList.add('hidden');
 				addItemForm.reset();
+				stringFields.classList.add('hidden');
+				editingItemId = null;
+				// Reset modal title
+				const modalTitle = document.querySelector('#add-item-modal h3');
+				if (modalTitle) {
+					modalTitle.textContent = 'Add Inventory Item';
+				}
+				// Reset submit button text
+				const submitBtn = addItemForm.querySelector('button[type="submit"]');
+				if (submitBtn) {
+					submitBtn.textContent = 'Add Item';
+				}
 			}
+
+			// Show/hide string fields based on category
+			categorySelect.addEventListener('change', () => {
+				if (categorySelect.value === 'string') {
+					stringFields.classList.remove('hidden');
+				} else {
+					stringFields.classList.add('hidden');
+				}
+			});
 
 			addItemBtn.addEventListener('click', openModal);
 			closeModalBtn.addEventListener('click', closeModal);
@@ -219,6 +421,11 @@ import '../styles/global.css';
 				e.preventDefault();
 				
 				const formData = new FormData(addItemForm);
+				const characteristicsValue = formData.get('string_characteristics');
+				const characteristicsArray = characteristicsValue 
+					? characteristicsValue.split(',').map(c => c.trim()).filter(c => c)
+					: [];
+				
 				const data = {
 					name: formData.get('name'),
 					brand: formData.get('brand') || null,
@@ -227,27 +434,84 @@ import '../styles/global.css';
 					quantity: parseInt(formData.get('quantity')),
 					status: formData.get('status'),
 					notes: formData.get('notes') || null,
+					string_type: formData.get('category') === 'string' ? formData.get('string_type') || null : null,
+					string_characteristics: formData.get('category') === 'string' ? JSON.stringify(characteristicsArray) : null,
 				};
 
 				try {
-					const response = await fetch(`${API_URL}/api/inventory`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify(data),
-					});
-
-					if (!response.ok) throw new Error('Failed to add inventory item');
-					
+					// Check if we're editing or creating
+					if (editingItemId) {
+						console.log('Updating item with ID:', editingItemId);
+						await updateInventoryItem(editingItemId, data);
+					} else {
+						console.log('Creating new item');
+						await createInventoryItem(data);
+					}
 					closeModal();
 					loadInventory();
 				} catch (error) {
-					console.error('Error adding inventory item:', error);
-					alert('Failed to add inventory item. Please try again.');
+					console.error('Error saving inventory item:', error);
+					alert('Failed to save inventory item. Please try again.');
 				}
 			});
 
 			// Load inventory when page loads
 			loadInventory();
+
+			async function editInventoryItem(itemId) {
+				console.log('editInventoryItem called with itemId:', itemId);
+				const item = await fetchInventory().then(items => items.find(i => i.id === itemId));
+				if (!item) return;
+
+				// Change modal title to indicate editing
+				const modalTitle = document.querySelector('#add-item-modal h3');
+				if (modalTitle) {
+					modalTitle.textContent = 'Edit Inventory Item';
+				}
+
+				// Change submit button text
+				const submitBtn = addItemForm.querySelector('button[type="submit"]');
+				if (submitBtn) {
+					submitBtn.textContent = 'Update Item';
+				}
+
+				// Populate form with item data
+				document.getElementById('name').value = item.name;
+				document.getElementById('brand').value = item.brand || '';
+				document.getElementById('category').value = item.category || '';
+				document.getElementById('price').value = item.price || '';
+				document.getElementById('quantity').value = item.quantity;
+				document.getElementById('status').value = item.status;
+				document.getElementById('notes').value = item.notes || '';
+
+				// Show/hide string fields based on category
+				if (item.category === 'string') {
+					stringFields.classList.remove('hidden');
+					document.getElementById('string_type').value = item.string_type || '';
+					const characteristics = item.string_characteristics ? JSON.parse(item.string_characteristics) : [];
+					document.getElementById('string_characteristics').value = characteristics.join(', ');
+				} else {
+					stringFields.classList.add('hidden');
+				}
+
+				// Store the item ID for update
+				editingItemId = itemId;
+				console.log('Set editingItemId to:', editingItemId);
+
+				openModal();
+			}
+
+			async function handleDeleteInventoryItem(itemId) {
+				if (!confirm('Are you sure you want to delete this item?')) return;
+
+				try {
+					await deleteInventoryItemApi(itemId);
+					loadInventory();
+				} catch (error) {
+					console.error('Error deleting inventory item:', error);
+					alert('Failed to delete inventory item. Please try again.');
+				}
+			}
 		</script>
 	</body>
 </html>

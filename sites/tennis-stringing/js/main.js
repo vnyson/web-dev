@@ -1,6 +1,9 @@
 import { initSplash, resetSplash } from '@vnyson/design-system/js/splash.js';
 
-const API_URL = 'https://tennis-admin-api.vnyson.workers.dev';
+const API_URL =
+  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://127.0.0.1:8787'
+    : 'https://tennis-admin-api.vnyson.workers.dev';
 
 // Clear splash for hard refresh
 const urlParams = new URLSearchParams(window.location.search);
@@ -74,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Queue Image Hover Effect
   queueImages.forEach((queueImage) => {
-    const originalSrc = queueImage.src;
     const gifSrc = queueImage.dataset.gifSrc;
 
     if (gifSrc) {
@@ -83,7 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       queueImage.addEventListener('mouseleave', () => {
-        queueImage.src = originalSrc;
+        // Re-fetch queue status to get the correct image
+        fetchQueueStatus();
       });
     }
   });
@@ -139,20 +142,89 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    inventoryGrid.innerHTML = items
-      .map(
-        (item) => `
-      <div class="inventory-item">
-        <div class="inventory-item__name">${item.name || 'N/A'}</div>
-        ${item.brand ? `<div class="inventory-item__brand">${item.brand}</div>` : ''}
-        ${item.category ? `<div class="inventory-item__category">${item.category}</div>` : ''}
-        ${item.price ? `<div class="inventory-item__price">$${item.price}</div>` : ''}
-        <div class="inventory-item__quantity">Qty: ${item.quantity || 0}</div>
-        ${item.status ? `<div class="inventory-item__status inventory-item__status--${item.status}">${item.status.replace('_', ' ')}</div>` : ''}
-      </div>
-    `,
-      )
-      .join('');
+    // Sort items: strings first, then rackets, then other equipment
+    const sortedItems = items.sort((a, b) => {
+      const categoryOrder = { string: 0, racket: 1 };
+      const aCategoryOrder = categoryOrder[a.category?.toLowerCase()] ?? 2;
+      const bCategoryOrder = categoryOrder[b.category?.toLowerCase()] ?? 2;
+      if (aCategoryOrder !== bCategoryOrder) return aCategoryOrder - bCategoryOrder;
+      return (a.name || '').localeCompare(b.name || '');
+    });
+
+    // Group by section: String, Rackets, Other Equipment
+    const groupedItems = {
+      string: items.filter((item) => item.category?.toLowerCase() === 'string'),
+      racket: items.filter((item) => item.category?.toLowerCase() === 'racket'),
+      other: items.filter(
+        (item) =>
+          item.category?.toLowerCase() !== 'string' && item.category?.toLowerCase() !== 'racket',
+      ),
+    };
+
+    // Generate table HTML
+    let tableHtml = '<table class="inventory-table">';
+    tableHtml +=
+      '<thead><tr><th>Name</th><th>Type</th><th>Characteristics</th><th>Price</th><th>Qty</th></tr></thead>';
+    tableHtml += '<tbody>';
+
+    // Render strings first
+    if (groupedItems['string'].length > 0) {
+      tableHtml += '<tr><td colspan="5" class="inventory-category-header">Strings</td></tr>';
+      groupedItems['string'].forEach((item) => {
+        const characteristics = item.string_characteristics
+          ? JSON.parse(item.string_characteristics)
+          : [];
+        const characteristicsHtml =
+          characteristics.length > 0
+            ? characteristics.map((c) => `<span class="inventory-tag">${c}</span>`).join(' ')
+            : '-';
+        tableHtml += `
+          <tr>
+            <td>${item.name || 'N/A'}</td>
+            <td>${item.string_type || '-'}</td>
+            <td>${characteristicsHtml}</td>
+            <td class="inventory-price">${item.price ? `$${item.price}` : '-'}</td>
+            <td>${item.quantity || 0}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // Render rackets
+    if (groupedItems['racket'].length > 0) {
+      tableHtml += '<tr><td colspan="5" class="inventory-category-header">Rackets</td></tr>';
+      groupedItems['racket'].forEach((item) => {
+        tableHtml += `
+          <tr>
+            <td>${item.name || 'N/A'}</td>
+            <td>-</td>
+            <td>-</td>
+            <td class="inventory-price">${item.price ? `$${item.price}` : '-'}</td>
+            <td>${item.quantity || 0}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // Render other equipment
+    if (groupedItems['other'].length > 0) {
+      tableHtml +=
+        '<tr><td colspan="5" class="inventory-category-header">Other Equipment</td></tr>';
+      groupedItems['other'].forEach((item) => {
+        tableHtml += `
+          <tr>
+            <td>${item.name || 'N/A'}</td>
+            <td>-</td>
+            <td>-</td>
+            <td class="inventory-price">${item.price ? `$${item.price}` : '-'}</td>
+            <td>${item.quantity || 0}</td>
+          </tr>
+        `;
+      });
+    }
+
+    tableHtml += '</tbody></table>';
+    inventoryGrid.innerHTML = tableHtml;
   }
 
   initSplash({
