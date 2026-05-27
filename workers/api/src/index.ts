@@ -69,7 +69,7 @@ async function handleGoogleAuth(
   env: Env,
   corsHeaders: HeadersInit,
 ): Promise<Response> {
-  const redirectUri = `${new URL(request.url).origin}/auth/google/callback`;
+  const redirectUri = 'https://admin.tennis.vnyson.com/login';
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${env.GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile`;
   return Response.redirect(authUrl, 302);
 }
@@ -80,8 +80,15 @@ async function handleGoogleCallback(
   env: Env,
   corsHeaders: HeadersInit,
 ): Promise<Response> {
-  const url = new URL(request.url);
-  const code = url.searchParams.get('code');
+  let code: string | null = null;
+
+  if (request.method === 'POST') {
+    const body = await request.json();
+    code = body.code;
+  } else {
+    const url = new URL(request.url);
+    code = url.searchParams.get('code');
+  }
 
   if (!code) {
     return new Response('Authorization code not found', { status: 400, headers: corsHeaders });
@@ -93,7 +100,7 @@ async function handleGoogleCallback(
   }
 
   // Exchange code for tokens
-  const redirectUri = `${url.origin}/auth/google/callback`;
+  const redirectUri = 'https://admin.tennis.vnyson.com/login';
   const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
