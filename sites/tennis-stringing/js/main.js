@@ -46,22 +46,22 @@ document.addEventListener('DOMContentLoaded', () => {
       text = 'EST. 1-2 days';
     } else if (count === 1) {
       imageName = 'Pokemon Hospital-1.png';
-      text = 'EST. 2-3 days';
+      text = 'EST. 1-2 days';
     } else if (count === 2) {
       imageName = 'Pokemon Hospital-2.png';
-      text = 'EST. 3-4 days';
+      text = 'EST. 2-3 days';
     } else if (count === 3) {
       imageName = 'Pokemon Hospital-3.png';
-      text = 'EST. 4-5 days';
+      text = 'EST. 2-3 days';
     } else if (count === 4) {
       imageName = 'Pokemon Hospital-4.png';
-      text = 'EST. 5-6 days';
+      text = 'EST. 4-5 days';
     } else if (count === 5) {
       imageName = 'Pokemon Hospital-5.png';
       text = 'EST. 6-7 days';
     } else if (count === 6) {
       imageName = 'Pokemon Hospital-6.png';
-      text = 'EST. 7-8 days';
+      text = 'EST. 6-7 days';
     } else {
       imageName = 'Pokemon Hospital-FULL.png';
       text = 'EST. 1-2 weeks';
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Generate table HTML
     let tableHtml = '<table class="inventory-table">';
     tableHtml +=
-      '<thead><tr><th>Name</th><th>Type</th><th>Characteristics</th><th>Price</th><th>Qty</th></tr></thead>';
+      '<thead><tr><th><span class="dollar-sign">$</span></th><th>Name</th><th>Mat.</th><th>Det.</th></tr></thead>';
     tableHtml += '<tbody>';
 
     // Render strings first
@@ -180,11 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
             : '-';
         tableHtml += `
           <tr>
+            <td class="inventory-price">${item.price ? `<span class="dollar-sign">$</span>${item.price}` : '-'}</td>
             <td>${item.name || 'N/A'}</td>
             <td>${item.string_type || '-'}</td>
             <td>${characteristicsHtml}</td>
-            <td class="inventory-price">${item.price ? `$${item.price}` : '-'}</td>
-            <td>${item.quantity || 0}</td>
           </tr>
         `;
       });
@@ -196,11 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
       groupedItems['racket'].forEach((item) => {
         tableHtml += `
           <tr>
+            <td class="inventory-price"><span class="dollar-sign">$</span>${item.price ? `${item.price}` : '-'}</td>
             <td>${item.name || 'N/A'}</td>
             <td>-</td>
             <td>-</td>
-            <td class="inventory-price">${item.price ? `$${item.price}` : '-'}</td>
-            <td>${item.quantity || 0}</td>
           </tr>
         `;
       });
@@ -213,11 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
       groupedItems['other'].forEach((item) => {
         tableHtml += `
           <tr>
+            <td class="inventory-price"><span class="dollar-sign">$</span>${item.price ? `${item.price}` : '-'}</td>
             <td>${item.name || 'N/A'}</td>
             <td>-</td>
             <td>-</td>
-            <td class="inventory-price">${item.price ? `$${item.price}` : '-'}</td>
-            <td>${item.quantity || 0}</td>
           </tr>
         `;
       });
@@ -323,8 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
       isPlaying = true;
       hasPlayedOnce = true;
 
-      // Force reload to restart animation
-      serviceGif.src = originalSrc + '?t=' + Date.now();
+      serviceGif.src = originalSrc;
       serviceGif.classList.remove('service-gif--paused');
       serviceGif.classList.add('service-gif--playing');
 
