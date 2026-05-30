@@ -28,6 +28,22 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 								<a href="/players" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Players</a>
 							</div>
 						</div>
+						<div class="flex items-center sm:hidden">
+							<button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-controls="mobile-menu" aria-expanded="false" class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+								<span class="sr-only">Toggle navigation menu</span>
+								<svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+								</svg>
+							</button>
+						</div>
+						<div id="mobile-menu" class="hidden sm:hidden">
+							<div class="px-4 pb-3 space-y-1">
+								<a href="/" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Dashboard</a>
+								<a href="/inventory" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Inventory</a>
+								<a href="/jobs" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Jobs</a>
+								<a href="/players" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Players</a>
+							</div>
+						</div>
 						<div class="flex items-center">
 							<a href="/login" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
 								Login with Google
@@ -283,8 +299,8 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 										<h4 class="font-medium text-gray-900 mb-2">Player Portal</h4>
 										<button class="generate-link-btn text-indigo-600 hover:text-indigo-900 text-sm" data-player-id="${player.id}">Generate Shareable Link</button>
 										<div class="shareable-link-container mt-2 hidden" data-player-id="${player.id}">
-											<input type="text" class="shareable-link-input w-full text-sm border border-gray-300 rounded px-2 py-1" readonly />
-											<button class="copy-link-btn text-xs text-gray-600 hover:text-gray-900 mt-1" data-player-id="${player.id}">Copy Link</button>
+									<input type="text" class="shareable-link-input w-full text-sm border border-gray-300 rounded px-2 py-1" readonly data-player-id="${player.id}" />
+									<button type="button" class="copy-link-btn text-xs text-gray-600 hover:text-gray-900 mt-1" data-player-id="${player.id}">Copy Link</button>
 										</div>
 									</div>
 								</td>
