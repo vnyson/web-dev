@@ -1,22 +1,27 @@
----
+﻿---
 import '../../styles/global.css';
 ---
 
 <script>
+  import { getAuthHeaders, getAuthToken, fetchRackets } from '../../lib/api';
+
   const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://127.0.0.1:8787'
     : 'https://tennis-admin-api.vnyson.workers.dev';
 
+  if (!getAuthToken()) {
+    window.location.href = '/login';
+  }
+
   let players = [];
   let inventory = [];
   let selectedPlayer = null;
+  let playerRackets = [];
 
   async function loadPlayers() {
     try {
       const response = await fetch(`${API_URL}/api/players`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
       });
       if (!response.ok) throw new Error('Failed to fetch players');
       players = await response.json();
@@ -29,15 +34,45 @@ import '../../styles/global.css';
   async function loadInventory() {
     try {
       const response = await fetch(`${API_URL}/api/inventory`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
       });
       if (!response.ok) throw new Error('Failed to fetch inventory');
       inventory = await response.json();
     } catch (error) {
       console.error('Error loading inventory:', error);
     }
+  }
+
+  async function loadRackets(playerId) {
+    playerRackets = [];
+    const racquetInput = document.getElementById('racquet');
+    if (racquetInput) {
+      racquetInput.value = '';
+    }
+    if (!playerId) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/rackets?player_id=${encodeURIComponent(playerId)}`, {
+        headers: getAuthHeaders(),
+      });
+      if (!response.ok) throw new Error('Failed to fetch rackets');
+      playerRackets = await response.json();
+      populateRacquetOptions(playerRackets);
+    } catch (error) {
+      console.error('Error loading rackets:', error);
+    }
+  }
+
+  function populateRacquetOptions(rackets) {
+    const datalist = document.getElementById('racquet-options');
+    if (!datalist) return;
+
+    datalist.innerHTML = rackets
+      .map((racket) => {
+        const label = `${racket.brand || ''} ${racket.model || ''} ${racket.notes || ''}`.trim();
+        return label ? `<option value="${label}" />` : '';
+      })
+      .join('');
   }
 
   function populatePlayerDropdown() {
@@ -56,18 +91,26 @@ import '../../styles/global.css';
   function handlePlayerChange(event) {
     const playerId = event.target.value;
     selectedPlayer = players.find(p => p.id === playerId);
+    const racquetInput = document.getElementById('racquet');
+    const racquetOptions = document.getElementById('racquet-options');
 
-    if (selectedPlayer) {
-      document.getElementById('player_name').value = selectedPlayer.name || '';
-      document.getElementById('phone').value = selectedPlayer.phone || '';
-      document.getElementById('string_mains').value = selectedPlayer.string_pref || '';
-      document.getElementById('tension_mains').value = selectedPlayer.tension || '';
-      
-      // Auto-fill racquet if player has one
-      if (selectedPlayer.racquet) {
-        document.getElementById('racquet').value = selectedPlayer.racquet;
-      }
+    if (!selectedPlayer) {
+      document.getElementById('player_name').value = '';
+      document.getElementById('phone').value = '';
+      document.getElementById('string_mains').value = '';
+      document.getElementById('tension_mains').value = '';
+      if (racquetInput) racquetInput.value = '';
+      if (racquetOptions) racquetOptions.innerHTML = '';
+      playerRackets = [];
+      return;
     }
+
+    document.getElementById('player_name').value = selectedPlayer.name || '';
+    document.getElementById('phone').value = selectedPlayer.phone || '';
+    document.getElementById('string_mains').value = selectedPlayer.string_pref || '';
+    document.getElementById('tension_mains').value = selectedPlayer.tension || '';
+
+    loadRackets(playerId);
   }
 
   function checkInventoryAvailability(stringName) {
@@ -140,8 +183,7 @@ import '../../styles/global.css';
     try {
       const response = await fetch(`${API_URL}/api/stringing`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: getAuthHeaders(),
         body: JSON.stringify(data),
       });
 
@@ -210,6 +252,22 @@ import '../../styles/global.css';
 								<a href="/players" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Players</a>
 							</div>
 						</div>
+						<div class="flex items-center sm:hidden">
+							<button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-controls="mobile-menu" aria-expanded="false" class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+								<span class="sr-only">Toggle navigation menu</span>
+								<svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+								</svg>
+							</button>
+						</div>
+						<div id="mobile-menu" class="hidden sm:hidden">
+							<div class="px-4 pb-3 space-y-1">
+								<a href="/" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Dashboard</a>
+								<a href="/inventory" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Inventory</a>
+								<a href="/jobs" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Jobs</a>
+								<a href="/players" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Players</a>
+							</div>
+						</div>
 						<div class="flex items-center">
 							<a href="/login" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
 								Login with Google
@@ -222,7 +280,7 @@ import '../../styles/global.css';
 			<main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
 				<div class="px-4 py-6 sm:px-0">
 					<div class="mb-6">
-						<a href="/jobs" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">← Back to Jobs</a>
+						<a href="/jobs" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">â† Back to Jobs</a>
 					</div>
 					<h2 class="text-2xl font-bold text-gray-900 mb-6">New Drop Off</h2>
 
@@ -266,9 +324,8 @@ import '../../styles/global.css';
 
 									<div class="sm:col-span-3">
 										<label for="racquet" class="block text-sm font-medium text-gray-700">Racquet</label>
-										<input type="text" name="racquet" id="racquet" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., Wilson Pro Staff 97" />
-									</div>
-
+                                        <input type="text" list="racquet-options" name="racquet" id="racquet" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., Wilson Pro Staff 97" />
+                                        <datalist id="racquet-options"></datalist>
 									<div class="sm:col-span-3">
 										<label for="string_mains" class="block text-sm font-medium text-gray-700">String (Mains)</label>
 										<input type="text" name="string_mains" id="string_mains" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
@@ -316,3 +373,4 @@ import '../../styles/global.css';
 		</div>
 	</body>
 </html>
+

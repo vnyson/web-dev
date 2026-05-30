@@ -131,17 +131,25 @@ body {
     display: none;
   }
 
+  .main-container {
+    padding-bottom: calc(75px + var(--space-md));
+  }
+
   .mobile-navigation-bottom {
     position: fixed;
     bottom: 0.5%;
     width: 95%;
     display: flex;
-    z-index: 1000;
+    z-index: 900;
     padding: var(--space-xs);
     gap: var(--space-xs);
     align-items: center;
     justify-content: center;
     overflow: hidden;
+  }
+
+  .splash:not(.splash--seen) ~ .mobile-navigation-bottom {
+    display: none;
   }
 
   .button-mobile {
@@ -410,6 +418,10 @@ body {
 }
 
 /* Profile Overlay */
+.splash {
+  z-index: 1500;
+}
+
 .profile-overlay {
   position: fixed;
   top: 0;
@@ -420,7 +432,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1100;
   padding: var(--space-xs);
 }
 
@@ -448,7 +460,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1100;
   padding: var(--space-xs);
 }
 

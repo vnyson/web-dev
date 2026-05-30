@@ -63,6 +63,17 @@ function generateAccessToken(): string {
   return crypto.randomUUID();
 }
 
+function parseRacketLabel(racquet: string | null | undefined) {
+  if (!racquet) return { brand: null, model: null };
+  const trimmed = racquet.trim();
+  if (!trimmed) return { brand: null, model: null };
+  const parts = trimmed.split(/\s+/);
+  if (parts.length === 1) {
+    return { brand: trimmed, model: null };
+  }
+  return { brand: parts.shift() || null, model: parts.join(' ') || null };
+}
+
 function normalizePhone(phone: string): string {
   return (phone || '').replace(/\D/g, '');
 }
@@ -421,8 +432,8 @@ async function handleRegenerateToken(
   // Return shareable link
   const url = new URL(request.url);
   const isLocal = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
-  const frontendOrigin = isLocal ? 'http://localhost:8080' : 'https://vnyson.com';
-  const shareableLink = `${frontendOrigin}/player.html?token=${newToken}`;
+  const frontendOrigin = isLocal ? 'http://localhost:8080' : 'https://tennis-stringing.pages.dev';
+  const shareableLink = `${frontendOrigin}/?token=${newToken}`;
 
   return new Response(JSON.stringify({ shareableLink }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -574,25 +585,26 @@ export async function handlePlayers(
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // Get player's last jobs
+    if (url.searchParams.has('last_jobs')) {
+      const playerId = url.searchParams.get('last_jobs');
+      const result = await env.DB.prepare(
+        'SELECT * FROM stringing WHERE player_id = ? ORDER BY created_at DESC LIMIT 5',
+      )
+        .bind(playerId)
+        .all();
+      return new Response(JSON.stringify(result.results), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Get all players - requires admin session
     const isAdmin = await validateAdminSession(request, env);
     if (!isAdmin) {
       return new Response('Unauthorized', { status: 401, headers: corsHeaders });
     }
     const result = await env.DB.prepare('SELECT * FROM players ORDER BY name').all();
-    return new Response(JSON.stringify(result.results), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-
-  // Get player's last jobs
-  if (request.method === 'GET' && url.searchParams.has('last_jobs')) {
-    const playerId = url.searchParams.get('last_jobs');
-    const result = await env.DB.prepare(
-      'SELECT * FROM stringing WHERE player_id = ? ORDER BY created_at DESC LIMIT 5',
-    )
-      .bind(playerId)
-      .all();
     return new Response(JSON.stringify(result.results), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -735,6 +747,60 @@ export async function handleStringing(
 
     const body = await request.json();
     const jobId = body.id || crypto.randomUUID();
+
+    // Create a new player record when adding a drop off for a new customer
+    if (!body.player_id && body.player_name) {
+      const newPlayerId = crypto.randomUUID();
+      const accessToken = generateAccessToken();
+      const playerStmt = env.DB.prepare(`
+        INSERT INTO players (id, name, club, level, style, grip, string_pref, tension, racquet, notes, email, phone, restring_interval_weeks, inventory_preferences, access_token, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      await playerStmt
+        .bind(
+          newPlayerId,
+          body.player_name,
+          null,
+          null,
+          null,
+          null,
+          body.string_mains || null,
+          body.tension_mains || null,
+          null,
+          body.notes || null,
+          body.email || null,
+          body.phone || null,
+          null,
+          null,
+          accessToken,
+          new Date().toISOString(),
+          new Date().toISOString(),
+        )
+        .run();
+
+      body.player_id = newPlayerId;
+
+      if (body.racquet) {
+        const { brand, model } = parseRacketLabel(body.racquet);
+        await env.DB.prepare(
+          `
+          INSERT INTO rackets (id, player_id, brand, model, year, notes, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        )
+          .bind(
+            crypto.randomUUID(),
+            newPlayerId,
+            brand,
+            model,
+            null,
+            null,
+            new Date().toISOString(),
+            new Date().toISOString(),
+          )
+          .run();
+      }
+    }
 
     // Generate token for player if they don't have one
     if (body.player_id) {
