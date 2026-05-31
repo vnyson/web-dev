@@ -74,6 +74,29 @@ function parseRacketLabel(racquet: string | null | undefined) {
   return { brand: parts.shift() || null, model: parts.join(' ') || null };
 }
 
+const tableColumnsCache = new Map<string, Set<string>>();
+
+async function getTableColumns(tableName: string, env: Env): Promise<Set<string>> {
+  // Only use cache if we have a non-empty result
+  if (tableColumnsCache.has(tableName)) {
+    const cached = tableColumnsCache.get(tableName)!;
+    if (cached.size > 0) return cached;
+  }
+
+  try {
+    const result: any = await env.DB.prepare(`PRAGMA table_info(${tableName})`).all();
+    const columns = new Set<string>((result.results || []).map((row: any) => row.name));
+    // Only cache if we got columns back
+    if (columns.size > 0) {
+      tableColumnsCache.set(tableName, columns);
+    }
+    return columns;
+  } catch (e) {
+    console.error(`getTableColumns error for ${tableName}:`, e);
+    return new Set<string>();
+  }
+}
+
 function normalizePhone(phone: string): string {
   return (phone || '').replace(/\D/g, '');
 }
@@ -494,63 +517,76 @@ async function handleQueueStatus(
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
-    const path = url.pathname;
+    try {
+      const url = new URL(request.url);
+      const path = url.pathname;
 
-    // CORS headers
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Dev-Mode',
-    };
+      // CORS headers
+      const corsHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Dev-Mode',
+      };
 
-    // Handle CORS preflight requests
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
-    }
+      // Handle CORS preflight requests
+      if (request.method === 'OPTIONS') {
+        return new Response(null, { headers: corsHeaders });
+      }
 
-    // OAuth routes
-    if (path === '/auth/google') {
-      return handleGoogleAuth(request, env, corsHeaders);
-    }
-    if (path === '/auth/google/callback') {
-      return handleGoogleCallback(request, env, corsHeaders);
-    }
+      // OAuth routes
+      if (path === '/auth/google') {
+        return handleGoogleAuth(request, env, corsHeaders);
+      }
+      if (path === '/auth/google/callback') {
+        return handleGoogleCallback(request, env, corsHeaders);
+      }
 
-    // API routes
-    if (path.startsWith('/api/players')) {
-      return handlePlayers(request, env, corsHeaders);
-    }
-    if (path.startsWith('/api/stringing')) {
-      return handleStringing(request, env, corsHeaders);
-    }
-    if (path.startsWith('/api/inventory')) {
-      return handleInventory(request, env, corsHeaders);
-    }
-    if (path.startsWith('/api/history')) {
-      return handleHistory(request, env, corsHeaders);
-    }
-    if (path.startsWith('/api/rackets')) {
-      return handleRackets(request, env, corsHeaders);
-    }
-    if (path === '/api/player-by-token') {
-      return handlePlayerByToken(request, env, corsHeaders);
-    }
-    if (path === '/api/player-verify') {
-      return handlePlayerVerify(request, env, corsHeaders);
-    }
-    if (path === '/api/regenerate-token') {
-      return handleRegenerateToken(request, env, corsHeaders);
-    }
-    if (path === '/api/dev-login') {
-      return handleDevLogin(request, env, corsHeaders);
-    }
-    if (path === '/api/queue-status') {
-      return handleQueueStatus(request, env, corsHeaders);
-    }
+      // API routes
+      if (path.startsWith('/api/players')) {
+        return handlePlayers(request, env, corsHeaders);
+      }
+      if (path.startsWith('/api/stringing')) {
+        return handleStringing(request, env, corsHeaders);
+      }
+      if (path.startsWith('/api/inventory')) {
+        return handleInventory(request, env, corsHeaders);
+      }
+      if (path.startsWith('/api/history')) {
+        return handleHistory(request, env, corsHeaders);
+      }
+      if (path.startsWith('/api/rackets')) {
+        return handleRackets(request, env, corsHeaders);
+      }
+      if (path === '/api/player-by-token') {
+        return handlePlayerByToken(request, env, corsHeaders);
+      }
+      if (path === '/api/player-verify') {
+        return handlePlayerVerify(request, env, corsHeaders);
+      }
+      if (path === '/api/regenerate-token') {
+        return handleRegenerateToken(request, env, corsHeaders);
+      }
+      if (path === '/api/dev-login') {
+        return handleDevLogin(request, env, corsHeaders);
+      }
+      if (path === '/api/queue-status') {
+        return handleQueueStatus(request, env, corsHeaders);
+      }
 
-    // 404 for unknown routes
-    return new Response('Not Found', { status: 404, headers: corsHeaders });
+      // 404 for unknown routes
+      return new Response('Not Found', { status: 404, headers: corsHeaders });
+    } catch (err: any) {
+      console.error('Unhandled error in fetch handler:', err);
+      const corsHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Dev-Mode',
+      };
+      return new Response(
+        JSON.stringify({ error: 'Internal server error', detail: err?.message || String(err) }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
   },
 };
 
@@ -622,8 +658,8 @@ export async function handlePlayers(
     const accessToken = generateAccessToken();
 
     const stmt = env.DB.prepare(`
-      INSERT INTO players (id, name, club, level, style, grip, string_pref, tension, racquet, notes, email, phone, restring_interval_weeks, inventory_preferences, access_token, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO players (id, name, club, level, style, grip, string_pref, tension, tension_cross, racquet, notes, email, phone, restring_interval_weeks, inventory_preferences, access_token, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     await stmt
       .bind(
@@ -635,6 +671,7 @@ export async function handlePlayers(
         body.grip || null,
         body.string_pref || null,
         body.tension || null,
+        body.tension_cross || null,
         body.racquet || null,
         body.notes || null,
         body.email || null,
@@ -669,7 +706,7 @@ export async function handlePlayers(
     }
 
     const stmt = env.DB.prepare(`
-      UPDATE players SET name = ?, club = ?, level = ?, style = ?, grip = ?, string_pref = ?, tension = ?, racquet = ?, notes = ?, email = ?, phone = ?, restring_interval_weeks = ?, inventory_preferences = ?, updated_at = ?
+      UPDATE players SET name = ?, club = ?, level = ?, style = ?, grip = ?, string_pref = ?, tension = ?, tension_cross = ?, racquet = ?, notes = ?, email = ?, phone = ?, restring_interval_weeks = ?, inventory_preferences = ?, updated_at = ?
       WHERE id = ?
     `);
     await stmt
@@ -681,6 +718,7 @@ export async function handlePlayers(
         body.grip || null,
         body.string_pref || null,
         body.tension || null,
+        body.tension_cross || null,
         body.racquet || null,
         body.notes || null,
         body.email || null,
@@ -721,7 +759,14 @@ export async function handleStringing(
 
   if (request.method === 'GET') {
     if (id && id !== 'stringing') {
-      const result = await env.DB.prepare('SELECT * FROM stringing WHERE id = ?').bind(id).first();
+      const result = await env.DB.prepare(
+        `SELECT s.*, COALESCE(NULLIF(s.player_name, ''), p.name) AS player_name
+         FROM stringing s
+         LEFT JOIN players p ON s.player_id = p.id
+         WHERE s.id = ?`,
+      )
+        .bind(id)
+        .first();
       if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
       return new Response(JSON.stringify(result), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -732,7 +777,12 @@ export async function handleStringing(
     if (!isAdmin) {
       return new Response('Unauthorized', { status: 401, headers: corsHeaders });
     }
-    const result = await env.DB.prepare('SELECT * FROM stringing ORDER BY created_at DESC').all();
+    const result = await env.DB.prepare(
+      `SELECT s.*, COALESCE(NULLIF(s.player_name, ''), p.name) AS player_name
+       FROM stringing s
+       LEFT JOIN players p ON s.player_id = p.id
+       ORDER BY s.created_at DESC`,
+    ).all();
     return new Response(JSON.stringify(result.results), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -747,6 +797,17 @@ export async function handleStringing(
 
     const body = await request.json();
     const jobId = body.id || crypto.randomUUID();
+
+    let playerName = body.player_name || null;
+    if (body.player_id) {
+      const player = await env.DB.prepare('SELECT name FROM players WHERE id = ?')
+        .bind(body.player_id)
+        .first();
+      if (player) {
+        playerName = player.name;
+      }
+    }
+    body.player_name = playerName;
 
     // Create a new player record when adding a drop off for a new customer
     if (!body.player_id && body.player_name) {
@@ -1004,38 +1065,46 @@ export async function handleInventory(
   env: Env,
   corsHeaders: HeadersInit,
 ): Promise<Response> {
-  const url = new URL(request.url);
-  const id = url.pathname.split('/').pop();
+  try {
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop();
 
-  if (request.method === 'GET') {
-    // Public read-only access - no authentication required
-    if (id && id !== 'inventory') {
-      const result = await env.DB.prepare('SELECT * FROM inventory WHERE id = ?').bind(id).first();
-      if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
-      return new Response(JSON.stringify(result), {
+    if (request.method === 'GET') {
+      // Public read-only access - no authentication required
+      if (id && id !== 'inventory') {
+        const result = await env.DB.prepare('SELECT * FROM inventory WHERE id = ?')
+          .bind(id)
+          .first();
+        if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
+        return new Response(JSON.stringify(result), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const result = await env.DB.prepare('SELECT * FROM inventory ORDER BY category, name').all();
+      return new Response(JSON.stringify(result.results), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    const result = await env.DB.prepare('SELECT * FROM inventory ORDER BY category, name').all();
-    return new Response(JSON.stringify(result.results), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
 
-  if (request.method === 'POST') {
-    // Requires admin session
-    const isAdmin = await validateAdminSession(request, env);
-    if (!isAdmin) {
-      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
-    }
+    if (request.method === 'POST') {
+      // Requires admin session
+      const isAdmin = await validateAdminSession(request, env);
+      if (!isAdmin) {
+        return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+      }
 
-    const body = await request.json();
-    const stmt = env.DB.prepare(`
-      INSERT INTO inventory (id, name, brand, category, price, quantity, status, notes, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    await stmt
-      .bind(
+      const body = await request.json();
+      const columns = await getTableColumns('inventory', env);
+      const hasStringColumns = columns.has('string_type') && columns.has('string_characteristics');
+
+      const stmt = env.DB.prepare(`
+        INSERT INTO inventory (id, name, brand, category, price, quantity, status, notes, ${
+          hasStringColumns ? 'string_type, string_characteristics, ' : ''
+        }created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ${hasStringColumns ? '?, ?, ' : ''}?, ?)
+      `);
+
+      const bindValues: any[] = [
         body.id || crypto.randomUUID(),
         body.name,
         body.brand || null,
@@ -1044,29 +1113,39 @@ export async function handleInventory(
         body.quantity || 0,
         body.status || 'in_stock',
         body.notes || null,
+      ];
+
+      if (hasStringColumns) {
+        bindValues.push(body.string_type || null, body.string_characteristics || null);
+      }
+      bindValues.push(
         body.created_at || new Date().toISOString(),
         body.updated_at || new Date().toISOString(),
-      )
-      .run();
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
+      );
 
-  if (request.method === 'PUT') {
-    // Requires admin session
-    const isAdmin = await validateAdminSession(request, env);
-    if (!isAdmin) {
-      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+      await stmt.bind(...bindValues).run();
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    const body = await request.json();
-    const stmt = env.DB.prepare(`
-      UPDATE inventory SET name = ?, brand = ?, category = ?, price = ?, quantity = ?, status = ?, notes = ?, string_type = ?, string_characteristics = ?, updated_at = ?
-      WHERE id = ?
-    `);
-    await stmt
-      .bind(
+    if (request.method === 'PUT') {
+      // Requires admin session
+      const isAdmin = await validateAdminSession(request, env);
+      if (!isAdmin) {
+        return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+      }
+
+      const body = await request.json();
+      const columns = await getTableColumns('inventory', env);
+      const hasStringColumns = columns.has('string_type') && columns.has('string_characteristics');
+      const stmt = env.DB.prepare(`
+        UPDATE inventory SET name = ?, brand = ?, category = ?, price = ?, quantity = ?, status = ?, notes = ?, ${
+          hasStringColumns ? 'string_type = ?, string_characteristics = ?,' : ''
+        } updated_at = ?
+        WHERE id = ?
+      `);
+      const bindValues = [
         body.name,
         body.brand || null,
         body.category || null,
@@ -1074,31 +1153,39 @@ export async function handleInventory(
         body.quantity || 0,
         body.status || 'in_stock',
         body.notes || null,
-        body.string_type || null,
-        body.string_characteristics || null,
-        new Date().toISOString(),
-        id,
-      )
-      .run();
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
+      ];
+      if (hasStringColumns) {
+        bindValues.push(body.string_type || null, body.string_characteristics || null);
+      }
+      bindValues.push(new Date().toISOString(), id);
 
-  if (request.method === 'DELETE') {
-    // Requires admin session
-    const isAdmin = await validateAdminSession(request, env);
-    if (!isAdmin) {
-      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+      await stmt.bind(...bindValues).run();
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    await env.DB.prepare('DELETE FROM inventory WHERE id = ?').bind(id).run();
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
+    if (request.method === 'DELETE') {
+      // Requires admin session
+      const isAdmin = await validateAdminSession(request, env);
+      if (!isAdmin) {
+        return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+      }
 
-  return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+      await env.DB.prepare('DELETE FROM inventory WHERE id = ?').bind(id).run();
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+  } catch (err: any) {
+    console.error('handleInventory error:', err);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error', detail: err?.message || String(err) }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    );
+  }
 }
 
 export async function handleHistory(
@@ -1280,11 +1367,12 @@ export async function handleRackets(
 
     const body = await request.json();
     const stmt = env.DB.prepare(`
-      UPDATE rackets SET brand = ?, model = ?, year = ?, notes = ?, updated_at = ?
+      UPDATE rackets SET player_id = ?, brand = ?, model = ?, year = ?, notes = ?, updated_at = ?
       WHERE id = ?
     `);
     await stmt
       .bind(
+        body.player_id || null,
         body.brand || null,
         body.model || null,
         body.year || null,

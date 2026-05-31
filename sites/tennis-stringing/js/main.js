@@ -134,8 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const profilePhoneInput = document.getElementById('profile-phone');
   const profileStringPrefInput = document.getElementById('profile-string-pref');
   const profileTensionInput = document.getElementById('profile-tension');
+  const profileTensionCrossInput = document.getElementById('profile-tension-cross');
   const profileGripInput = document.getElementById('profile-grip');
-  const profileRacquetInput = document.getElementById('profile-racquet');
   const profileNotesInput = document.getElementById('profile-notes');
 
   // Lists & inventory
@@ -161,11 +161,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const QUEUED_JOB_STATUSES = new Set(['queued', 'in_queue']);
   const READY_JOB_STATUS = 'ready_for_pickup';
   const RACKET_INVENTORY_SLOTS = [
-    { left: '10%', bottom: '6%', width: '17%' },
-    { left: '28%', bottom: '6%', width: '17%' },
-    { left: '46%', bottom: '6%', width: '17%' },
-    { left: '64%', bottom: '6%', width: '17%' },
-    { left: '82%', bottom: '6%', width: '17%' },
+    { left: '16%', bottom: '6%', width: '16%' },
+    { left: '32%', bottom: '6%', width: '16%' },
+    { left: '48%', bottom: '6%', width: '16%' },
+    { left: '64%', bottom: '6%', width: '16%' },
+    { left: '80%', bottom: '6%', width: '16%' },
   ];
 
   const RACKET_IMAGE_MAP = {
@@ -518,8 +518,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (profilePhoneInput) profilePhoneInput.value = data.player.phone || '';
     if (profileStringPrefInput) profileStringPrefInput.value = data.player.string_pref || '';
     if (profileTensionInput) profileTensionInput.value = data.player.tension || '';
+    if (profileTensionCrossInput) profileTensionCrossInput.value = data.player.tension_cross || '';
     if (profileGripInput) profileGripInput.value = data.player.grip || '';
-    if (profileRacquetInput) profileRacquetInput.value = data.player.racquet || '';
     if (profileNotesInput) profileNotesInput.value = data.player.notes || '';
 
     // Populate merged Jobs list (stringing + history)
@@ -680,12 +680,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const payload = {
         name: currentPlayerData.name,
+        club: currentPlayerData.club || null,
+        level: currentPlayerData.level || null,
+        style: currentPlayerData.style || null,
         email: profileEmailInput.value.trim(),
         phone: profilePhoneInput.value.trim(),
         string_pref: profileStringPrefInput.value.trim(),
         tension: profileTensionInput.value.trim(),
+        tension_cross: profileTensionCrossInput ? profileTensionCrossInput.value.trim() : null,
         grip: profileGripInput.value.trim(),
-        racquet: profileRacquetInput.value.trim(),
+        restring_interval_weeks: currentPlayerData.restring_interval_weeks || null,
+        inventory_preferences: currentPlayerData.inventory_preferences || null,
         notes: profileNotesInput.value.trim(),
       };
 
