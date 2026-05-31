@@ -96,6 +96,7 @@ export function initSplash(options = {}) {
     splash.addEventListener(
       'animationend',
       () => {
+        splash.classList.add(config.seenClass);
         splash.setAttribute('hidden', '');
       },
       { once: true },

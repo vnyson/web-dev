@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, regeneratePlayerToken, getAuthToken } from '../lib/api';
+import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, deleteRacket, regeneratePlayerToken, getAuthToken } from '../lib/api';
 ---
 
 <html lang="en">
@@ -104,12 +104,12 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 										<input type="text" name="string_pref" id="string_pref" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
 									</div>
 									<div>
-										<label for="tension" class="block text-sm font-medium text-gray-700">Tension</label>
-										<input type="text" name="tension" id="tension" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+										<label for="tension" class="block text-sm font-medium text-gray-700">Tension (Mains)</label>
+										<input type="text" name="tension" id="tension" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 54" />
 									</div>
 									<div>
-										<label for="racquet" class="block text-sm font-medium text-gray-700">Racquet</label>
-										<input type="text" name="racquet" id="racquet" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+										<label for="tension_cross" class="block text-sm font-medium text-gray-700">Tension (Cross)</label>
+										<input type="text" name="tension_cross" id="tension_cross" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 52" />
 									</div>
 									<div>
 										<label for="restring_interval_weeks" class="block text-sm font-medium text-gray-700">Restring Interval (weeks)</label>
@@ -126,6 +126,51 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 								</div>
 								<div class="flex justify-end space-x-3 mt-6">
 									<button type="button" id="cancel-btn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+										Cancel
+									</button>
+									<button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+										Save
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+
+					<!-- Add/Edit Racket Modal -->
+					<div id="racket-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden items-center justify-center z-50">
+						<div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
+							<div class="px-6 py-4 border-b border-gray-200">
+								<h3 id="racket-modal-title" class="text-lg font-medium text-gray-900">Add Racket</h3>
+							</div>
+							<form id="racket-form" class="px-6 py-4 space-y-4">
+								<input type="hidden" id="racket-id" name="id" />
+								<input type="hidden" id="racket-player-id" name="player_id" />
+								<div class="space-y-4">
+									<div>
+										<label for="racket-brand" class="block text-sm font-medium text-gray-700">Brand *</label>
+										<input type="text" name="brand" id="racket-brand" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="racket-model" class="block text-sm font-medium text-gray-700">Model</label>
+										<input type="text" name="model" id="racket-model" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="racket-year" class="block text-sm font-medium text-gray-700">Year</label>
+										<input type="number" name="year" id="racket-year" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div>
+										<label for="racket-notes" class="block text-sm font-medium text-gray-700">Notes</label>
+										<textarea name="notes" id="racket-notes" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+									</div>
+									<div id="racket-owner-field" class="hidden">
+										<label for="racket-owner" class="block text-sm font-medium text-gray-700">Owner</label>
+										<select id="racket-owner" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+											<option value="">Select player...</option>
+										</select>
+									</div>
+								</div>
+								<div class="flex justify-end space-x-3 mt-6">
+									<button type="button" id="racket-cancel-btn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
 										Cancel
 									</button>
 									<button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -164,7 +209,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 		</div>
 
 		<script>
-			import { getAuthToken, fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket as deleteRacketApi, regeneratePlayerToken } from '../lib/api';
+			import { getAuthToken, fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, deleteRacket as deleteRacketApi, regeneratePlayerToken } from '../lib/api';
 
 			// Check authentication on page load
 			const token = getAuthToken();
@@ -176,38 +221,52 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 				? 'http://127.0.0.1:8787'
 				: 'https://tennis-admin-api.vnyson.workers.dev';
 
-			// Modal elements
-			const modal = document.getElementById('player-modal');
-		 const addPlayerBtn = document.getElementById('add-player-btn');
-		 const cancelBtn = document.getElementById('cancel-btn');
-		 const playerForm = document.getElementById('player-form');
-		 const modalTitle = document.getElementById('modal-title');
-		 const playerIdInput = document.getElementById('player-id');
-			
-			// Open modal for adding player
+			// Player modal elements
+			const playerModal = document.getElementById('player-modal');
+			const addPlayerBtn = document.getElementById('add-player-btn');
+			const cancelBtn = document.getElementById('cancel-btn');
+			const playerForm = document.getElementById('player-form');
+			const modalTitle = document.getElementById('modal-title');
+			const playerIdInput = document.getElementById('player-id');
+
+			// Racket modal elements
+			const racketModal = document.getElementById('racket-modal');
+			const racketCancelBtn = document.getElementById('racket-cancel-btn');
+			const racketForm = document.getElementById('racket-form');
+			const racketModalTitle = document.getElementById('racket-modal-title');
+			const racketIdInput = document.getElementById('racket-id');
+			const racketPlayerIdInput = document.getElementById('racket-player-id');
+			const racketBrandInput = document.getElementById('racket-brand');
+			const racketModelInput = document.getElementById('racket-model');
+			const racketYearInput = document.getElementById('racket-year');
+			const racketNotesInput = document.getElementById('racket-notes');
+			const racketOwnerField = document.getElementById('racket-owner-field');
+			const racketOwnerSelect = document.getElementById('racket-owner');
+
+			// Open player modal for adding player
 			addPlayerBtn.addEventListener('click', () => {
 				modalTitle.textContent = 'Add Player';
 				playerForm.reset();
 				playerIdInput.value = '';
-				modal.classList.remove('hidden');
-				modal.classList.add('flex');
+				playerModal.classList.remove('hidden');
+				playerModal.classList.add('flex');
 			});
-			
-			// Close modal
+
+			// Close player modal
 			cancelBtn.addEventListener('click', () => {
-				modal.classList.add('hidden');
-				modal.classList.remove('flex');
+				playerModal.classList.add('hidden');
+				playerModal.classList.remove('flex');
 			});
-			
-			// Close modal on backdrop click
-			modal.addEventListener('click', (e) => {
-				if (e.target === modal) {
-					modal.classList.add('hidden');
-					modal.classList.remove('flex');
+
+			// Close player modal on backdrop click
+			playerModal.addEventListener('click', (e) => {
+				if (e.target === playerModal) {
+					playerModal.classList.add('hidden');
+					playerModal.classList.remove('flex');
 				}
 			});
-			
-			// Handle form submission
+
+			// Handle player form submission
 			playerForm.addEventListener('submit', async (e) => {
 				e.preventDefault();
 
@@ -230,19 +289,131 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 					}
 
 					// Close modal and reload players
-					modal.classList.add('hidden');
-					modal.classList.remove('flex');
+					playerModal.classList.add('hidden');
+					playerModal.classList.remove('flex');
 					loadPlayers();
 				} catch (error) {
 					console.error('Failed to save player:', error);
 					alert('Failed to save player. Please try again.');
 				}
 			});
-			
+
+			// ---- Racket modal handlers ----
+
+			// Close racket modal
+			racketCancelBtn.addEventListener('click', () => {
+				closeRacketModal();
+			});
+
+			// Close racket modal on backdrop click
+			racketModal.addEventListener('click', (e) => {
+				if (e.target === racketModal) {
+					closeRacketModal();
+				}
+			});
+
+			// Handle racket form submission
+			racketForm.addEventListener('submit', async (e) => {
+				e.preventDefault();
+
+				const brand = racketBrandInput.value.trim();
+				if (!brand) {
+					alert('Brand is required.');
+					return;
+				}
+
+				const racketId = racketIdInput.value;
+				const playerId = racketPlayerIdInput.value;
+				const data = {
+					brand,
+					model: racketModelInput.value.trim() || null,
+					year: racketYearInput.value ? parseInt(racketYearInput.value, 10) : null,
+					notes: racketNotesInput.value.trim() || null,
+				};
+
+				// Include player_id if this is a create or owner change
+				const ownerId = racketOwnerSelect.value || playerId;
+				if (ownerId) {
+					data.player_id = ownerId;
+				}
+
+				try {
+					if (racketId) {
+						// Update existing racket
+						await updateRacket(racketId, data);
+					} else {
+						// Create new racket
+						data.player_id = playerId;
+						await createRacket(data);
+					}
+
+					closeRacketModal();
+					loadRackets(playerId);
+				} catch (error) {
+					console.error('Failed to save racket:', error);
+					alert('Failed to save racket. Please try again.');
+				}
+			});
+
+			function closeRacketModal() {
+				racketModal.classList.add('hidden');
+				racketModal.classList.remove('flex');
+				racketForm.reset();
+				racketIdInput.value = '';
+				racketPlayerIdInput.value = '';
+				racketOwnerField.classList.add('hidden');
+				racketOwnerSelect.innerHTML = '<option value="">Select player...</option>';
+			}
+
+			function openRacketModal(playerId, racketData) {
+				racketPlayerIdInput.value = playerId;
+
+				if (racketData) {
+					// Edit mode
+					racketModalTitle.textContent = 'Edit Racket';
+					racketIdInput.value = racketData.id;
+					racketBrandInput.value = racketData.brand || '';
+					racketModelInput.value = racketData.model || '';
+					racketYearInput.value = racketData.year || '';
+					racketNotesInput.value = racketData.notes || '';
+
+					// Show owner dropdown so they can reassign
+					racketOwnerField.classList.remove('hidden');
+					populateOwnerDropdown(playerId, racketData.player_id);
+				} else {
+					// Add mode
+					racketModalTitle.textContent = 'Add Racket';
+					racketForm.reset();
+					racketIdInput.value = '';
+					racketOwnerField.classList.add('hidden');
+				}
+
+				racketModal.classList.remove('hidden');
+				racketModal.classList.add('flex');
+			}
+
+			async function populateOwnerDropdown(currentPlayerId, selectedPlayerId) {
+				try {
+					const players = await fetchPlayers();
+					racketOwnerSelect.innerHTML = '<option value="">Select player...</option>';
+					players.forEach(p => {
+						const option = document.createElement('option');
+						option.value = p.id;
+						option.textContent = p.name;
+						if (p.id === selectedPlayerId) {
+							option.selected = true;
+						}
+						racketOwnerSelect.appendChild(option);
+					});
+				} catch (error) {
+					console.error('Failed to load players for owner dropdown:', error);
+				}
+			}
+
 			async function loadPlayers() {
 				try {
 					const players = await fetchPlayers();
-					
+
 					const tbody = document.getElementById('players-table');
 					if (players.length === 0) {
 						tbody.innerHTML = `
@@ -274,8 +445,8 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 										<div><span class="font-medium text-gray-700">Phone:</span> ${player.phone || '-'}</div>
 										<div><span class="font-medium text-gray-700">Grip:</span> ${player.grip || '-'}</div>
 										<div><span class="font-medium text-gray-700">String Preference:</span> ${player.string_pref || '-'}</div>
-										<div><span class="font-medium text-gray-700">Tension:</span> ${player.tension || '-'}</div>
-										<div><span class="font-medium text-gray-700">Racquet:</span> ${player.racquet || '-'}</div>
+										<div><span class="font-medium text-gray-700">Tension (Mains):</span> ${player.tension || '-'}</div>
+										<div><span class="font-medium text-gray-700">Tension (Cross):</span> ${player.tension_cross || '-'}</div>
 										<div><span class="font-medium text-gray-700">Restring Interval:</span> ${player.restring_interval_weeks ? `${player.restring_interval_weeks} weeks` : '-'}</div>
 										<div><span class="font-medium text-gray-700">Inventory Preferences:</span> ${player.inventory_preferences || '-'}</div>
 										${player.notes ? `<div class="col-span-2"><span class="font-medium text-gray-700">Notes:</span> ${player.notes}</div>` : ''}
@@ -306,7 +477,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 								</td>
 							</tr>
 						`).join('');
-						
+
 						// Add event listeners for expand/collapse
 						tbody.querySelectorAll('.player-row').forEach(row => {
 							row.addEventListener('click', (e) => {
@@ -314,16 +485,16 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 								if (e.target.classList.contains('edit-btn') || e.target.classList.contains('delete-btn')) {
 									return;
 								}
-								
+
 								const playerId = row.dataset.id;
 								const detailsRow = tbody.querySelector(`.player-details[data-player-id="${playerId}"]`);
 								const icon = row.querySelector('.expand-icon');
-								
+
 								if (detailsRow) {
 									const isHidden = detailsRow.classList.contains('hidden');
 									detailsRow.classList.toggle('hidden');
 									icon.textContent = detailsRow.classList.contains('hidden') ? '▶' : '▼';
-									
+
 									// Load rackets and last jobs when expanding
 									if (isHidden) {
 										loadRackets(playerId);
@@ -332,7 +503,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 								}
 							});
 						});
-						
+
 						// Add event listeners for edit buttons
 						tbody.querySelectorAll('.edit-btn').forEach(btn => {
 							btn.addEventListener('click', async (e) => {
@@ -341,7 +512,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 								await loadPlayerForEdit(playerId);
 							});
 						});
-						
+
 						// Add event listeners for delete buttons
 						tbody.querySelectorAll('.delete-btn').forEach(btn => {
 							btn.addEventListener('click', async (e) => {
@@ -352,19 +523,13 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 								}
 							});
 						});
-						
+
 						// Add event listeners for add racket buttons
 						tbody.querySelectorAll('.add-racket-btn').forEach(btn => {
 							btn.addEventListener('click', async (e) => {
 								e.stopPropagation();
 								const playerId = e.target.dataset.playerId;
-								const brand = prompt('Enter racket brand:');
-								if (brand) {
-									const model = prompt('Enter racket model:');
-									const year = prompt('Enter racket year:');
-									const notes = prompt('Enter racket notes:');
-									await addRacket(playerId, { brand, model, year: year ? parseInt(year) : null, notes });
-								}
+								openRacketModal(playerId, null);
 							});
 						});
 
@@ -406,7 +571,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 					`;
 				}
 			}
-			
+
 			async function loadPlayerForEdit(playerId) {
 				try {
 					const response = await fetch(`${API_URL}/api/players/${playerId}`, {
@@ -414,7 +579,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 					});
 					if (!response.ok) throw new Error('Failed to fetch player');
 					const player = await response.json();
-					
+
 					// Populate form with player data
 					modalTitle.textContent = 'Edit Player';
 					playerIdInput.value = player.id;
@@ -427,20 +592,20 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 					document.getElementById('grip').value = player.grip || '';
 					document.getElementById('string_pref').value = player.string_pref || '';
 					document.getElementById('tension').value = player.tension || '';
-					document.getElementById('racquet').value = player.racquet || '';
+					document.getElementById('tension_cross').value = player.tension_cross || '';
 					document.getElementById('restring_interval_weeks').value = player.restring_interval_weeks || '';
 					document.getElementById('notes').value = player.notes || '';
 					document.getElementById('inventory_preferences').value = player.inventory_preferences || '';
-					
+
 					// Show modal
-					modal.classList.remove('hidden');
-					modal.classList.add('flex');
+					playerModal.classList.remove('hidden');
+					playerModal.classList.add('flex');
 				} catch (error) {
 					console.error('Failed to load player for edit:', error);
 					alert('Failed to load player. Please try again.');
 				}
 			}
-			
+
 			async function deletePlayer(playerId) {
 				try {
 					const response = await fetch(`${API_URL}/api/players/${playerId}`, {
@@ -454,11 +619,11 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 					alert('Failed to delete player. Please try again.');
 				}
 			}
-			
+
 			async function loadRackets(playerId) {
 				try {
 					const rackets = await fetchRackets(playerId);
-					
+
 					const racketsList = document.querySelector(`.rackets-list[data-player-id="${playerId}"]`);
 					if (rackets.length === 0) {
 						racketsList.innerHTML = '<p class="text-sm text-gray-500">No rackets yet.</p>';
@@ -467,11 +632,32 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 							<div class="flex justify-between items-center py-1 border-b last:border-0">
 								<span class="text-sm">${racket.brand || ''} ${racket.model || ''} ${racket.year ? `(${racket.year})` : ''}</span>
 								<div class="flex space-x-2">
+									<button class="edit-racket-btn text-indigo-600 hover:text-indigo-900 text-xs" data-racket-id="${racket.id}" data-player-id="${playerId}">Edit</button>
 									<button class="delete-racket-btn text-red-600 hover:text-red-900 text-xs" data-racket-id="${racket.id}" data-player-id="${playerId}">Delete</button>
 								</div>
 							</div>
 						`).join('');
-						
+
+						// Add event listeners for edit racket buttons
+						racketsList.querySelectorAll('.edit-racket-btn').forEach(btn => {
+							btn.addEventListener('click', async (e) => {
+								e.stopPropagation();
+								const racketId = e.target.dataset.racketId;
+								const currentPlayerId = e.target.dataset.playerId;
+								try {
+									const response = await fetch(`${API_URL}/api/rackets/${racketId}`, {
+										headers: { 'Authorization': `Bearer ${getAuthToken()}` },
+									});
+									if (!response.ok) throw new Error('Failed to fetch racket');
+									const racket = await response.json();
+									openRacketModal(currentPlayerId, racket);
+								} catch (error) {
+									console.error('Failed to load racket for edit:', error);
+									alert('Failed to load racket. Please try again.');
+								}
+							});
+						});
+
 						// Add event listeners for delete racket buttons
 						racketsList.querySelectorAll('.delete-racket-btn').forEach(btn => {
 							btn.addEventListener('click', async (e) => {
@@ -490,7 +676,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 					racketsList.innerHTML = '<p class="text-sm text-red-500">Failed to load rackets.</p>';
 				}
 			}
-			
+
 			async function addRacket(playerId, data) {
 				try {
 					await createRacket({ player_id: playerId, ...data });
@@ -500,7 +686,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 					alert('Failed to add racket. Please try again.');
 				}
 			}
-			
+
 			async function deleteRacket(racketId, playerId) {
 				try {
 					await deleteRacketApi(racketId);
@@ -510,7 +696,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 					alert('Failed to delete racket. Please try again.');
 				}
 			}
-			
+
 			async function loadLastJobs(playerId) {
 				try {
 					const response = await fetch(`${API_URL}/api/players?last_jobs=${playerId}`, {
@@ -552,7 +738,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, deleteRacket, r
 					alert('Failed to generate shareable link. Please try again.');
 				}
 			}
-			
+
 			// Load players when page loads
 			loadPlayers();
 		</script>

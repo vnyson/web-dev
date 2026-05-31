@@ -1,7 +1,26 @@
 // Use localhost API when running locally
+let _apiUrl: string | null = null;
+
+export function getApiUrl(): string {
+  if (_apiUrl) return _apiUrl;
+  if (
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ) {
+    _apiUrl = 'http://127.0.0.1:8787';
+  } else {
+    _apiUrl = 'https://tennis-admin-api.vnyson.workers.dev';
+  }
+  return _apiUrl;
+}
+
+// Kept for backward compatibility with existing imports (e.g. jobs.astro, players.astro)
+// These pages use API_URL in client-side <script> blocks where window is available
 export const API_URL =
-  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://127.0.0.1:8787'
+  typeof window !== 'undefined'
+    ? window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://127.0.0.1:8787'
+      : 'https://tennis-admin-api.vnyson.workers.dev'
     : 'https://tennis-admin-api.vnyson.workers.dev';
 
 // Helper function to get auth token from localStorage
@@ -48,7 +67,7 @@ export function getAuthHeaders(): HeadersInit {
 export { getAuthToken, setAuthToken, clearAuthToken };
 
 export async function fetchPlayers() {
-  const response = await fetch(`${API_URL}/api/players`, {
+  const response = await fetch(`${getApiUrl()}/api/players`, {
     headers: getAuthHeaders(),
   });
   if (!response.ok) throw new Error('Failed to fetch players');
@@ -56,7 +75,7 @@ export async function fetchPlayers() {
 }
 
 export async function fetchStringing() {
-  const response = await fetch(`${API_URL}/api/stringing`, {
+  const response = await fetch(`${getApiUrl()}/api/stringing`, {
     headers: getAuthHeaders(),
   });
   if (!response.ok) throw new Error('Failed to fetch stringing jobs');
@@ -64,7 +83,7 @@ export async function fetchStringing() {
 }
 
 export async function fetchInventory() {
-  const response = await fetch(`${API_URL}/api/inventory`, {
+  const response = await fetch(`${getApiUrl()}/api/inventory`, {
     headers: getAuthHeaders(),
   });
   if (!response.ok) throw new Error('Failed to fetch inventory');
@@ -72,7 +91,7 @@ export async function fetchInventory() {
 }
 
 export async function fetchHistory() {
-  const response = await fetch(`${API_URL}/api/history`, {
+  const response = await fetch(`${getApiUrl()}/api/history`, {
     headers: getAuthHeaders(),
   });
   if (!response.ok) throw new Error('Failed to fetch history');
@@ -80,7 +99,7 @@ export async function fetchHistory() {
 }
 
 export async function createPlayer(data: any) {
-  const response = await fetch(`${API_URL}/api/players`, {
+  const response = await fetch(`${getApiUrl()}/api/players`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
@@ -90,7 +109,7 @@ export async function createPlayer(data: any) {
 }
 
 export async function createStringingJob(data: any) {
-  const response = await fetch(`${API_URL}/api/stringing`, {
+  const response = await fetch(`${getApiUrl()}/api/stringing`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
@@ -100,7 +119,7 @@ export async function createStringingJob(data: any) {
 }
 
 export async function updateStringingJob(id: string, data: any) {
-  const response = await fetch(`${API_URL}/api/stringing/${id}`, {
+  const response = await fetch(`${getApiUrl()}/api/stringing/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
@@ -110,7 +129,7 @@ export async function updateStringingJob(id: string, data: any) {
 }
 
 export async function createInventoryItem(data: any) {
-  const response = await fetch(`${API_URL}/api/inventory`, {
+  const response = await fetch(`${getApiUrl()}/api/inventory`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
@@ -120,7 +139,7 @@ export async function createInventoryItem(data: any) {
 }
 
 export async function updateInventoryItem(id: string, data: any) {
-  const response = await fetch(`${API_URL}/api/inventory/${id}`, {
+  const response = await fetch(`${getApiUrl()}/api/inventory/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
@@ -130,7 +149,7 @@ export async function updateInventoryItem(id: string, data: any) {
 }
 
 export async function deleteInventoryItem(id: string) {
-  const response = await fetch(`${API_URL}/api/inventory/${id}`, {
+  const response = await fetch(`${getApiUrl()}/api/inventory/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -139,7 +158,9 @@ export async function deleteInventoryItem(id: string) {
 }
 
 export async function fetchRackets(playerId?: string) {
-  const url = playerId ? `${API_URL}/api/rackets?player_id=${playerId}` : `${API_URL}/api/rackets`;
+  const url = playerId
+    ? `${getApiUrl()}/api/rackets?player_id=${playerId}`
+    : `${getApiUrl()}/api/rackets`;
   const response = await fetch(url, {
     headers: getAuthHeaders(),
   });
@@ -148,7 +169,7 @@ export async function fetchRackets(playerId?: string) {
 }
 
 export async function createRacket(data: any) {
-  const response = await fetch(`${API_URL}/api/rackets`, {
+  const response = await fetch(`${getApiUrl()}/api/rackets`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
@@ -157,8 +178,18 @@ export async function createRacket(data: any) {
   return response.json();
 }
 
+export async function updateRacket(id: string, data: any) {
+  const response = await fetch(`${getApiUrl()}/api/rackets/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to update racket');
+  return response.json();
+}
+
 export async function deleteRacket(id: string) {
-  const response = await fetch(`${API_URL}/api/rackets/${id}`, {
+  const response = await fetch(`${getApiUrl()}/api/rackets/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -167,7 +198,7 @@ export async function deleteRacket(id: string) {
 }
 
 export async function regeneratePlayerToken(playerId: string) {
-  const response = await fetch(`${API_URL}/api/regenerate-token`, {
+  const response = await fetch(`${getApiUrl()}/api/regenerate-token`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify({ player_id: playerId }),

@@ -265,7 +265,9 @@ import { fetchInventory, createInventoryItem, getAuthToken } from '../lib/api';
 						} else {
 							stringsTbody.innerHTML = strings.map(item => {
 								const quantityClass = item.quantity <= 5 ? 'text-red-600 font-medium' : 'text-gray-500';
-								const characteristics = item.string_characteristics ? JSON.parse(item.string_characteristics) : [];
+							const characteristics = Array.isArray(item.string_characteristics)
+								? item.string_characteristics
+								: (item.string_characteristics ? JSON.parse(item.string_characteristics) : []);
 								return `
 								<tr>
 									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
@@ -390,6 +392,7 @@ import { fetchInventory, createInventoryItem, getAuthToken } from '../lib/api';
 			
 			// Track editing state
 			let editingItemId = null;
+			const modalTitle = document.querySelector('#add-item-modal h3');
 
 			function openModal() {
 				modal.classList.remove('hidden');
@@ -449,7 +452,7 @@ function updateStringFieldsVisibility() {
 					brand: formData.get('brand') || null,
 					category: formData.get('category'),
 					price: formData.get('price') ? parseFloat(formData.get('price')) : null,
-					quantity: parseInt(formData.get('quantity')),
+					quantity: Number.isNaN(parseInt(formData.get('quantity') || '0', 10)) ? 0 : parseInt(formData.get('quantity') || '0', 10),
 					status: formData.get('status'),
 					notes: formData.get('notes') || null,
 					string_type: formData.get('category') === 'string' ? formData.get('string_type') || null : null,
@@ -506,7 +509,9 @@ function updateStringFieldsVisibility() {
 				if (item.category === 'string') {
 					stringFields.classList.remove('hidden');
 					document.getElementById('string_type').value = item.string_type || '';
-					const characteristics = item.string_characteristics ? JSON.parse(item.string_characteristics) : [];
+					const characteristics = Array.isArray(item.string_characteristics)
+						? item.string_characteristics
+						: (item.string_characteristics ? JSON.parse(item.string_characteristics) : []);
 					document.getElementById('string_characteristics').value = characteristics.join(', ');
 				} else {
 					stringFields.classList.add('hidden');

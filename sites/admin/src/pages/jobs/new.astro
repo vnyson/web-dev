@@ -1,4 +1,4 @@
-﻿---
+---
 import '../../styles/global.css';
 ---
 
@@ -107,8 +107,9 @@ import '../../styles/global.css';
 
     document.getElementById('player_name').value = selectedPlayer.name || '';
     document.getElementById('phone').value = selectedPlayer.phone || '';
-    document.getElementById('string_mains').value = selectedPlayer.string_pref || '';
+    document.getElementById('string_mains').value = '';
     document.getElementById('tension_mains').value = selectedPlayer.tension || '';
+    document.getElementById('tension_crosses').value = selectedPlayer.tension_cross || '';
 
     loadRackets(playerId);
   }
@@ -280,7 +281,7 @@ import '../../styles/global.css';
 			<main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
 				<div class="px-4 py-6 sm:px-0">
 					<div class="mb-6">
-						<a href="/jobs" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">â† Back to Jobs</a>
+						<a href="/jobs" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">← Back to Jobs</a>
 					</div>
 					<h2 class="text-2xl font-bold text-gray-900 mb-6">New Drop Off</h2>
 
@@ -326,6 +327,7 @@ import '../../styles/global.css';
 										<label for="racquet" class="block text-sm font-medium text-gray-700">Racquet</label>
                                         <input type="text" list="racquet-options" name="racquet" id="racquet" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., Wilson Pro Staff 97" />
                                         <datalist id="racquet-options"></datalist>
+                                        </div>
 									<div class="sm:col-span-3">
 										<label for="string_mains" class="block text-sm font-medium text-gray-700">String (Mains)</label>
 										<input type="text" name="string_mains" id="string_mains" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
