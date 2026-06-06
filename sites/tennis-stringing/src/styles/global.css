@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import shared design system */
+@import '../../../packages/design-system/css/tokens.css';
+@import '../../../packages/design-system/css/base.css';
+@import '../../../packages/design-system/css/components.css';
+
+.hidden {
+  display: none !important;
+}
+
+body {
+  background: #ffffff;
+}
+
+.dollar-sign {
+  font-family: var(--font-family-base) !important;
+}
+
+/* Grass Background Tiles */
+.grass-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(200px, 1fr));
+  pointer-events: none;
+}
+
+.grass-tile {
+  background-size: cover;
+  background-position: center;
+}
+
+.grass-tile--1 {
+  background-image: url('../assets/images/soft-green-low-grass-1.png');
+}
+
+.grass-tile--2 {
+  background-image: url('../assets/images/soft-green-low-grass-2.png');
+}
+
+.grass-tile--3 {
+  background-image: url('../assets/images/soft-green-low-grass-3.png');
+}
