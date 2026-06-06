@@ -1,0 +1,168 @@
+<!-- Profile Overlay -->
+<div id="profile-overlay" class="profile-overlay hidden">
+  <div
+    class="profile-overlay__content panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all"
+  >
+    <div class="profile-overlay__header">
+      <div class="profile-overlay__header-main">
+        <h2>profile</h2>
+        <button
+          id="profile-clear-token-btn"
+          type="button"
+          class="profile-reset-button hidden"
+          aria-label="Reset profile session"
+        >
+          reset
+        </button>
+      </div>
+      <button
+        class="profile-overlay__close pixel-borders pixel-borders--1"
+        aria-label="Close profile"
+      >
+        x
+      </button>
+    </div>
+    <div id="profile-job-status" class="profile-job-status hidden" role="status"></div>
+    <div id="profile-content" class="profile-table-container">
+      <!-- Loading Panel -->
+      <div id="profile-loading" class="profile-panel hidden">
+        <p>Loading profile...</p>
+      </div>
+
+      <!-- Error Alert Panel -->
+      <div id="profile-error-alert" class="profile-alert profile-alert--error hidden"></div>
+      <div id="profile-success-alert" class="profile-alert profile-alert--success hidden"></div>
+
+      <!-- Verify Form Panel -->
+      <div id="profile-verify-panel" class="profile-panel hidden">
+        <p class="profile-instructions">Verify your identity to access your profile.</p>
+        <form id="profile-verify-form" class="pixel-form">
+          <div class="form-group">
+            <label for="verify-name">Name (partial match)</label>
+            <input
+              type="text"
+              id="verify-name"
+              class="pixel-input"
+              placeholder="e.g. Vinay"
+              required
+            />
+          </div>
+          <div id="verify-phone-last4-container" class="form-group">
+            <label for="verify-phone-last4">Last 4 digits of Phone</label>
+            <input
+              type="text"
+              id="verify-phone-last4"
+              class="pixel-input"
+              placeholder="e.g. 3062"
+              maxlength="4"
+            />
+          </div>
+          <div id="verify-phone-full-container" class="form-group hidden">
+            <label for="verify-phone-full"
+              >Multiple players matched. Please enter your FULL Phone Number</label
+            >
+            <input
+              type="tel"
+              id="verify-phone-full"
+              class="pixel-input"
+              placeholder="e.g. 817-798-3062"
+            />
+          </div>
+          <div class="flex gap-md profile-form-actions">
+            <button
+              type="submit"
+              class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all pixel-button pixel-border-theme--primary flex-1"
+            >
+              Verify
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Main Profile Panel -->
+      <div id="profile-view-panel" class="profile-panel hidden">
+        <div class="profile-hero">
+          <div class="profile-hero__avatar">
+            <div
+              id="profile-image-container"
+              class="panel-pixel pixel-borders pixel-borders--3 pixel-borders--inset pixel-borders--inset-all profile-image-container"
+            >
+              <img id="profile-image" src="/assets/images/profile/generic.png" alt="profile" />
+            </div>
+          </div>
+          <div class="profile-hero__inventory">
+            <div id="profile-racket-inventory" class="profile-racket-inventory">
+              <div class="profile-racket-inventory__stage">
+                <div id="profile-racket-slots" class="profile-racket-inventory__slots"></div>
+                <img
+                  class="profile-racket-inventory__frame"
+                  src="/assets/images/player-racket-inventory.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </div>
+            </div>
+            <div id="profile-racket-detail" class="profile-racket-detail hidden"></div>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="profile-tabs flex gap-xs profile-tabs-nav">
+          <button class="profile-tab-btn active" data-tab="info">Info</button>
+          <button class="profile-tab-btn" data-tab="jobs">Jobs</button>
+        </div>
+
+        <!-- Tab Content: Info -->
+        <div id="profile-tab-info" class="profile-tab-content">
+          <form id="profile-edit-form" class="pixel-form">
+            <div class="form-group">
+              <label>Name (Read-only)</label>
+              <input type="text" id="profile-name" class="pixel-input read-only" readonly />
+            </div>
+            <div class="form-group">
+              <label for="profile-email">Email</label>
+              <input type="email" id="profile-email" class="pixel-input" />
+            </div>
+            <div class="form-group">
+              <label for="profile-phone">Phone</label>
+              <input type="tel" id="profile-phone" class="pixel-input" />
+            </div>
+            <div class="form-group">
+              <label for="profile-string-pref">string preference</label>
+              <input type="text" id="profile-string-pref" class="pixel-input" />
+            </div>
+            <div class="form-group">
+              <label for="profile-tension">tension (mains)</label>
+              <input type="text" id="profile-tension" class="pixel-input" />
+            </div>
+            <div class="form-group">
+              <label for="profile-tension-cross">tension (cross)</label>
+              <input type="text" id="profile-tension-cross" class="pixel-input" />
+            </div>
+            <div class="form-group">
+              <label for="profile-grip">grip preference</label>
+              <input type="text" id="profile-grip" class="pixel-input" />
+            </div>
+            <div class="form-group">
+              <label for="profile-notes">Notes</label>
+              <textarea id="profile-notes" class="pixel-input"></textarea>
+            </div>
+            <div class="flex gap-md profile-form-actions">
+              <button
+                type="submit"
+                class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all pixel-button pixel-border-theme--primary flex-1"
+              >
+                Save Profile
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tab Content: Jobs -->
+        <div id="profile-tab-jobs" class="profile-tab-content hidden">
+          <div id="profile-jobs-list" class="pixel-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

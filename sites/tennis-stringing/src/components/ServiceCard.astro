@@ -1,0 +1,25 @@
+---
+export interface Props {
+  animation: string;
+  heading: string;
+  gifSrc: string;
+}
+
+const { animation, heading, gifSrc } = Astro.props;
+---
+
+<div
+  class="service-card panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all flex-1"
+  data-animation={animation}
+>
+  <div class="service-gif-container">
+    <img
+      class="service-gif"
+      src={gifSrc}
+      alt={`${heading} animation`}
+      data-static-src={gifSrc}
+    />
+  </div>
+  <h3 class="service-heading">{heading}</h3>
+  <slot />
+</div>
