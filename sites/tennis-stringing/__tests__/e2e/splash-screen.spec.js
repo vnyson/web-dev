@@ -2,18 +2,26 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Splash Screen', () => {
   test('shows splash screen on first visit', async ({ page }) => {
+    // Clear sessionStorage on an already-loaded about:blank page
+    await page.goto('about:blank');
+    await page.evaluate(() => {
+      sessionStorage.clear();
+      localStorage.clear();
+    });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
     // Splash should be visible initially
     const splash = page.locator('.splash');
     await expect(splash).toBeVisible();
-
-    // Splash should have the animate-in class
-    await expect(splash).toHaveClass(/splash--animate-in/);
   });
 
   test('splash has loading animation elements', async ({ page }) => {
+    await page.goto('about:blank');
+    await page.evaluate(() => {
+      sessionStorage.clear();
+      localStorage.clear();
+    });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 

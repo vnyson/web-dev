@@ -20,8 +20,9 @@ test.describe('Token Management', () => {
     // Close overlay
     await page.locator('.profile-overlay__close').click();
 
-    // Reload page via navigateToSite
-    await navigateToSite(page);
+    // Reload page - use goto to preserve localStorage
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
 
     // Token should persist in localStorage
     const token = await page.evaluate(() => localStorage.getItem('player_token'));

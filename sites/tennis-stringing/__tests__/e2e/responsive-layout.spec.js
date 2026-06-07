@@ -15,7 +15,8 @@ test.describe('Responsive Layout', () => {
     const desktopActions = page.locator('.desktop-customer-actions');
     await expect(desktopActions).toBeVisible();
 
-    await expect(page.locator('.desktop-section')).toBeVisible();
+    // Use first() since there are two .desktop-section elements
+    await expect(page.locator('.desktop-section').first()).toBeVisible();
   });
 
   test('shows mobile navigation at mobile viewport', async ({ page }) => {
@@ -45,13 +46,13 @@ test.describe('Responsive Layout', () => {
     await setupApiMocks(page);
     await navigateToSite(page);
 
-    // Contact header should show business name
-    const contactTitle = page.locator('.contact-header__title');
+    // Use first() since there are two .contact-header__title elements (desktop + mobile)
+    const contactTitle = page.locator('.desktop-section .contact-header__title');
     await expect(contactTitle).toBeVisible();
     await expect(contactTitle).toContainText('rva racket services');
 
     // Should show name and phone
-    const contactInfo = page.locator('.contact-header__info');
+    const contactInfo = page.locator('.desktop-section .contact-header__info');
     await expect(contactInfo.first()).toBeVisible();
   });
 
