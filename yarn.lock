@@ -2524,11 +2524,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:>=10.0.0":
-  version: 25.6.0
-  resolution: "@types/node@npm:25.6.0"
+  version: 25.9.2
+  resolution: "@types/node@npm:25.9.2"
   dependencies:
-    undici-types: "npm:~7.19.0"
-  checksum: 10c0/d2d2015630ff098a201407f55f5077a20270ae4f465c739b40865cd9933b91b9c5d2b85568eadaf3db0801b91e267333ca7eb39f007428b173d1cdab4b339ac5
+    undici-types: "npm:>=7.24.0 <7.24.7"
+  checksum: 10c0/f14c0d56361febb985eccc45cf0834ee6e2f07c4389a636f3e1a55ebde320077a80bface18c9afd3092f5fa295925502c1a9d55f805efa813f634aa9c941cbac
   languageName: node
   linkType: hard
 
@@ -4049,15 +4049,15 @@ __metadata:
   linkType: hard
 
 "engine.io-client@npm:~6.6.1":
-  version: 6.6.4
-  resolution: "engine.io-client@npm:6.6.4"
+  version: 6.6.5
+  resolution: "engine.io-client@npm:6.6.5"
   dependencies:
     "@socket.io/component-emitter": "npm:~3.1.0"
     debug: "npm:~4.4.1"
     engine.io-parser: "npm:~5.2.1"
-    ws: "npm:~8.18.3"
+    ws: "npm:~8.20.1"
     xmlhttprequest-ssl: "npm:~2.1.1"
-  checksum: 10c0/d90bc32d614f67db9c198d1c26a787529f3038a7429c75e677f5495938cc45f9e89d435e8860bcfcc01db410e21d2f245b914f2fcbdb03ffd50d30f2aeec5143
+  checksum: 10c0/fb3e6d0f2409ac6b39df69b1eb93cd6440fd536506eee949b437bbc5ee5cc8ab009074b1f0ec10ba3dbb633cf386700fda194159a5a0320a554120c0d28a7493
   languageName: node
   linkType: hard
 
@@ -4069,8 +4069,8 @@ __metadata:
   linkType: hard
 
 "engine.io@npm:~6.6.0":
-  version: 6.6.7
-  resolution: "engine.io@npm:6.6.7"
+  version: 6.6.8
+  resolution: "engine.io@npm:6.6.8"
   dependencies:
     "@types/cors": "npm:^2.8.12"
     "@types/node": "npm:>=10.0.0"
@@ -4081,8 +4081,8 @@ __metadata:
     cors: "npm:~2.8.5"
     debug: "npm:~4.4.1"
     engine.io-parser: "npm:~5.2.1"
-    ws: "npm:~8.18.3"
-  checksum: 10c0/cde9cbadf39b0ccc5399ac7d64fc2802bd93300672b2e6f86ca96a6f0c5be40f6f512af8f0709d7f789b455a7b9af2a1fc06407dcad2082fa1f150591b6358e2
+    ws: "npm:~8.20.1"
+  checksum: 10c0/3cf705d4be8683322b3ff3c09e680ca72e03f2a475b2c76e5945c920aa85b6edc4ef442df18b0a1a7eaa205797802b993ed9f194bff27ed09f46b43711e88af2
   languageName: node
   linkType: hard
 
@@ -8705,12 +8705,12 @@ __metadata:
   linkType: hard
 
 "socket.io-adapter@npm:~2.5.2":
-  version: 2.5.6
-  resolution: "socket.io-adapter@npm:2.5.6"
+  version: 2.5.7
+  resolution: "socket.io-adapter@npm:2.5.7"
   dependencies:
     debug: "npm:~4.4.1"
-    ws: "npm:~8.18.3"
-  checksum: 10c0/2af9827c3e8e2a445d7d1523f7ad4fcc37009da44f72042e8a9af27e4caf29fe0a34de6771a6e9971a0ff8d527631fe25b80230ff6c42c045e2913f0ac308059
+    ws: "npm:~8.20.1"
+  checksum: 10c0/c911e18e2a8a1cf30117d3df7f6309a6d1c802cc3cc1115606d75e0928ea270978800725d4557526bfb1853ccaa2bc33b0d221a361cd2653bdd00b7e313ffab0
   languageName: node
   linkType: hard
 
@@ -9400,10 +9400,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~7.19.0":
-  version: 7.19.2
-  resolution: "undici-types@npm:7.19.2"
-  checksum: 10c0/7159f10546f9f6c47d36776bb1bbf8671e87c1e587a6fee84ae1f111ae8de4f914efa8ca0dfcd224f4f4a9dfc3f6028f627ccb5ddaccf82d7fd54671b89fac3e
+"undici-types@npm:>=7.24.0 <7.24.7":
+  version: 7.24.6
+  resolution: "undici-types@npm:7.24.6"
+  checksum: 10c0/d9cd8befb643ac904615c280a095ba4240531f6bb4a5e75a22a7483630ca8d3f1016d2ab6ace6ceda1f63b3a2db2fe037fafe121d6917a0187573aa548ff78ca
   languageName: node
   linkType: hard
 
@@ -10179,7 +10179,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:8.20.1":
+"ws@npm:8.20.1, ws@npm:~8.20.1":
   version: 8.20.1
   resolution: "ws@npm:8.20.1"
   peerDependencies:
@@ -10206,21 +10206,6 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 10c0/ef4a243476283fc49bc7550966c4af4aa0eef56273837211e700de3b664e08604a760cdddcb5ba43c049140e74ccfec5b0ee0bb439e08c2adf9138902fdde5f9
-  languageName: node
-  linkType: hard
-
-"ws@npm:~8.18.3":
-  version: 8.18.3
-  resolution: "ws@npm:8.18.3"
-  peerDependencies:
-    bufferutil: ^4.0.1
-    utf-8-validate: ">=5.0.2"
-  peerDependenciesMeta:
-    bufferutil:
-      optional: true
-    utf-8-validate:
-      optional: true
-  checksum: 10c0/eac918213de265ef7cb3d4ca348b891a51a520d839aa51cdb8ca93d4fa7ff9f6ccb339ccee89e4075324097f0a55157c89fa3f7147bde9d8d7e90335dc087b53
   languageName: node
   linkType: hard
 
