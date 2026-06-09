@@ -1,0 +1,506 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import QueueIndicator from '../components/QueueIndicator.astro';
+import ContactCard from '../components/ContactCard.astro';
+import StringingCard from '../components/StringingCard.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import ProfileOverlay from '../components/ProfileOverlay.astro';
+import InventoryOverlay from '../components/InventoryOverlay.astro';
+import MobileNav from '../components/MobileNav.astro';
+---
+
+<BaseLayout>
+  <div class="main-container flex flex-col">
+    <!-- Desktop Section (hidden on mobile) -->
+    <section class="desktop-section">
+      <div class="desktop-navigation-bar">
+        <QueueIndicator />
+        <ContactCard />
+        <StringingCard />
+      </div>
+    </section>
+
+    <!-- Mobile Section (hidden on desktop) -->
+    <section class="mobile-section">
+      <div class="flex flex-col md:flex-row gap-xl">
+        <div
+          class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all contact-header__content"
+        >
+          <h2 class="contact-header__title">rva racket services</h2>
+          <p class="contact-header__info">vinay soni</p>
+          <p class="contact-header__info">817 798 3062</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Desktop Returning Customers + Demo -->
+    <section class="desktop-section desktop-customer-actions">
+      <button
+        class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all pixel-button pixel-border-theme--warning profile-button"
+      >
+        Existing Customer
+      </button>
+      <button
+        class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all pixel-button pixel-border-theme--disabled"
+      >
+        Demo
+      </button>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services">
+      <h2 class="services-title">Services</h2>
+      <div class="flex flex-col md:flex-row gap-xl">
+        <ServiceCard
+          animation="string"
+          heading="stringing"
+          gifSrc="/assets/images/services/racket-stringing.gif"
+        >
+          <p class="service-description">scaling cost</p>
+          <p class="service-description"><span class="dollar-sign">$</span>10 OR &frac12; string msrp</p>
+          <p class="service-rates">
+            ex. <span class="dollar-sign">$</span>12 set &rarr; <span class="dollar-sign">$</span>22 strung
+          </p>
+          <p class="service-rates">
+            ex. <span class="dollar-sign">$</span>26 set &rarr; <span class="dollar-sign">$</span>39 strung
+          </p>
+        </ServiceCard>
+
+        <ServiceCard
+          animation="weights"
+          heading="customization + matching"
+          gifSrc="/assets/images/services/racket-weight.gif"
+        >
+          <p class="service-description">add lead, new grips, match multiple sticks</p>
+          <p class="service-rates">
+            material cost + <span class="dollar-sign">$</span>5/ stick (for matching)
+          </p>
+        </ServiceCard>
+
+        <ServiceCard
+          animation="racquet"
+          heading="spec-ing"
+          gifSrc="/assets/images/services/racket-scale.gif"
+        >
+          <p class="service-description">get your sticks' actual specs</p>
+          <p class="service-rates">free with stringing</p>
+        </ServiceCard>
+      </div>
+    </section>
+  </div>
+
+  <ProfileOverlay />
+  <InventoryOverlay />
+  <MobileNav />
+</BaseLayout>
+
+<script>
+  import { fetchQueueStatus, verifyPlayer, loadPlayerByToken, updatePlayer, fetchInventory } from '../lib/api';
+  import { updateQueueDisplayElements } from '../lib/queue-display';
+
+  const API_URL =
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://127.0.0.1:8787'
+      : 'https://tennis-admin-api.vnyson.workers.dev';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Queue Data Fetching
+    const queueImages = document.querySelectorAll('.queue-image');
+    const queueTexts = document.querySelectorAll('.queue-text');
+
+    if (queueImages.length > 0 && queueTexts.length > 0) {
+      fetchQueueStatus()
+        .then((data) => updateQueueDisplayElements(queueImages, queueTexts, data.count))
+        .catch(() => updateQueueDisplayElements(queueImages, queueTexts, 0));
+    }
+
+    // Queue Image Hover Effect
+    queueImages.forEach((queueImage) => {
+      const gifSrc = queueImage.dataset.gifSrc;
+      if (gifSrc) {
+        queueImage.addEventListener('mouseenter', () => {
+          queueImage.src = gifSrc;
+        });
+        queueImage.addEventListener('mouseleave', () => {
+          fetchQueueStatus()
+            .then((data) => updateQueueDisplayElements(queueImages, queueTexts, data.count))
+            .catch(() => {});
+        });
+      }
+    });
+
+    // Profile & Inventory Overlay logic
+    const profileButtons = document.querySelectorAll('.profile-button, .profile-button-mobile');
+    const profileOverlay = document.getElementById('profile-overlay');
+    const profileCloseButton = document.querySelector('.profile-overlay__close');
+    const inventoryOverlay = document.getElementById('inventory-overlay');
+    const inventoryButtons = document.querySelectorAll('.inventory-button, .inventory-button-mobile');
+    const inventoryCloseButton = document.querySelector('.inventory-overlay__close');
+    const inventoryGrid = document.getElementById('inventory-grid');
+
+    function closeAllOverlays() {
+      profileOverlay?.classList.add('hidden');
+      inventoryOverlay?.classList.add('hidden');
+    }
+
+    function openProfileOverlay() {
+      closeAllOverlays();
+      profileOverlay?.classList.remove('hidden');
+    }
+
+    function openInventoryOverlay() {
+      closeAllOverlays();
+      inventoryOverlay?.classList.remove('hidden');
+    }
+
+    // Profile elements
+    const profileLoading = document.getElementById('profile-loading');
+    const profileErrorAlert = document.getElementById('profile-error-alert');
+    const profileSuccessAlert = document.getElementById('profile-success-alert');
+    const profileVerifyPanel = document.getElementById('profile-verify-panel');
+    const profileVerifyForm = document.getElementById('profile-verify-form');
+    const verifyNameInput = document.getElementById('verify-name');
+    const verifyPhoneLast4Container = document.getElementById('verify-phone-last4-container');
+    const verifyPhoneLast4Input = document.getElementById('verify-phone-last4');
+    const verifyPhoneFullContainer = document.getElementById('verify-phone-full-container');
+    const verifyPhoneFullInput = document.getElementById('verify-phone-full');
+    const profileClearTokenBtn = document.getElementById('profile-clear-token-btn');
+    const profileViewPanel = document.getElementById('profile-view-panel');
+    const profileEditForm = document.getElementById('profile-edit-form');
+    const profileNameInput = document.getElementById('profile-name');
+    const profileEmailInput = document.getElementById('profile-email');
+    const profilePhoneInput = document.getElementById('profile-phone');
+    const profileStringPrefInput = document.getElementById('profile-string-pref');
+    const profileTensionInput = document.getElementById('profile-tension');
+    const profileTensionCrossInput = document.getElementById('profile-tension-cross');
+    const profileGripInput = document.getElementById('profile-grip');
+    const profileNotesInput = document.getElementById('profile-notes');
+    const profileJobsList = document.getElementById('profile-jobs-list');
+    const profileRacketSlots = document.getElementById('profile-racket-slots');
+    const profileRacketDetail = document.getElementById('profile-racket-detail');
+    const profileRacketInventory = document.getElementById('profile-racket-inventory');
+    const profileJobStatus = document.getElementById('profile-job-status');
+    const profileImage = document.getElementById('profile-image');
+    const profileTabButtons = document.querySelectorAll('.profile-tab-btn');
+    const profileTabContents = document.querySelectorAll('.profile-tab-content');
+
+    let currentPlayerData = null;
+    let currentPlayerRackets = [];
+    let isCollisionActive = false;
+    let alertDismissTimeout = null;
+    const ALERT_DISMISS_MS = 4000;
+
+    const GENERIC_PROFILE_IMAGE = 'assets/images/profile/generic.png';
+    const PROFILE_IMAGES = ['Jason Ford.png', 'Michal Paw.png'];
+
+    function getProfileImageForPlayer(playerName) {
+      const name = (playerName || '').trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
+      let bestMatch = null;
+      let bestScore = 0;
+      for (const filename of PROFILE_IMAGES) {
+        const slug = filename.replace(/\.png$/i, '').trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
+        const slugWords = slug.split(' ').filter(Boolean);
+        const nameWords = name.split(' ').filter(Boolean);
+        if (slugWords.length === 0 || nameWords.length === 0) continue;
+        const matchedWords = slugWords.filter((w) => nameWords.includes(w)).length;
+        const score = matchedWords / slugWords.length;
+        if (score > bestScore) { bestScore = score; bestMatch = filename; }
+      }
+      if (bestScore >= 0.5 && bestMatch) return `assets/images/profile/${bestMatch}`;
+      return GENERIC_PROFILE_IMAGE;
+    }
+
+    function showPanel(panelId) {
+      [profileLoading, profileVerifyPanel, profileViewPanel].forEach((panel) => {
+        if (panel) panel.classList.add('hidden');
+      });
+      const target = document.getElementById(panelId);
+      if (target) target.classList.remove('hidden');
+    }
+
+    function showAlert(type, message, autoDismissMs = ALERT_DISMISS_MS) {
+      if (alertDismissTimeout) { clearTimeout(alertDismissTimeout); alertDismissTimeout = null; }
+      if (profileErrorAlert) profileErrorAlert.classList.add('hidden');
+      if (profileSuccessAlert) profileSuccessAlert.classList.add('hidden');
+      const alert = type === 'error' ? profileErrorAlert : profileSuccessAlert;
+      if (alert) { alert.textContent = message; alert.classList.remove('hidden'); }
+      if (autoDismissMs > 0) { alertDismissTimeout = setTimeout(clearAlerts, autoDismissMs); }
+    }
+
+    function clearAlerts() {
+      if (alertDismissTimeout) { clearTimeout(alertDismissTimeout); alertDismissTimeout = null; }
+      if (profileErrorAlert) profileErrorAlert.classList.add('hidden');
+      if (profileSuccessAlert) profileSuccessAlert.classList.add('hidden');
+    }
+
+    function setClearTokenButtonVisible(visible) {
+      if (profileClearTokenBtn) { profileClearTokenBtn.classList.toggle('hidden', !visible); }
+    }
+
+    function showVerificationForm() {
+      setClearTokenButtonVisible(false);
+      currentPlayerRackets = [];
+      showPanel('profile-verify-panel');
+      isCollisionActive = false;
+      if (verifyPhoneLast4Container) verifyPhoneLast4Container.classList.remove('hidden');
+      if (verifyPhoneFullContainer) verifyPhoneFullContainer.classList.add('hidden');
+      if (verifyPhoneLast4Input) { verifyPhoneLast4Input.setAttribute('required', 'true'); verifyPhoneLast4Input.value = ''; }
+      if (verifyPhoneFullInput) { verifyPhoneFullInput.removeAttribute('required'); verifyPhoneFullInput.value = ''; }
+      if (verifyNameInput) verifyNameInput.value = '';
+      clearAlerts();
+      if (profileJobStatus) { profileJobStatus.textContent = ''; profileJobStatus.className = 'profile-job-status hidden'; }
+    }
+
+    function renderProfileData(data, token) {
+      currentPlayerData = data.player;
+      currentPlayerData.token = token;
+      setClearTokenButtonVisible(true);
+      if (profileLoading) profileLoading.classList.add('hidden');
+      const playerRackets = data.rackets || [];
+      if (profileImage) { profileImage.src = getProfileImageForPlayer(data.player.name); profileImage.alt = 'profile'; }
+      if (profileNameInput) profileNameInput.value = data.player.name || '';
+      if (profileEmailInput) profileEmailInput.value = data.player.email || '';
+      if (profilePhoneInput) profilePhoneInput.value = data.player.phone || '';
+      if (profileStringPrefInput) profileStringPrefInput.value = data.player.string_pref || '';
+      if (profileTensionInput) profileTensionInput.value = data.player.tension || '';
+      if (profileTensionCrossInput) profileTensionCrossInput.value = data.player.tension_cross || '';
+      if (profileGripInput) profileGripInput.value = data.player.grip || '';
+      if (profileNotesInput) profileNotesInput.value = data.player.notes || '';
+      // Job status
+      if (profileJobStatus) {
+        const readyJobs = (data.jobs || []).filter((j) => j.status === 'ready_for_pickup');
+        if (readyJobs.length > 0) {
+          const countLabel = readyJobs.length > 1 ? ` (${readyJobs.length} racquets)` : '';
+          profileJobStatus.textContent = `Ready to pick up${countLabel}`;
+          profileJobStatus.className = 'profile-job-status profile-job-status--ready';
+          profileJobStatus.classList.remove('hidden');
+        } else {
+          profileJobStatus.textContent = '';
+          profileJobStatus.className = 'profile-job-status hidden';
+        }
+      }
+    }
+
+    async function loadProfileWithToken(token) {
+      showPanel('profile-loading');
+      clearAlerts();
+      try {
+        const data = await loadPlayerByToken(token);
+        renderProfileData(data, token);
+        showPanel('profile-view-panel');
+      } catch (err) {
+        localStorage.removeItem('player_token');
+        showVerificationForm();
+        showAlert('error', 'Session expired. Please verify your info again.');
+      }
+    }
+
+    // URL param token
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken = urlParams.get('token');
+    if (urlToken) {
+      localStorage.setItem('player_token', urlToken);
+      const newUrl = new URL(window.location);
+      newUrl.searchParams.delete('token');
+      window.history.replaceState({}, '', newUrl.pathname);
+      if (profileOverlay) { openProfileOverlay(); loadProfileWithToken(urlToken); }
+    }
+
+    // Profile buttons
+    if (profileButtons.length > 0 && profileOverlay) {
+      profileButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          openProfileOverlay();
+          const token = localStorage.getItem('player_token');
+          if (token) { loadProfileWithToken(token); } else { showVerificationForm(); }
+        });
+      });
+    }
+
+    // Close handlers
+    if (profileCloseButton) profileCloseButton.addEventListener('click', closeAllOverlays);
+    if (profileOverlay) profileOverlay.addEventListener('click', (e) => { if (e.target === profileOverlay) closeAllOverlays(); });
+    if (profileClearTokenBtn) {
+      profileClearTokenBtn.addEventListener('click', () => {
+        localStorage.removeItem('player_token');
+        currentPlayerData = null;
+        showVerificationForm();
+      });
+    }
+
+    // Verify form
+    if (profileVerifyForm) {
+      profileVerifyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearAlerts();
+        const name = verifyNameInput.value.trim();
+        const phoneLast4 = verifyPhoneLast4Input.value.trim();
+        const phone = verifyPhoneFullInput.value.trim();
+        const payload = { name };
+        if (isCollisionActive) { payload.phone = phone; } else { payload.phone_last4 = phoneLast4; }
+        showPanel('profile-loading');
+        try {
+          const data = await verifyPlayer(payload);
+          if (data.multiple) {
+            isCollisionActive = true;
+            showPanel('profile-verify-panel');
+            if (verifyPhoneLast4Container) verifyPhoneLast4Container.classList.add('hidden');
+            if (verifyPhoneFullContainer) verifyPhoneFullContainer.classList.remove('hidden');
+            if (verifyPhoneLast4Input) verifyPhoneLast4Input.removeAttribute('required');
+            if (verifyPhoneFullInput) verifyPhoneFullInput.setAttribute('required', 'true');
+            showAlert('error', 'Multiple matches found. Please enter your full phone number.');
+          } else if (data.token) {
+            localStorage.setItem('player_token', data.token);
+            renderProfileData(data, data.token);
+            showPanel('profile-view-panel');
+            showAlert('success', 'Verified successfully!');
+          }
+        } catch (err) {
+          showPanel('profile-verify-panel');
+          showAlert('error', err.message || 'Player not found.');
+        }
+      });
+    }
+
+    // Tab switching
+    profileTabButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        profileTabButtons.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        const targetTab = btn.dataset.tab;
+        profileTabContents.forEach((content) => {
+          content.classList.toggle('hidden', content.id !== `profile-tab-${targetTab}`);
+        });
+      });
+    });
+
+    // Profile edit
+    if (profileEditForm) {
+      profileEditForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentPlayerData || !currentPlayerData.token) return;
+        const payload = {
+          name: currentPlayerData.name,
+          club: currentPlayerData.club || null,
+          level: currentPlayerData.level || null,
+          style: currentPlayerData.style || null,
+          email: profileEmailInput.value.trim(),
+          phone: profilePhoneInput.value.trim(),
+          string_pref: profileStringPrefInput.value.trim(),
+          tension: profileTensionInput.value.trim(),
+          tension_cross: profileTensionCrossInput ? profileTensionCrossInput.value.trim() : null,
+          grip: profileGripInput.value.trim(),
+          restring_interval_weeks: currentPlayerData.restring_interval_weeks || null,
+          inventory_preferences: currentPlayerData.inventory_preferences || null,
+          notes: profileNotesInput.value.trim(),
+        };
+        showPanel('profile-loading');
+        clearAlerts();
+        try {
+          await updatePlayer(currentPlayerData.id, currentPlayerData.token, payload);
+          await loadProfileWithToken(currentPlayerData.token);
+          showAlert('success', 'Profile updated successfully!');
+        } catch (err) {
+          showPanel('profile-view-panel');
+          showAlert('error', 'Error updating profile. Please try again.');
+        }
+      });
+    }
+
+    // Inventory
+    if (inventoryButtons.length > 0 && inventoryOverlay) {
+      inventoryButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          openInventoryOverlay();
+          fetchInventory();
+        });
+      });
+    }
+    if (inventoryCloseButton) inventoryCloseButton.addEventListener('click', closeAllOverlays);
+    if (inventoryOverlay) inventoryOverlay.addEventListener('click', (e) => { if (e.target === inventoryOverlay) closeAllOverlays(); });
+
+    // Rotating String Display
+    const stringNameElements = document.querySelectorAll('.string-name');
+    if (stringNameElements.length > 0) {
+      const strings = ['ReString Zero 1.23mm', 'Tourna Big Hitter Silver 17g', 'Golden Set Snake Bite 17g'];
+      let currentIndex = 0;
+      stringNameElements.forEach((el) => { el.textContent = strings[0]; });
+      setInterval(() => {
+        stringNameElements.forEach((el) => el.classList.add('string-name--fading-out'));
+        setTimeout(() => {
+          currentIndex = (currentIndex + 1) % strings.length;
+          stringNameElements.forEach((el) => {
+            el.textContent = strings[currentIndex];
+            el.classList.remove('string-name--fading-out');
+          });
+        }, 250);
+      }, 7000);
+    }
+
+    // Service GIF Animation
+    const serviceGifs = document.querySelectorAll('.service-gif');
+    serviceGifs.forEach((gif) => {
+      const originalSrc = gif.src;
+      let isPlaying = false;
+      let hasPlayedOnce = false;
+      let animationTimeout;
+      const playGif = () => {
+        if (isPlaying) return;
+        isPlaying = true;
+        hasPlayedOnce = true;
+        gif.src = originalSrc;
+        gif.classList.remove('service-gif--paused');
+        gif.classList.add('service-gif--playing');
+        animationTimeout = setTimeout(() => {
+          if (animationTimeout) clearTimeout(animationTimeout);
+          isPlaying = false;
+          gif.classList.remove('service-gif--playing');
+          gif.classList.add('service-gif--paused');
+        }, 1500);
+      };
+      gif.classList.add('service-gif--paused');
+      gif.addEventListener('mouseenter', playGif);
+      gif.addEventListener('mouseleave', () => {
+        if (animationTimeout) clearTimeout(animationTimeout);
+        isPlaying = false;
+        gif.classList.remove('service-gif--playing');
+        gif.classList.add('service-gif--paused');
+      });
+      gif.addEventListener('click', (e) => { e.preventDefault(); isPlaying ? (() => { if (animationTimeout) clearTimeout(animationTimeout); isPlaying = false; gif.classList.remove('service-gif--playing'); gif.classList.add('service-gif--paused'); })() : playGif(); });
+      gif.addEventListener('touchstart', (e) => { e.preventDefault(); if (!isPlaying) playGif(); });
+      gif.addEventListener('touchend', () => { setTimeout(() => { isPlaying = false; gif.classList.remove('service-gif--playing'); gif.classList.add('service-gif--paused'); }, 1000); });
+      const observer = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting && !hasPlayedOnce) playGif(); }); }, { threshold: 0.5 });
+      observer.observe(gif);
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        observer.disconnect();
+        gif.classList.remove('service-gif--paused');
+        gif.classList.add('service-gif--playing');
+      }
+    });
+
+    // Random Grass Background Tiles
+    const grassBackground = document.querySelector('.grass-background');
+    if (grassBackground) {
+      const sessionKey = 'tennis-stringing-grass-tiles';
+      const tileSize = 200;
+      let tileConfig = sessionStorage.getItem(sessionKey);
+      if (!tileConfig) {
+        const cols = Math.ceil(window.innerWidth / tileSize) + 1;
+        const rows = Math.ceil(window.innerHeight / tileSize) + 1;
+        tileConfig = [];
+        for (let i = 0; i < cols * rows; i++) {
+          tileConfig.push(Math.floor(Math.random() * 3) + 1);
+        }
+        sessionStorage.setItem(sessionKey, JSON.stringify(tileConfig));
+      } else {
+        tileConfig = JSON.parse(tileConfig);
+      }
+      tileConfig.forEach((pattern) => {
+        const tile = document.createElement('div');
+        tile.className = `grass-tile grass-tile--${pattern}`;
+        grassBackground.appendChild(tile);
+      });
+    }
+  });
+</script>
+</write_to_file>

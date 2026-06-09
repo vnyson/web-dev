@@ -1,0 +1,62 @@
+---
+import '../styles/global.css';
+import { initSplash, resetSplash } from '@vnyson/design-system/js/splash.js';
+
+export interface Props {
+  title?: string;
+}
+
+const { title = 'Tennis Stringing & Racket Services' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="icon" type="image/png" href="/assets/images/tennis-ball-large.png" />
+  </head>
+  <body>
+    <!-- Grass Background Tiles -->
+    <div class="grass-background"></div>
+
+    <!-- Splash Screen -->
+    <div class="splash">
+      <div class="splash__content">
+        <img
+          class="splash__animation"
+          src="/assets/images/splash-loading/bike-animation-side-large.gif"
+          alt="Loading animation"
+        />
+        <p class="splash__loading-text">loading<span class="splash__dots"></span></p>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <slot />
+
+    <script>
+      import { initSplash, resetSplash } from '@vnyson/design-system/js/splash.js';
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('clear-splash')) {
+        resetSplash('tennis-stringing-splash');
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        initSplash({
+          storageKey: 'tennis-stringing-splash',
+          duration: 2000,
+          mode: 'crossfade',
+          animationMode: 'bike',
+          animationPaths: [
+            '/assets/images/splash-loading/bike-animation-side-large.gif',
+            '/assets/images/splash-loading/bike-antimation-front-large.gif',
+          ],
+        });
+      });
+    </script>
+  </body>
+</html>
