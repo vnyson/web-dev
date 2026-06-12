@@ -139,3 +139,31 @@ export async function fetchInventory(): Promise<InventoryItem[]> {
   if (!response.ok) throw new Error('Failed to fetch inventory');
   return response.json();
 }
+
+export interface DemoRacket {
+  id: string;
+  brand: string;
+  model: string;
+  year?: number;
+  head_size?: string;
+  length?: string;
+  static_weight?: string;
+  swing_weight?: string;
+  balance?: string;
+  stiffness?: string;
+  string_pattern?: string;
+  beam_width?: string;
+  grip_size?: string;
+  color?: string;
+  image_url?: string;
+  notes?: string;
+  demo_condition?: string;
+  active_demos?: number;
+  [key: string]: unknown;
+}
+
+export async function fetchDemoRackets(): Promise<DemoRacket[]> {
+  const response = await fetch(`${API_URL}/api/rackets?demo=true`);
+  if (!response.ok) throw new Error('Failed to fetch demo rackets');
+  return response.json();
+}

@@ -6,6 +6,7 @@ import StringingCard from '../components/StringingCard.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import ProfileOverlay from '../components/ProfileOverlay.astro';
 import InventoryOverlay from '../components/InventoryOverlay.astro';
+import DemoOverlay from '../components/DemoOverlay.astro';
 import MobileNav from '../components/MobileNav.astro';
 ---
 
@@ -41,7 +42,7 @@ import MobileNav from '../components/MobileNav.astro';
         Existing Customer
       </button>
       <button
-        class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all pixel-button pixel-border-theme--disabled"
+        class="panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all pixel-button pixel-border-theme--danger demo-button"
       >
         Demo
       </button>
@@ -91,12 +92,14 @@ import MobileNav from '../components/MobileNav.astro';
 
   <ProfileOverlay />
   <InventoryOverlay />
+  <DemoOverlay />
   <MobileNav />
 </BaseLayout>
 
 <script>
-  import { fetchQueueStatus, verifyPlayer, loadPlayerByToken, updatePlayer, fetchInventory } from '../lib/api';
+  import { fetchQueueStatus, verifyPlayer, loadPlayerByToken, updatePlayer, fetchInventory, fetchDemoRackets } from '../lib/api';
   import { updateQueueDisplayElements } from '../lib/queue-display';
+  import { getRacketImage } from '../lib/racket-images';
 
   const API_URL =
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -137,10 +140,15 @@ import MobileNav from '../components/MobileNav.astro';
     const inventoryButtons = document.querySelectorAll('.inventory-button, .inventory-button-mobile');
     const inventoryCloseButton = document.querySelector('.inventory-overlay__close');
     const inventoryGrid = document.getElementById('inventory-grid');
+    const demoOverlay = document.getElementById('demo-overlay');
+    const demoButtons = document.querySelectorAll('.demo-button, .demo-button-mobile');
+    const demoCloseButton = document.querySelector('#demo-overlay .inventory-overlay__close');
+    const demoGrid = document.getElementById('demo-grid');
 
     function closeAllOverlays() {
       profileOverlay?.classList.add('hidden');
       inventoryOverlay?.classList.add('hidden');
+      demoOverlay?.classList.add('hidden');
     }
 
     function openProfileOverlay() {
@@ -408,16 +416,175 @@ import MobileNav from '../components/MobileNav.astro';
     }
 
     // Inventory
+    async function loadInventory() {
+      if (!inventoryGrid) return;
+      inventoryGrid.innerHTML = '<p>Loading inventory...</p>';
+      try {
+        const inventory = await fetchInventory();
+        
+        // Group items
+        const strings = inventory.filter(item => item.category?.toLowerCase() === 'string');
+        const other = inventory.filter(item => item.category?.toLowerCase() !== 'string' && item.category?.toLowerCase() !== 'racket');
+
+        let html = '';
+
+        if (strings.length > 0) {
+          html += `
+            <div class="inventory-category-header">Strings</div>
+            <table class="inventory-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Tags</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${strings.map(item => {
+                  const characteristics = Array.isArray(item.string_characteristics)
+                    ? item.string_characteristics
+                    : (item.string_characteristics ? JSON.parse(item.string_characteristics as string) : []);
+                  const tagsHtml = characteristics.map((tag: string) => `<span class="inventory-tag">${tag}</span>`).join(' ');
+                  const priceHtml = item.price ? `<span class="inventory-price">$${item.price}</span>` : '—';
+                  return `
+                    <tr>
+                      <td>${item.name}</td>
+                      <td>${item.string_type || '—'}</td>
+                      <td>${tagsHtml || '—'}</td>
+                      <td>${priceHtml}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          `;
+        }
+
+        if (other.length > 0) {
+          html += `
+            <div class="inventory-category-header" style="margin-top: var(--space-md);">Equipment & Accessories</div>
+            <table class="inventory-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Brand</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${other.map(item => {
+                  const priceHtml = item.price ? `<span class="inventory-price">$${item.price}</span>` : '—';
+                  return `
+                    <tr>
+                      <td>${item.name}</td>
+                      <td>${item.brand || '—'}</td>
+                      <td>${item.category || '—'}</td>
+                      <td>${priceHtml}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          `;
+        }
+
+        if (strings.length === 0 && other.length === 0) {
+          html = '<p>No inventory items available at this time.</p>';
+        }
+
+        inventoryGrid.innerHTML = html;
+      } catch (err) {
+        console.error('Failed to load inventory:', err);
+        inventoryGrid.innerHTML = '<p style="color: red; text-align: center;">Failed to load inventory.</p>';
+      }
+    }
+
     if (inventoryButtons.length > 0 && inventoryOverlay) {
       inventoryButtons.forEach((btn) => {
         btn.addEventListener('click', () => {
           openInventoryOverlay();
-          fetchInventory();
+          loadInventory();
         });
       });
     }
     if (inventoryCloseButton) inventoryCloseButton.addEventListener('click', closeAllOverlays);
     if (inventoryOverlay) inventoryOverlay.addEventListener('click', (e) => { if (e.target === inventoryOverlay) closeAllOverlays(); });
+
+    // Demo overlay logic
+    function openDemoOverlay() {
+      closeAllOverlays();
+      demoOverlay?.classList.remove('hidden');
+      loadDemoRackets();
+    }
+
+    async function loadDemoRackets() {
+      if (!demoGrid) return;
+      try {
+        const rackets = await fetchDemoRackets();
+        if (rackets.length === 0) {
+          demoGrid.innerHTML = '<div class="demo-empty"><p>No demo rackets available at this time.</p><p>Check back soon or ask about our demo program!</p></div>';
+          return;
+        }
+        demoGrid.innerHTML = rackets.map((r) => {
+          const specs = [
+            r.head_size ? { label: 'Head', value: `${r.head_size} sq in` } : null,
+            r.length ? { label: 'Length', value: `${r.length} in` } : null,
+            r.static_weight ? { label: 'Weight', value: `${r.static_weight} g` } : null,
+            r.swing_weight ? { label: 'Swing', value: `${r.swing_weight} kg·cm²` } : null,
+            r.balance ? { label: 'Balance', value: `${r.balance} cm` } : null,
+            r.stiffness ? { label: 'Stiffness', value: r.stiffness } : null,
+            r.string_pattern ? { label: 'Pattern', value: r.string_pattern } : null,
+            r.beam_width ? { label: 'Beam', value: `${r.beam_width} mm` } : null,
+            r.grip_size ? { label: 'Grip', value: r.grip_size } : null,
+            r.color ? { label: 'Color', value: r.color } : null,
+          ].filter(Boolean);
+          const conditionLabel = r.demo_condition
+            ? `<span class="demo-condition demo-condition--${r.demo_condition}">${r.demo_condition}</span>`
+            : '';
+          const onDemo = r.active_demos > 0
+            ? '<span class="demo-status--out">On Demo</span>'
+            : '<span class="demo-status--available">Available</span>';
+          const imgSrc = r.image_url || getRacketImage(r.brand, r.model, r.year);
+          return `
+            <div class="demo-racket-card panel-pixel pixel-borders pixel-borders--1">
+              <div class="demo-racket-card__inner">
+                <div class="demo-racket-card__image">
+                  <img src="${imgSrc}" alt="${r.brand || ''} ${r.model || ''}" />
+                </div>
+                <div class="demo-racket-card__info">
+                  <div class="demo-racket-card__heading">
+                    <h3 class="demo-racket-card__title">${r.brand || ''} ${r.model || ''}</h3>
+                    <span class="demo-racket-card__year">${r.year ? `(${r.year})` : '—'}</span>
+                  </div>
+                  <div class="demo-racket-card__badges">
+                    ${conditionLabel}
+                    ${onDemo}
+                  </div>
+                  <ul class="demo-racket-card__specs">
+                    ${specs.map(({ label, value }) => `
+                      <li><span class="demo-racket-card__spec-label">${label}</span><span class="demo-racket-card__spec-value">${value}</span></li>
+                    `).join('')}
+                  </ul>
+                  ${r.notes ? `<p class="demo-racket-card__notes">${r.notes}</p>` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        demoGrid.innerHTML = '<p style="text-align:center;padding:1rem;color:red;">Failed to load demo rackets.</p>';
+      }
+    }
+
+    if (demoButtons.length > 0 && demoOverlay) {
+      demoButtons.forEach((btn) => {
+        btn.addEventListener('click', openDemoOverlay);
+      });
+    }
+    if (demoCloseButton) demoCloseButton.addEventListener('click', closeAllOverlays);
+    if (demoOverlay) demoOverlay.addEventListener('click', (e) => { if (e.target === demoOverlay) closeAllOverlays(); });
 
     // Rotating String Display
     const stringNameElements = document.querySelectorAll('.string-name');

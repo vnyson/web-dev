@@ -1,6 +1,5 @@
 ---
 import '../styles/global.css';
-import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, deleteRacket, regeneratePlayerToken, getAuthToken } from '../lib/api';
 ---
 
 <html lang="en">
@@ -26,6 +25,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 								<a href="/inventory" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Inventory</a>
 								<a href="/jobs" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Jobs</a>
 								<a href="/players" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Players</a>
+								<a href="/customization" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Customization</a>
 							</div>
 						</div>
 						<div class="flex items-center sm:hidden">
@@ -42,6 +42,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 								<a href="/inventory" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Inventory</a>
 								<a href="/jobs" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Jobs</a>
 								<a href="/players" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Players</a>
+								<a href="/customization" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Customization</a>
 							</div>
 						</div>
 						<div class="flex items-center">
@@ -55,12 +56,16 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 
 			<main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
 				<div class="px-4 py-6 sm:px-0">
-					<div class="flex justify-between items-center mb-6">
-						<h2 class="text-2xl font-bold text-gray-900">Players</h2>
-						<button id="add-player-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
-							Add Player
-						</button>
-					</div>
+				<div class="flex justify-between items-center mb-6">
+					<h2 class="text-2xl font-bold text-gray-900">Players</h2>
+					<button id="add-player-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+						Add Player
+					</button>
+				</div>
+				<div class="mb-4">
+					<label for="player-fuzzy-search" class="sr-only">Search players</label>
+					<input type="text" id="player-fuzzy-search" placeholder="Search players by name, club, or phone..." autocomplete="off" class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+				</div>
 
 					<!-- Add/Edit Player Modal -->
 					<div id="player-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden items-center justify-center z-50">
@@ -145,7 +150,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 							<form id="racket-form" class="px-6 py-4 space-y-4">
 								<input type="hidden" id="racket-id" name="id" />
 								<input type="hidden" id="racket-player-id" name="player_id" />
-								<div class="space-y-4">
+								<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 									<div>
 										<label for="racket-brand" class="block text-sm font-medium text-gray-700">Brand *</label>
 										<input type="text" name="brand" id="racket-brand" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
@@ -159,10 +164,54 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 										<input type="number" name="year" id="racket-year" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
 									</div>
 									<div>
+										<label for="racket-head-size" class="block text-sm font-medium text-gray-700">Head Size (sq in)</label>
+										<input type="text" name="head_size" id="racket-head-size" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 98" />
+									</div>
+									<div>
+										<label for="racket-length" class="block text-sm font-medium text-gray-700">Length (in)</label>
+										<input type="text" name="length" id="racket-length" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 27" />
+									</div>
+									<div>
+										<label for="racket-static-weight" class="block text-sm font-medium text-gray-700">Static Weight (g)</label>
+										<input type="text" name="static_weight" id="racket-static-weight" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 320" />
+									</div>
+									<div>
+										<label for="racket-swing-weight" class="block text-sm font-medium text-gray-700">Swing Weight (RA)</label>
+										<input type="text" name="swing_weight" id="racket-swing-weight" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 327" />
+									</div>
+									<div>
+										<label for="racket-balance" class="block text-sm font-medium text-gray-700">Balance (cm)</label>
+										<input type="text" name="balance" id="racket-balance" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 31.5" />
+									</div>
+									<div>
+										<label for="racket-stiffness" class="block text-sm font-medium text-gray-700">Stiffness (RA)</label>
+										<input type="text" name="stiffness" id="racket-stiffness" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 72" />
+									</div>
+									<div>
+										<label for="racket-string-pattern" class="block text-sm font-medium text-gray-700">String Pattern</label>
+										<input type="text" name="string_pattern" id="racket-string-pattern" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 16x19" />
+									</div>
+									<div>
+										<label for="racket-beam-width" class="block text-sm font-medium text-gray-700">Beam Width (mm)</label>
+										<input type="text" name="beam_width" id="racket-beam-width" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 21" />
+									</div>
+									<div>
+										<label for="racket-grip-size" class="block text-sm font-medium text-gray-700">Grip Size (in)</label>
+										<input type="text" name="grip_size" id="racket-grip-size" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 4.25" />
+									</div>
+									<div>
+										<label for="racket-color" class="block text-sm font-medium text-gray-700">Color</label>
+										<input type="text" name="color" id="racket-color" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div class="sm:col-span-2">
+										<label for="racket-image-url" class="block text-sm font-medium text-gray-700">Image URL</label>
+										<input type="text" name="image_url" id="racket-image-url" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									</div>
+									<div class="sm:col-span-2">
 										<label for="racket-notes" class="block text-sm font-medium text-gray-700">Notes</label>
 										<textarea name="notes" id="racket-notes" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
 									</div>
-									<div id="racket-owner-field" class="hidden">
+									<div id="racket-owner-field" class="hidden sm:col-span-2">
 										<label for="racket-owner" class="block text-sm font-medium text-gray-700">Owner</label>
 										<select id="racket-owner" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
 											<option value="">Select player...</option>
@@ -210,6 +259,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 
 		<script>
 			import { getAuthToken, fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, deleteRacket as deleteRacketApi, regeneratePlayerToken } from '../lib/api';
+			import { fuzzyScore } from '../lib/search';
 
 			// Check authentication on page load
 			const token = getAuthToken();
@@ -239,32 +289,20 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 			const racketBrandInput = document.getElementById('racket-brand');
 			const racketModelInput = document.getElementById('racket-model');
 			const racketYearInput = document.getElementById('racket-year');
+			const racketHeadSizeInput = document.getElementById('racket-head-size');
+			const racketLengthInput = document.getElementById('racket-length');
+			const racketStaticWeightInput = document.getElementById('racket-static-weight');
+			const racketSwingWeightInput = document.getElementById('racket-swing-weight');
+			const racketBalanceInput = document.getElementById('racket-balance');
+			const racketStiffnessInput = document.getElementById('racket-stiffness');
+			const racketStringPatternInput = document.getElementById('racket-string-pattern');
+			const racketBeamWidthInput = document.getElementById('racket-beam-width');
+			const racketGripSizeInput = document.getElementById('racket-grip-size');
+			const racketColorInput = document.getElementById('racket-color');
+			const racketImageUrlInput = document.getElementById('racket-image-url');
 			const racketNotesInput = document.getElementById('racket-notes');
 			const racketOwnerField = document.getElementById('racket-owner-field');
 			const racketOwnerSelect = document.getElementById('racket-owner');
-
-			// Open player modal for adding player
-			addPlayerBtn.addEventListener('click', () => {
-				modalTitle.textContent = 'Add Player';
-				playerForm.reset();
-				playerIdInput.value = '';
-				playerModal.classList.remove('hidden');
-				playerModal.classList.add('flex');
-			});
-
-			// Close player modal
-			cancelBtn.addEventListener('click', () => {
-				playerModal.classList.add('hidden');
-				playerModal.classList.remove('flex');
-			});
-
-			// Close player modal on backdrop click
-			playerModal.addEventListener('click', (e) => {
-				if (e.target === playerModal) {
-					playerModal.classList.add('hidden');
-					playerModal.classList.remove('flex');
-				}
-			});
 
 			// Handle player form submission
 			playerForm.addEventListener('submit', async (e) => {
@@ -328,27 +366,29 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 					brand,
 					model: racketModelInput.value.trim() || null,
 					year: racketYearInput.value ? parseInt(racketYearInput.value, 10) : null,
+					head_size: racketHeadSizeInput.value.trim() || null,
+					length: racketLengthInput.value.trim() || null,
+					static_weight: racketStaticWeightInput.value.trim() || null,
+					swing_weight: racketSwingWeightInput.value.trim() || null,
+					balance: racketBalanceInput.value.trim() || null,
+					stiffness: racketStiffnessInput.value.trim() || null,
+					string_pattern: racketStringPatternInput.value.trim() || null,
+					beam_width: racketBeamWidthInput.value.trim() || null,
+					grip_size: racketGripSizeInput.value.trim() || null,
+					color: racketColorInput.value.trim() || null,
+					image_url: racketImageUrlInput.value.trim() || null,
 					notes: racketNotesInput.value.trim() || null,
+					player_id: racketOwnerField.classList.contains('hidden') ? playerId : racketOwnerSelect.value || playerId,
 				};
-
-				// Include player_id if this is a create or owner change
-				const ownerId = racketOwnerSelect.value || playerId;
-				if (ownerId) {
-					data.player_id = ownerId;
-				}
 
 				try {
 					if (racketId) {
-						// Update existing racket
 						await updateRacket(racketId, data);
 					} else {
-						// Create new racket
-						data.player_id = playerId;
-						await createRacket(data);
+						await createRacket(playerId, data);
 					}
-
 					closeRacketModal();
-					loadRackets(playerId);
+					loadPlayers();
 				} catch (error) {
 					console.error('Failed to save racket:', error);
 					alert('Failed to save racket. Please try again.');
@@ -375,13 +415,25 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 					racketBrandInput.value = racketData.brand || '';
 					racketModelInput.value = racketData.model || '';
 					racketYearInput.value = racketData.year || '';
+					racketHeadSizeInput.value = racketData.head_size || '';
+					racketLengthInput.value = racketData.length || '';
+					racketStaticWeightInput.value = racketData.static_weight || '';
+					racketSwingWeightInput.value = racketData.swing_weight || '';
+					racketBalanceInput.value = racketData.balance || '';
+					racketStiffnessInput.value = racketData.stiffness || '';
+					racketStringPatternInput.value = racketData.string_pattern || '';
+					racketBeamWidthInput.value = racketData.beam_width || '';
+					racketGripSizeInput.value = racketData.grip_size || '';
+					racketColorInput.value = racketData.color || '';
+					racketImageUrlInput.value = racketData.image_url || '';
 					racketNotesInput.value = racketData.notes || '';
-
-					// Show owner dropdown so they can reassign
-					racketOwnerField.classList.remove('hidden');
-					populateOwnerDropdown(playerId, racketData.player_id);
+					if (racketData.player_id) {
+						racketOwnerField.classList.remove('hidden');
+						populateOwnerDropdown(playerId, racketData.player_id);
+					} else {
+						racketOwnerField.classList.add('hidden');
+					}
 				} else {
-					// Add mode
 					racketModalTitle.textContent = 'Add Racket';
 					racketForm.reset();
 					racketIdInput.value = '';
@@ -389,7 +441,7 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 				}
 
 				racketModal.classList.remove('hidden');
-				racketModal.classList.add('flex');
+				populateOwnerDropdown(playerId, racketData?.player_id);
 			}
 
 			async function populateOwnerDropdown(currentPlayerId, selectedPlayerId) {
@@ -424,7 +476,8 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 							</tr>
 						`;
 					} else {
-						tbody.innerHTML = players.map(player => `
+				cachedPlayers = players;
+				tbody.innerHTML = players.map(player => `
 							<tr class="player-row cursor-pointer hover:bg-gray-50" data-id="${player.id}">
 								<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
 									<span class="expand-icon mr-2 text-gray-400">▶</span>${player.name}
@@ -456,9 +509,10 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 											<h4 class="font-medium text-gray-900">Rackets</h4>
 											<button class="add-racket-btn text-indigo-600 hover:text-indigo-900 text-sm" data-player-id="${player.id}">+ Add Racket</button>
 										</div>
-										<div class="rackets-list" data-player-id="${player.id}">
+									<div class="rackets-list" data-player-id="${player.id}">
 											<p class="text-sm text-gray-500">Loading rackets...</p>
 										</div>
+										<a href="/customization" class="text-xs text-indigo-600 hover:text-indigo-800 mt-1 inline-block racket-customize-link" data-player-id="${player.id}" data-player-name="${player.name}">Customize rackets →</a>
 									</div>
 									<div class="border-t pt-4 mt-4">
 										<h4 class="font-medium text-gray-900 mb-2">Last Jobs</h4>
@@ -530,6 +584,17 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 								e.stopPropagation();
 								const playerId = e.target.dataset.playerId;
 								openRacketModal(playerId, null);
+							});
+						});
+
+						// Add event listeners for customize links
+						tbody.querySelectorAll('.racket-customize-link').forEach(btn => {
+							btn.addEventListener('click', (e) => {
+								e.stopPropagation();
+								const el = e.currentTarget as HTMLElement;
+								const playerId = el.dataset.playerId;
+								const playerName = el.dataset.playerName;
+								window.location.href = `/customization?player=${encodeURIComponent(playerId || '')}&name=${encodeURIComponent(playerName || '')}`;
 							});
 						});
 
@@ -628,10 +693,12 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 					if (rackets.length === 0) {
 						racketsList.innerHTML = '<p class="text-sm text-gray-500">No rackets yet.</p>';
 					} else {
-						racketsList.innerHTML = rackets.map(racket => `
+					racketsList.innerHTML = rackets.map(racket => `
 							<div class="flex justify-between items-center py-1 border-b last:border-0">
-								<span class="text-sm">${racket.brand || ''} ${racket.model || ''} ${racket.year ? `(${racket.year})` : ''}</span>
-								<div class="flex space-x-2">
+								<a href="/customization?player=${encodeURIComponent(playerId)}&racket=${encodeURIComponent(racket.id)}" class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline font-medium flex-1" onclick="event.stopPropagation()">${racket.brand || ''} ${racket.model || ''} ${racket.year ? `(${racket.year})` : ''}${racket.notes ? ` — ${racket.notes}` : ''}</a>
+								<div class="flex space-x-1 ml-2 items-center">
+									<button class="toggle-demo-btn text-xs px-1.5 py-0.5 rounded border ${racket.available_for_demo ? 'bg-blue-100 text-blue-700 border-blue-300' : 'bg-gray-50 text-gray-400 border-gray-200'}" data-racket-id="${racket.id}" data-player-id="${playerId}" data-available="${racket.available_for_demo ? '1' : '0'}" title="${racket.available_for_demo ? 'Available for demo - click to remove' : 'Click to make available for demo'}">Demo</button>
+									<button class="toggle-sale-btn text-xs px-1.5 py-0.5 rounded border ${racket.available_for_sale ? 'bg-green-100 text-green-700 border-green-300' : 'bg-gray-50 text-gray-400 border-gray-200'}" data-racket-id="${racket.id}" data-player-id="${playerId}" data-available="${racket.available_for_sale ? '1' : '0'}" title="${racket.available_for_sale ? 'Available for sale - click to remove' : 'Click to make available for sale'}">Sale</button>
 									<button class="edit-racket-btn text-indigo-600 hover:text-indigo-900 text-xs" data-racket-id="${racket.id}" data-player-id="${playerId}">Edit</button>
 									<button class="delete-racket-btn text-red-600 hover:text-red-900 text-xs" data-racket-id="${racket.id}" data-player-id="${playerId}">Delete</button>
 								</div>
@@ -666,6 +733,40 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 								const playerId = e.target.dataset.playerId;
 								if (confirm('Are you sure you want to delete this racket?')) {
 									await deleteRacket(racketId, playerId);
+								}
+							});
+						});
+
+						// Add event listeners for demo toggle buttons
+						racketsList.querySelectorAll('.toggle-demo-btn').forEach(btn => {
+							btn.addEventListener('click', async (e) => {
+								e.stopPropagation();
+								const racketId = btn.dataset.racketId;
+								const playerId = btn.dataset.playerId;
+								const isCurrentlyAvailable = btn.dataset.available === '1';
+								try {
+									await updateRacket(racketId, { available_for_demo: isCurrentlyAvailable ? 0 : 1 });
+									loadRackets(playerId);
+								} catch (error) {
+									console.error('Failed to toggle demo status:', error);
+									alert('Failed to update demo status.');
+								}
+							});
+						});
+
+						// Add event listeners for sale toggle buttons
+						racketsList.querySelectorAll('.toggle-sale-btn').forEach(btn => {
+							btn.addEventListener('click', async (e) => {
+								e.stopPropagation();
+								const racketId = btn.dataset.racketId;
+								const playerId = btn.dataset.playerId;
+								const isCurrentlyAvailable = btn.dataset.available === '1';
+								try {
+									await updateRacket(racketId, { available_for_sale: isCurrentlyAvailable ? 0 : 1 });
+									loadRackets(playerId);
+								} catch (error) {
+									console.error('Failed to toggle sale status:', error);
+									alert('Failed to update sale status.');
 								}
 							});
 						});
@@ -737,6 +838,35 @@ import { fetchPlayers, createPlayer, fetchRackets, createRacket, updateRacket, d
 					console.error('Failed to generate shareable link:', error);
 					alert('Failed to generate shareable link. Please try again.');
 				}
+			}
+
+			// ---- Fuzzy search for players table ----
+			let cachedPlayers: any[] = [];
+			const playerFuzzyInput = document.getElementById('player-fuzzy-search') as HTMLInputElement;
+
+			function filterPlayersTable() {
+				const query = (playerFuzzyInput?.value || '').trim();
+				const tbody = document.getElementById('players-table');
+				if (!tbody) return;
+
+				if (!query) {
+					tbody.querySelectorAll('.player-row').forEach((row) => { (row as HTMLElement).style.display = ''; });
+					tbody.querySelectorAll('.player-details').forEach((row) => { (row as HTMLElement).style.display = ''; });
+					return;
+				}
+
+				cachedPlayers.forEach((player: any) => {
+					const searchable = [player.name, player.club, player.phone, player.level, player.style, player.email].filter(Boolean).join(' ');
+					const score = fuzzyScore(query, searchable);
+					const row = tbody.querySelector(`tr.player-row[data-id="${player.id}"]`);
+					const details = tbody.querySelector(`tr.player-details[data-player-id="${player.id}"]`);
+					if (row) (row as HTMLElement).style.display = score > 0 ? '' : 'none';
+					if (details) (details as HTMLElement).style.display = 'none';
+				});
+			}
+
+			if (playerFuzzyInput) {
+				playerFuzzyInput.addEventListener('input', filterPlayersTable);
 			}
 
 			// Load players when page loads

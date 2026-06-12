@@ -572,6 +572,12 @@ export default {
       if (path === '/api/queue-status') {
         return handleQueueStatus(request, env, corsHeaders);
       }
+      if (path.startsWith('/api/demo-sessions')) {
+        return handleDemoSessions(request, env, corsHeaders);
+      }
+      if (path.startsWith('/api/player-racket-setups')) {
+        return handlePlayerRacketSetups(request, env, corsHeaders);
+      }
 
       // 404 for unknown routes
       return new Response('Not Found', { status: 404, headers: corsHeaders });
@@ -741,6 +747,310 @@ export async function handlePlayers(
       return new Response('Unauthorized', { status: 401, headers: corsHeaders });
     }
     await env.DB.prepare('DELETE FROM players WHERE id = ?').bind(id).run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+}
+
+// Handler for demo-sessions endpoint
+export async function handleDemoSessions(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
+  const url = new URL(request.url);
+  const id = url.pathname.split('/').pop();
+
+  if (request.method === 'GET') {
+    // Active demo sessions (racket currently on demo) - public read
+    if (url.searchParams.has('active')) {
+      const racketId = url.searchParams.get('active');
+      let query =
+        'SELECT ds.*, r.brand, r.model, r.head_size, r.static_weight, r.swing_weight, r.balance FROM demo_sessions ds JOIN rackets r ON ds.racket_id = r.id WHERE ds.returned_at IS NULL';
+      const bindValues: any[] = [];
+      if (racketId) {
+        query += ' AND ds.racket_id = ?';
+        bindValues.push(racketId);
+      }
+      query += ' ORDER BY ds.checked_out_at DESC';
+      const stmt = env.DB.prepare(query);
+      const result =
+        bindValues.length > 0 ? await stmt.bind(...bindValues).all() : await stmt.all();
+      return new Response(JSON.stringify(result.results), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // All demo sessions - requires admin
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
+    if (id && id !== 'demo-sessions') {
+      const result = await env.DB.prepare('SELECT * FROM demo_sessions WHERE id = ?')
+        .bind(id)
+        .first();
+      if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const result = await env.DB.prepare(
+      `SELECT ds.*, r.brand, r.model
+       FROM demo_sessions ds
+       LEFT JOIN rackets r ON ds.racket_id = r.id
+       ORDER BY ds.checked_out_at DESC`,
+    ).all();
+    return new Response(JSON.stringify(result.results), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (request.method === 'POST') {
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
+    const body = await request.json();
+    if (!body.racket_id || !body.checked_out_at) {
+      return new Response(JSON.stringify({ error: 'racket_id and checked_out_at required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const stmt = env.DB.prepare(`
+      INSERT INTO demo_sessions (id, racket_id, player_id, player_name, checked_out_at, returned_at, notes, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    await stmt
+      .bind(
+        body.id || crypto.randomUUID(),
+        body.racket_id,
+        body.player_id || null,
+        body.player_name || null,
+        body.checked_out_at,
+        body.returned_at || null,
+        body.notes || null,
+        body.created_at || new Date().toISOString(),
+      )
+      .run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (request.method === 'PUT') {
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
+    const body = await request.json();
+    const stmt = env.DB.prepare(`
+      UPDATE demo_sessions SET returned_at = ?, notes = ?
+      WHERE id = ?
+    `);
+    await stmt.bind(body.returned_at || new Date().toISOString(), body.notes || null, id).run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (request.method === 'DELETE') {
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+    await env.DB.prepare('DELETE FROM demo_sessions WHERE id = ?').bind(id).run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+}
+
+// Handler for player-racket-setups endpoint (stock vs customized)
+export async function handlePlayerRacketSetups(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
+  const url = new URL(request.url);
+  const id = url.pathname.split('/').pop();
+
+  if (request.method === 'GET') {
+    const racketId = url.searchParams.get('racket_id');
+    const playerId = url.searchParams.get('player_id');
+
+    // Public read is not allowed - requires auth
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
+    if (id && id !== 'player-racket-setups') {
+      const result = await env.DB.prepare('SELECT * FROM player_racket_setups WHERE id = ?')
+        .bind(id)
+        .first();
+      if (!result) return new Response('Not Found', { status: 404, headers: corsHeaders });
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (racketId) {
+      const result = await env.DB.prepare('SELECT * FROM player_racket_setups WHERE racket_id = ?')
+        .bind(racketId)
+        .all();
+      return new Response(JSON.stringify(result.results), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (playerId) {
+      const result = await env.DB.prepare('SELECT * FROM player_racket_setups WHERE player_id = ?')
+        .bind(playerId)
+        .all();
+      return new Response(JSON.stringify(result.results), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const result = await env.DB.prepare(
+      'SELECT * FROM player_racket_setups ORDER BY created_at DESC',
+    ).all();
+    return new Response(JSON.stringify(result.results), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (request.method === 'POST') {
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
+    const body = await request.json();
+    if (!body.racket_id || !body.player_id) {
+      return new Response(JSON.stringify({ error: 'racket_id and player_id required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Upsert: check if setup already exists for this racket
+    const existing = await env.DB.prepare('SELECT id FROM player_racket_setups WHERE racket_id = ?')
+      .bind(body.racket_id)
+      .first();
+
+    if (existing) {
+      // Update existing
+      const stmt = env.DB.prepare(`
+        UPDATE player_racket_setups SET
+          player_id = ?, stock_static_weight = ?, stock_swing_weight = ?, stock_balance = ?,
+          custom_static_weight = ?, custom_swing_weight = ?, custom_balance = ?,
+          modification_notes = ?, mass_added = ?, mass_location = ?, updated_at = ?
+        WHERE id = ?
+      `);
+      await stmt
+        .bind(
+          body.player_id,
+          body.stock_static_weight || null,
+          body.stock_swing_weight || null,
+          body.stock_balance || null,
+          body.custom_static_weight || null,
+          body.custom_swing_weight || null,
+          body.custom_balance || null,
+          body.modification_notes || null,
+          body.mass_added || null,
+          body.mass_location || null,
+          new Date().toISOString(),
+          existing.id,
+        )
+        .run();
+    } else {
+      // Insert new
+      const stmt = env.DB.prepare(`
+        INSERT INTO player_racket_setups (id, racket_id, player_id,
+          stock_static_weight, stock_swing_weight, stock_balance,
+          custom_static_weight, custom_swing_weight, custom_balance,
+          modification_notes, mass_added, mass_location, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      await stmt
+        .bind(
+          body.id || crypto.randomUUID(),
+          body.racket_id,
+          body.player_id,
+          body.stock_static_weight || null,
+          body.stock_swing_weight || null,
+          body.stock_balance || null,
+          body.custom_static_weight || null,
+          body.custom_swing_weight || null,
+          body.custom_balance || null,
+          body.modification_notes || null,
+          body.mass_added || null,
+          body.mass_location || null,
+          body.created_at || new Date().toISOString(),
+          body.updated_at || new Date().toISOString(),
+        )
+        .run();
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (request.method === 'PUT') {
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
+    const body = await request.json();
+    const stmt = env.DB.prepare(`
+      UPDATE player_racket_setups SET
+        player_id = ?, stock_static_weight = ?, stock_swing_weight = ?, stock_balance = ?,
+        custom_static_weight = ?, custom_swing_weight = ?, custom_balance = ?,
+        modification_notes = ?, mass_added = ?, mass_location = ?, updated_at = ?
+      WHERE id = ?
+    `);
+    await stmt
+      .bind(
+        body.player_id || null,
+        body.stock_static_weight || null,
+        body.stock_swing_weight || null,
+        body.stock_balance || null,
+        body.custom_static_weight || null,
+        body.custom_swing_weight || null,
+        body.custom_balance || null,
+        body.modification_notes || null,
+        body.mass_added || null,
+        body.mass_location || null,
+        new Date().toISOString(),
+        id,
+      )
+      .run();
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (request.method === 'DELETE') {
+    const isAdmin = await validateAdminSession(request, env);
+    if (!isAdmin) {
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+    await env.DB.prepare('DELETE FROM player_racket_setups WHERE id = ?').bind(id).run();
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -1293,6 +1603,20 @@ export async function handleRackets(
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    // Public demo filter - no auth required
+    const demoFilter = url.searchParams.get('demo');
+    if (demoFilter === 'true') {
+      const result = await env.DB.prepare(
+        `SELECT r.*,
+          (SELECT COUNT(*) FROM demo_sessions ds WHERE ds.racket_id = r.id AND ds.returned_at IS NULL) as active_demos
+         FROM rackets r
+         WHERE r.available_for_demo = 1
+         ORDER BY r.brand, r.model`,
+      ).all();
+      return new Response(JSON.stringify(result.results), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     if (playerId) {
       // Get rackets by player_id - requires player token or admin session
       const token = url.searchParams.get('token');
@@ -1338,17 +1662,37 @@ export async function handleRackets(
 
     const body = await request.json();
     const stmt = env.DB.prepare(`
-      INSERT INTO rackets (id, player_id, brand, model, year, notes, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO rackets (id, player_id, brand, model, year, notes,
+        head_size, length, static_weight, swing_weight, balance, stiffness,
+        string_pattern, beam_width, grip_size, color, image_url,
+        available_for_demo, available_for_sale, sale_price, sale_quantity, demo_condition,
+        created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     await stmt
       .bind(
         body.id || crypto.randomUUID(),
-        body.player_id,
+        body.player_id || null,
         body.brand || null,
         body.model || null,
         body.year || null,
         body.notes || null,
+        body.head_size || null,
+        body.length || null,
+        body.static_weight || null,
+        body.swing_weight || null,
+        body.balance || null,
+        body.stiffness || null,
+        body.string_pattern || null,
+        body.beam_width || null,
+        body.grip_size || null,
+        body.color || null,
+        body.image_url || null,
+        body.available_for_demo || 0,
+        body.available_for_sale || 0,
+        body.sale_price || null,
+        body.sale_quantity || 0,
+        body.demo_condition || null,
         body.created_at || new Date().toISOString(),
         body.updated_at || new Date().toISOString(),
       )
@@ -1366,17 +1710,79 @@ export async function handleRackets(
     }
 
     const body = await request.json();
+    const existing = await env.DB.prepare('SELECT * FROM rackets WHERE id = ?').bind(id).first();
+    if (!existing) {
+      return new Response('Not Found', { status: 404, headers: corsHeaders });
+    }
+
+    // Merge: only update fields that are provided in the request body
+    const merged = {
+      player_id: body.player_id !== undefined ? body.player_id : (existing as any).player_id,
+      brand: body.brand !== undefined ? body.brand : (existing as any).brand,
+      model: body.model !== undefined ? body.model : (existing as any).model,
+      year: body.year !== undefined ? body.year : (existing as any).year,
+      notes: body.notes !== undefined ? body.notes : (existing as any).notes,
+      head_size: body.head_size !== undefined ? body.head_size : (existing as any).head_size,
+      length: body.length !== undefined ? body.length : (existing as any).length,
+      static_weight:
+        body.static_weight !== undefined ? body.static_weight : (existing as any).static_weight,
+      swing_weight:
+        body.swing_weight !== undefined ? body.swing_weight : (existing as any).swing_weight,
+      balance: body.balance !== undefined ? body.balance : (existing as any).balance,
+      stiffness: body.stiffness !== undefined ? body.stiffness : (existing as any).stiffness,
+      string_pattern:
+        body.string_pattern !== undefined ? body.string_pattern : (existing as any).string_pattern,
+      beam_width: body.beam_width !== undefined ? body.beam_width : (existing as any).beam_width,
+      grip_size: body.grip_size !== undefined ? body.grip_size : (existing as any).grip_size,
+      color: body.color !== undefined ? body.color : (existing as any).color,
+      image_url: body.image_url !== undefined ? body.image_url : (existing as any).image_url,
+      available_for_demo:
+        body.available_for_demo !== undefined
+          ? body.available_for_demo
+          : (existing as any).available_for_demo,
+      available_for_sale:
+        body.available_for_sale !== undefined
+          ? body.available_for_sale
+          : (existing as any).available_for_sale,
+      sale_price: body.sale_price !== undefined ? body.sale_price : (existing as any).sale_price,
+      sale_quantity:
+        body.sale_quantity !== undefined ? body.sale_quantity : (existing as any).sale_quantity,
+      demo_condition:
+        body.demo_condition !== undefined ? body.demo_condition : (existing as any).demo_condition,
+    };
+
     const stmt = env.DB.prepare(`
-      UPDATE rackets SET player_id = ?, brand = ?, model = ?, year = ?, notes = ?, updated_at = ?
+      UPDATE rackets SET
+        player_id = ?, brand = ?, model = ?, year = ?, notes = ?,
+        head_size = ?, length = ?, static_weight = ?, swing_weight = ?, balance = ?, stiffness = ?,
+        string_pattern = ?, beam_width = ?, grip_size = ?, color = ?, image_url = ?,
+        available_for_demo = ?, available_for_sale = ?, sale_price = ?, sale_quantity = ?, demo_condition = ?,
+        updated_at = ?
       WHERE id = ?
     `);
     await stmt
       .bind(
-        body.player_id || null,
-        body.brand || null,
-        body.model || null,
-        body.year || null,
-        body.notes || null,
+        merged.player_id,
+        merged.brand,
+        merged.model,
+        merged.year,
+        merged.notes,
+        merged.head_size,
+        merged.length,
+        merged.static_weight,
+        merged.swing_weight,
+        merged.balance,
+        merged.stiffness,
+        merged.string_pattern,
+        merged.beam_width,
+        merged.grip_size,
+        merged.color,
+        merged.image_url,
+        merged.available_for_demo,
+        merged.available_for_sale,
+        merged.sale_price,
+        merged.sale_quantity,
+        merged.demo_condition,
         new Date().toISOString(),
         id,
       )
