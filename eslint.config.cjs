@@ -24,7 +24,7 @@ module.exports = [
     },
   },
   {
-    files: ['sites/**/js/**/*.js'],
+    files: ['sites/**/js/*.js'],
     languageOptions: {
       globals: {
         ...globals.browser,

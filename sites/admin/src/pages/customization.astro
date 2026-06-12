@@ -1,0 +1,523 @@
+---
+import '../styles/global.css';
+import { fetchPlayers, fetchRackets, fetchPlayerRacketSetups, savePlayerRacketSetup } from '../lib/api';
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Customization - Tennis Admin</title>
+	</head>
+	<body class="bg-gray-50">
+		<div class="min-h-screen">
+			<nav class="bg-white shadow-sm">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="flex justify-between h-16">
+						<div class="flex">
+							<div class="flex-shrink-0 flex items-center">
+								<h1 class="text-xl font-bold text-gray-900">Tennis Admin</h1>
+							</div>
+							<div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+								<a href="/" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Dashboard</a>
+								<a href="/inventory" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Inventory</a>
+								<a href="/jobs" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Jobs</a>
+								<a href="/players" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Players</a>
+								<a href="/customization" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Customization</a>
+							</div>
+						</div>
+						<div class="flex items-center sm:hidden">
+							<button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-controls="mobile-menu" aria-expanded="false" class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+								<span class="sr-only">Toggle navigation menu</span>
+								<svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+								</svg>
+							</button>
+						</div>
+						<div id="mobile-menu" class="hidden sm:hidden">
+							<div class="px-4 pb-3 space-y-1">
+								<a href="/" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Dashboard</a>
+								<a href="/inventory" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Inventory</a>
+								<a href="/jobs" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Jobs</a>
+								<a href="/players" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Players</a>
+								<a href="/customization" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Customization</a>
+							</div>
+						</div>
+						<div class="flex items-center">
+							<a href="/login" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+								Login with Google
+							</a>
+						</div>
+					</div>
+				</div>
+			</nav>
+
+			<main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+				<div class="px-4 py-6 sm:px-0">
+					<h2 class="text-2xl font-bold text-gray-900 mb-6">Customization</h2>
+
+					<!-- Player Rackets Section -->
+					<div class="bg-white shadow rounded-lg mb-6">
+						<div class="px-6 py-4 border-b border-gray-200">
+							<h3 class="text-lg font-medium text-gray-900">Player Rackets — Stock vs Customized</h3>
+						</div>
+						<div class="px-6 py-4 space-y-4">
+							<div class="relative">
+								<label for="player-search" class="block text-sm font-medium text-gray-700">Find Player</label>
+								<input type="text" id="player-search" placeholder="Start typing a name..." autocomplete="off" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+								<div id="player-search-results" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"></div>
+								<input type="hidden" id="player-id" />
+							</div>
+							<div id="racket-select-container" class="hidden">
+								<label for="racket-select" class="block text-sm font-medium text-gray-700">Select Racket</label>
+								<select id="racket-select" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+									<option value="">Select a racket...</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<!-- Setup Editor -->
+					<div id="setup-editor" class="hidden bg-white shadow rounded-lg mb-6">
+						<div class="px-6 py-4 border-b border-gray-200">
+							<h3 id="setup-editor-title" class="text-lg font-medium text-gray-900">Racket Setup</h3>
+						</div>
+						<div class="px-6 py-4">
+							<form id="setup-form" class="space-y-6">
+								<input type="hidden" id="setup-id" />
+								<input type="hidden" id="setup-racket-id" />
+								<input type="hidden" id="setup-player-id" />
+
+								<!-- Stock Specs -->
+								<div>
+									<h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">Stock Specs (Manufacturer)</h4>
+									<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+										<div>
+											<label for="stock-static-weight" class="block text-sm font-medium text-gray-700">Static Weight (g)</label>
+											<input type="text" id="stock-static-weight" placeholder="e.g. 300" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+										</div>
+										<div>
+											<label for="stock-swing-weight" class="block text-sm font-medium text-gray-700">Swing Weight (kg·cm²)</label>
+											<input type="text" id="stock-swing-weight" placeholder="e.g. 320" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+										</div>
+										<div>
+											<label for="stock-balance" class="block text-sm font-medium text-gray-700">Balance (cm)</label>
+											<input type="text" id="stock-balance" placeholder="e.g. 32" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+										</div>
+									</div>
+								</div>
+
+								<!-- Customized Specs -->
+								<div>
+									<h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">Customized Specs</h4>
+									<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+										<div>
+											<label for="custom-static-weight" class="block text-sm font-medium text-gray-700">Static Weight (g)</label>
+											<input type="text" id="custom-static-weight" placeholder="e.g. 310" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+										</div>
+										<div>
+											<label for="custom-swing-weight" class="block text-sm font-medium text-gray-700">Swing Weight (kg·cm²)</label>
+											<input type="text" id="custom-swing-weight" placeholder="e.g. 335" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+										</div>
+										<div>
+											<label for="custom-balance" class="block text-sm font-medium text-gray-700">Balance (cm)</label>
+											<input type="text" id="custom-balance" placeholder="e.g. 33.5" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+										</div>
+									</div>
+								</div>
+
+								<!-- Modification Details -->
+								<div>
+									<h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">Modification Details</h4>
+									<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+										<div>
+											<label for="mass-added" class="block text-sm font-medium text-gray-700">Mass Added (g)</label>
+											<input type="text" id="mass-added" placeholder="e.g. 10" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+										</div>
+										<div>
+											<label for="mass-location" class="block text-sm font-medium text-gray-700">Weight Location</label>
+											<input type="text" id="mass-location" placeholder="e.g. 3 and 9 o'clock, under grip" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+										</div>
+									</div>
+									<div class="mt-4">
+										<label for="modification-notes" class="block text-sm font-medium text-gray-700">Modification Notes</label>
+										<textarea id="modification-notes" rows="3" placeholder="Describe any modifications made..." class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+									</div>
+								</div>
+
+								<!-- Preview -->
+								<div id="setup-preview" class="hidden bg-gray-50 border border-gray-200 rounded-lg p-4">
+									<h4 class="text-sm font-semibold text-gray-900 mb-2">Preview</h4>
+									<div id="setup-preview-content" class="text-sm text-gray-700 space-y-1"></div>
+								</div>
+
+								<div class="flex justify-end space-x-3">
+									<button type="button" id="setup-cancel-btn" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+										Cancel
+									</button>
+									<button type="submit" class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+										Save Setup
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+
+					<!-- Existing Setups Table -->
+					<div id="setups-table-container" class="hidden bg-white shadow rounded-lg">
+						<div class="px-6 py-4 border-b border-gray-200">
+							<h3 class="text-lg font-medium text-gray-900">Existing Setups</h3>
+						</div>
+						<div class="overflow-x-auto">
+							<table class="min-w-full divide-y divide-gray-200">
+								<thead class="bg-gray-50">
+									<tr>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Racket</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock Weight</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Custom Weight</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock Swing</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Custom Swing</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock Balance</th>
+										<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Custom Balance</th>
+										<th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+									</tr>
+								</thead>
+								<tbody id="setups-table-body" class="bg-white divide-y divide-gray-200">
+									<tr>
+										<td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
+											Select a player to view their setups.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+
+		<script>
+			import { getAuthToken, fetchPlayers, fetchRackets, fetchPlayerRacketSetups, savePlayerRacketSetup, deletePlayerRacketSetup } from '../lib/api';
+			import { fuzzyScore } from '../lib/search';
+
+			if (!getAuthToken()) {
+				window.location.href = '/login';
+			}
+
+			const playerSearch = document.getElementById('player-search') as HTMLInputElement;
+			const playerSearchResults = document.getElementById('player-search-results') as HTMLDivElement;
+			const playerIdInput = document.getElementById('player-id') as HTMLInputElement;
+			const racketSelectContainer = document.getElementById('racket-select-container');
+			const racketSelect = document.getElementById('racket-select');
+			const setupEditor = document.getElementById('setup-editor');
+			const setupForm = document.getElementById('setup-form');
+			const setupId = document.getElementById('setup-id');
+			const setupRacketId = document.getElementById('setup-racket-id');
+			const setupPlayerId = document.getElementById('setup-player-id');
+			const setupsTableContainer = document.getElementById('setups-table-container');
+			const setupsTableBody = document.getElementById('setups-table-body');
+			const setupPreview = document.getElementById('setup-preview');
+			const setupPreviewContent = document.getElementById('setup-preview-content');
+			const setupCancelBtn = document.getElementById('setup-cancel-btn');
+
+			let allPlayers: any[] = [];
+			let allRackets: any[] = [];
+			let currentPlayerId: string | null = null;
+
+			async function init() {
+				try {
+					allPlayers = await fetchPlayers();
+
+					// Check URL params for pre-selected player (from Players tab)
+					const urlParams = new URLSearchParams(window.location.search);
+					const preselectedId = urlParams.get('player');
+					const preselectedName = urlParams.get('name');
+				if (preselectedId) {
+						playerSearch.value = preselectedName || '';
+						const preselectedRacket = urlParams.get('racket');
+						await selectPlayer(preselectedId);
+						// If a racket was specified, select it in the dropdown
+						if (preselectedRacket && racketSelect) {
+							racketSelect.value = preselectedRacket;
+							racketSelect.dispatchEvent(new Event('change'));
+						}
+						// Clear URL params
+						const cleanUrl = window.location.pathname;
+						window.history.replaceState({}, '', cleanUrl);
+					}
+				} catch (err) {
+					console.error('Failed to load players:', err);
+				}
+			}
+
+			function filterAndShowPlayers(query: string) {
+				if (!query || query.length < 1) {
+					playerSearchResults.classList.add('hidden');
+					return;
+				}
+
+				const scored = allPlayers
+					.filter(p => p.name)
+					.map(p => ({ player: p, score: fuzzyScore(query, p.name) }))
+					.filter(s => s.score > 0)
+					.sort((a, b) => b.score - a.score)
+					.slice(0, 10);
+
+				if (scored.length === 0) {
+					playerSearchResults.innerHTML = '<div class="px-3 py-2 text-sm text-gray-500">No players found</div>';
+					playerSearchResults.classList.remove('hidden');
+					return;
+				}
+
+				playerSearchResults.innerHTML = scored.map(s => `
+					<div class="player-result px-3 py-2 text-sm cursor-pointer hover:bg-indigo-50 flex items-center gap-2" data-player-id="${s.player.id}" data-player-name="${s.player.name}">
+						<span class="font-medium">${s.player.name}</span>
+						${s.player.club ? `<span class="text-gray-400">— ${s.player.club}</span>` : ''}
+						${s.player.phone ? `<span class="text-gray-400 text-xs ml-auto">${s.player.phone}</span>` : ''}
+					</div>
+				`).join('');
+
+				playerSearchResults.classList.remove('hidden');
+
+				// Add click listeners
+				playerSearchResults.querySelectorAll('.player-result').forEach(el => {
+					el.addEventListener('click', () => {
+						const id = el.getAttribute('data-player-id');
+						const name = el.getAttribute('data-player-name');
+						playerSearch.value = name;
+						playerSearchResults.classList.add('hidden');
+						selectPlayer(id);
+					});
+				});
+			}
+
+			async function selectPlayer(id: string) {
+				currentPlayerId = id;
+				playerIdInput.value = id;
+
+				try {
+					allRackets = await fetchRackets(currentPlayerId);
+					populateRacketDropdown(allRackets);
+					racketSelectContainer.classList.remove('hidden');
+					await loadSetups(currentPlayerId);
+				} catch (err) {
+					console.error('Failed to load rackets:', err);
+				}
+			}
+
+			// Fuzzy search input
+			playerSearch.addEventListener('input', () => {
+				filterAndShowPlayers(playerSearch.value.trim());
+			});
+
+			// Close dropdown when clicking outside
+			document.addEventListener('click', (e) => {
+				if (!playerSearch.contains(e.target) && !playerSearchResults.contains(e.target)) {
+					playerSearchResults.classList.add('hidden');
+				}
+			});
+
+			// Focus shows results if there's text
+			playerSearch.addEventListener('focus', () => {
+				if (playerSearch.value.trim()) {
+					filterAndShowPlayers(playerSearch.value.trim());
+				}
+			});
+
+			function populateRacketDropdown(rackets: any[]) {
+				racketSelect.innerHTML = '<option value="">Select a racket...</option>';
+				rackets.forEach(r => {
+					const option = document.createElement('option');
+					option.value = r.id;
+					const base = `${r.brand || ''} ${r.model || ''} ${r.year ? `(${r.year})` : ''}`.trim();
+					const suffix = r.notes ? ` — ${r.notes}` : '';
+					option.textContent = `${base}${suffix}`;
+					racketSelect.appendChild(option);
+				});
+			}
+
+			// When racket is selected, load or create setup
+			racketSelect.addEventListener('change', async () => {
+				const racketId = racketSelect.value;
+				if (!racketId || !currentPlayerId) {
+					setupEditor.classList.add('hidden');
+					return;
+				}
+
+				try {
+					const setups = await fetchPlayerRacketSetups(undefined);
+					const existing = setups.find((s: any) => s.racket_id === racketId);
+
+					if (existing) {
+						loadSetupIntoForm(existing);
+					} else {
+						// Fresh form for this racket
+						setupForm.reset();
+						setupId.value = '';
+						setupRacketId.value = racketId;
+						setupPlayerId.value = currentPlayerId;
+					}
+
+				const racket = allRackets.find((r: any) => r.id === racketId);
+				const title = document.getElementById('setup-editor-title');
+				if (title) {
+					const label = racket ? `${racket.brand || ''} ${racket.model || ''}`.trim() : 'Racket';
+					const notesLabel = racket?.notes ? ` (${racket.notes})` : '';
+					title.textContent = `Setup: ${label}${notesLabel}`;
+				}
+
+					setupEditor.classList.remove('hidden');
+					updatePreview();
+				} catch (err) {
+					console.error('Failed to load setup:', err);
+				}
+			});
+
+			function loadSetupIntoForm(setup: any) {
+				setupId.value = setup.id;
+				setupRacketId.value = setup.racket_id;
+				setupPlayerId.value = setup.player_id;
+				document.getElementById('stock-static-weight').value = setup.stock_static_weight || '';
+				document.getElementById('stock-swing-weight').value = setup.stock_swing_weight || '';
+				document.getElementById('stock-balance').value = setup.stock_balance || '';
+				document.getElementById('custom-static-weight').value = setup.custom_static_weight || '';
+				document.getElementById('custom-swing-weight').value = setup.custom_swing_weight || '';
+				document.getElementById('custom-balance').value = setup.custom_balance || '';
+				document.getElementById('mass-added').value = setup.mass_added || '';
+				document.getElementById('mass-location').value = setup.mass_location || '';
+				document.getElementById('modification-notes').value = setup.modification_notes || '';
+			}
+
+			// Update preview
+			function updatePreview() {
+				const stockW = document.getElementById('stock-static-weight').value;
+				const stockSw = document.getElementById('stock-swing-weight').value;
+				const stockB = document.getElementById('stock-balance').value;
+				const customW = document.getElementById('custom-static-weight').value;
+				const customSw = document.getElementById('custom-swing-weight').value;
+				const customB = document.getElementById('custom-balance').value;
+
+				if (!stockW && !stockSw && !stockB && !customW && !customSw && !customB) {
+					setupPreview.classList.add('hidden');
+					return;
+				}
+
+				setupPreview.classList.remove('hidden');
+				let html = '';
+				if (stockW || customW) {
+					html += `<p><strong>Static Weight:</strong> ${stockW || '—'}g → ${customW || '—'}g</p>`;
+				}
+				if (stockSw || customSw) {
+					html += `<p><strong>Swing Weight:</strong> ${stockSw || '—'} → ${customSw || '—'} kg·cm²</p>`;
+				}
+				if (stockB || customB) {
+					html += `<p><strong>Balance:</strong> ${stockB || '—'}cm → ${customB || '—'}cm</p>`;
+				}
+				setupPreviewContent.innerHTML = html;
+			}
+
+			// Listen for input changes on all setup fields
+			['stock-static-weight', 'stock-swing-weight', 'stock-balance', 'custom-static-weight', 'custom-swing-weight', 'custom-balance'].forEach(id => {
+				document.getElementById(id).addEventListener('input', updatePreview);
+			});
+
+			// Cancel
+			setupCancelBtn.addEventListener('click', () => {
+				setupEditor.classList.add('hidden');
+				racketSelect.value = '';
+			});
+
+			// Save setup
+			setupForm.addEventListener('submit', async (e) => {
+				e.preventDefault();
+				const data = {
+					id: setupId.value || undefined,
+					racket_id: setupRacketId.value,
+					player_id: setupPlayerId.value,
+					stock_static_weight: document.getElementById('stock-static-weight').value || null,
+					stock_swing_weight: document.getElementById('stock-swing-weight').value || null,
+					stock_balance: document.getElementById('stock-balance').value || null,
+					custom_static_weight: document.getElementById('custom-static-weight').value || null,
+					custom_swing_weight: document.getElementById('custom-swing-weight').value || null,
+					custom_balance: document.getElementById('custom-balance').value || null,
+					mass_added: document.getElementById('mass-added').value || null,
+					mass_location: document.getElementById('mass-location').value || null,
+					modification_notes: document.getElementById('modification-notes').value || null,
+				};
+
+				try {
+					await savePlayerRacketSetup(data);
+					setupEditor.classList.add('hidden');
+					if (currentPlayerId) await loadSetups(currentPlayerId);
+				} catch (err) {
+					console.error('Failed to save setup:', err);
+					alert('Failed to save setup. Please try again.');
+				}
+			});
+
+			// Load setups table
+			async function loadSetups(playerId: string) {
+				try {
+					const setups = await fetchPlayerRacketSetups(playerId);
+					if (setups.length === 0) {
+						setupsTableBody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">No setups recorded yet.</td></tr>';
+					} else {
+						setupsTableBody.innerHTML = setups.map((setup: any) => {
+							const racket = allRackets.find((r: any) => r.id === setup.racket_id);
+							const racketLabel = racket ? `${racket.brand || ''} ${racket.model || ''}`.trim() : 'Unknown';
+							return `
+								<tr>
+									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${racketLabel}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${setup.stock_static_weight || '—'}g</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">${setup.custom_static_weight || '—'}g</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${setup.stock_swing_weight || '—'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">${setup.custom_swing_weight || '—'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${setup.stock_balance || '—'}cm</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">${setup.custom_balance || '—'}cm</td>
+									<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+										<button class="edit-setup-btn text-indigo-600 hover:text-indigo-900 mr-3" data-setup-id="${setup.id}">Edit</button>
+										<button class="delete-setup-btn text-red-600 hover:text-red-900" data-setup-id="${setup.id}">Delete</button>
+									</td>
+								</tr>
+							`;
+						}).join('');
+
+						// Add edit listeners
+						setupsTableBody.querySelectorAll('.edit-setup-btn').forEach(btn => {
+							btn.addEventListener('click', () => {
+								const setupId = btn.dataset.setupId;
+								const setup = setups.find((s: any) => s.id === setupId);
+								if (setup) {
+									// Select the racket in dropdown
+									racketSelect.value = setup.racket_id;
+									racketSelect.dispatchEvent(new Event('change'));
+								}
+							});
+						});
+
+						// Add delete listeners
+						setupsTableBody.querySelectorAll('.delete-setup-btn').forEach(btn => {
+							btn.addEventListener('click', async () => {
+								if (!confirm('Delete this setup?')) return;
+								try {
+									await deletePlayerRacketSetup(btn.dataset.setupId);
+									await loadSetups(playerId);
+								} catch (err) {
+									console.error('Failed to delete setup:', err);
+								}
+							});
+						});
+					}
+					setupsTableContainer.classList.remove('hidden');
+				} catch (err) {
+					console.error('Failed to load setups:', err);
+				}
+			}
+
+			init();
+		</script>
+	</body>
+</html>

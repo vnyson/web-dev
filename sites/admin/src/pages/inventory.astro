@@ -1,4 +1,4 @@
-﻿---
+---
 import '../styles/global.css';
 import { fetchInventory, createInventoryItem, getAuthToken } from '../lib/api';
 ---
@@ -26,6 +26,7 @@ import { fetchInventory, createInventoryItem, getAuthToken } from '../lib/api';
 								<a href="/inventory" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Inventory</a>
 								<a href="/jobs" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Jobs</a>
 								<a href="/players" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Players</a>
+								<a href="/customization" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Customization</a>
 							</div>
 						</div>
 						<div class="flex items-center sm:hidden">
@@ -42,6 +43,7 @@ import { fetchInventory, createInventoryItem, getAuthToken } from '../lib/api';
 								<a href="/inventory" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Inventory</a>
 								<a href="/jobs" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Jobs</a>
 								<a href="/players" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Players</a>
+								<a href="/customization" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100">Customization</a>
 							</div>
 						</div>
 						<div class="flex items-center">
@@ -88,7 +90,6 @@ import { fetchInventory, createInventoryItem, getAuthToken } from '../lib/api';
 										<label for="category" class="block text-sm font-medium text-gray-700">Category</label>
 										<select name="category" id="category" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
 											<option value="string">String</option>
-											<option value="racket">Racket</option>
 											<option value="accessory">Accessory</option>
 											<option value="other">Other</option>
 										</select>
@@ -228,12 +229,103 @@ import { fetchInventory, createInventoryItem, getAuthToken } from '../lib/api';
 							</table>
 						</div>
 					</div>
+				<!-- Demo Sessions (Checkout/Return) -->
+					<div class="flex justify-between items-center mt-8 mb-4">
+						<h3 class="text-xl font-bold text-gray-900">Demo Sessions</h3>
+						<button id="start-demo-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+							Start Demo
+						</button>
+					</div>
+					<p class="text-sm text-gray-500 mb-4">Manage demo checkouts and returns. Mark rackets as demo-able from the <a href="/players" class="text-indigo-600 hover:text-indigo-800 underline">Players</a> page.</p>
+
+					<!-- Active Demo Sessions -->
+					<div class="bg-white shadow rounded-lg mb-6">
+						<div class="px-6 py-4 border-b border-gray-200">
+							<h4 class="text-lg font-medium text-gray-900">Active Demo Sessions</h4>
+						</div>
+						<div class="overflow-x-auto">
+							<table class="min-w-full divide-y divide-gray-200">
+								<thead class="bg-gray-50">
+									<tr>
+										<th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Racket</th>
+										<th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Player</th>
+										<th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Checked Out</th>
+										<th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+										<th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+									</tr>
+								</thead>
+								<tbody class="bg-white divide-y divide-gray-200" id="active-demos-table">
+									<tr>
+										<td colspan="5" class="px-4 py-4 text-center text-sm text-gray-500">Loading...</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- Demo Session History -->
+					<div class="bg-white shadow rounded-lg mb-6">
+						<div class="px-6 py-4 border-b border-gray-200">
+							<h4 class="text-lg font-medium text-gray-900">Demo History</h4>
+						</div>
+						<div class="overflow-x-auto">
+							<table class="min-w-full divide-y divide-gray-200">
+								<thead class="bg-gray-50">
+									<tr>
+										<th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Racket</th>
+										<th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Player</th>
+										<th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Checked Out</th>
+										<th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Returned</th>
+										<th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+									</tr>
+								</thead>
+								<tbody class="bg-white divide-y divide-gray-200" id="demo-history-table">
+									<tr>
+										<td colspan="5" class="px-4 py-4 text-center text-sm text-gray-500">Loading...</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- New Demo Session Modal -->
+					<div id="demo-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden items-center justify-center z-50">
+						<div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+							<div class="px-6 py-4 border-b border-gray-200">
+								<h3 class="text-lg font-medium text-gray-900">New Demo Session</h3>
+							</div>
+							<form id="demo-form" class="px-6 py-4 space-y-4">
+								<div>
+									<label for="demo-racket-select" class="block text-sm font-medium text-gray-700">Racket *</label>
+									<select id="demo-racket-select" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+										<option value="">Select racket...</option>
+									</select>
+								</div>
+								<div class="relative">
+									<label for="demo-player-name" class="block text-sm font-medium text-gray-700">Player Name *</label>
+									<input type="text" id="demo-player-name" placeholder="Start typing player name..." autocomplete="off" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+									<div id="demo-player-search-results" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"></div>
+									<input type="hidden" id="demo-player-id" />
+								</div>
+								<div>
+									<label for="demo-notes" class="block text-sm font-medium text-gray-700">Notes</label>
+									<textarea id="demo-notes" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+								</div>
+								<div class="flex justify-end space-x-3">
+									<button type="button" id="demo-cancel-btn" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+									<button type="submit" class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Check Out</button>
+								</div>
+							</form>
+						</div>
+					</div>
+
 				</div>
 			</main>
 		</div>
 
 		<script>
-			import { getAuthToken, fetchInventory, createInventoryItem, updateInventoryItem, deleteInventoryItem as deleteInventoryItemApi } from '../lib/api';
+		import { getAuthToken, fetchInventory, createInventoryItem, updateInventoryItem, deleteInventoryItem as deleteInventoryItemApi, fetchRackets, fetchPlayers } from '../lib/api';
+		import { fuzzyScore } from '../lib/search';
 
 			// Check authentication on page load
 			if (!getAuthToken()) {
@@ -248,7 +340,8 @@ import { fetchInventory, createInventoryItem, getAuthToken } from '../lib/api';
 
 					// Group items by category
 					const strings = inventory.filter(item => item.category?.toLowerCase() === 'string');
-					const rackets = inventory.filter(item => item.category?.toLowerCase() === 'racket');
+					const allPlayerRackets = await fetchRackets();
+					const rackets = allPlayerRackets.filter((r: any) => r.available_for_sale === 1 || r.available_for_sale === true);
 					const other = inventory.filter(item => item.category?.toLowerCase() !== 'string' && item.category?.toLowerCase() !== 'racket');
 
 					// Populate strings table
@@ -294,23 +387,25 @@ import { fetchInventory, createInventoryItem, getAuthToken } from '../lib/api';
 							racketsTbody.innerHTML = `
 								<tr>
 									<td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-										No rackets yet.
+										No rackets for sale yet.
 									</td>
 								</tr>
 							`;
 						} else {
-							racketsTbody.innerHTML = rackets.map(item => {
-								const quantityClass = item.quantity <= 5 ? 'text-red-600 font-medium' : 'text-gray-500';
+							racketsTbody.innerHTML = rackets.map(racket => {
+								const quantity = racket.sale_quantity || 0;
+								const quantityClass = quantity <= 5 ? 'text-red-600 font-medium' : 'text-gray-500';
+								const name = `${racket.brand || ''} ${racket.model || ''} ${racket.year ? `(${racket.year})` : ''}`.trim() || racket.id;
+								const status = quantity > 0 ? 'In Stock' : 'Out of Stock';
 								return `
 								<tr>
-									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
-									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.brand || '-'}</td>
-									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.price ? `$${item.price}` : '-'}</td>
-									<td class="px-6 py-4 whitespace-nowrap text-sm ${quantityClass}">${item.quantity}</td>
-									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.status}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${name}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${racket.brand || '-'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${racket.sale_price ? `$${racket.sale_price}` : '-'}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm ${quantityClass}">${quantity}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${status}</td>
 									<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-										<button class="text-indigo-600 hover:text-indigo-900 mr-3" data-id="${item.id}" data-action="edit">Edit</button>
-										<button class="text-red-600 hover:text-red-900" data-id="${item.id}" data-action="delete">Delete</button>
+										<a href="/players" class="text-indigo-600 hover:text-indigo-900">Manage on Players Page</a>
 									</td>
 								</tr>
 							`;
@@ -535,6 +630,255 @@ function updateStringFieldsVisibility() {
 					alert('Failed to delete inventory item. Please try again.');
 				}
 			}
+
+			// ---- DEMO MANAGEMENT ----
+			const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+				? 'http://127.0.0.1:8787'
+				: 'https://tennis-admin-api.vnyson.workers.dev';
+
+			function getAuthHeaders() {
+				const token = getAuthToken();
+				return { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) };
+			}
+
+			// Populate demo racket select with rackets available for demo
+			async function populateDemoRacketSelect() {
+				try {
+					const rackets = await fetchRackets();
+					const demoRacketSelect = document.getElementById('demo-racket-select');
+					if (!demoRacketSelect) return;
+
+					const demoRackets = rackets.filter((r: any) => r.available_for_demo === 1 || r.available_for_demo === true);
+
+					demoRacketSelect.innerHTML = '<option value="">Select racket...</option>';
+					demoRackets.forEach((racket: any) => {
+						const option = document.createElement('option');
+						option.value = racket.id;
+						option.textContent = `${racket.brand || ''} ${racket.model || ''} ${racket.year ? `(${racket.year})` : ''}`.trim() || racket.id;
+						demoRacketSelect.appendChild(option);
+					});
+
+					if (demoRackets.length === 0) {
+						const option = document.createElement('option');
+						option.value = '';
+						option.textContent = 'No demo-able rackets available';
+						option.disabled = true;
+						demoRacketSelect.appendChild(option);
+					}
+				} catch (error) {
+					console.error('Failed to load demo rackets:', error);
+				}
+			}
+
+
+			// Load demo sessions (active + history)
+			async function loadDemoSessions() {
+				try {
+					const res = await fetch(`${API_URL}/api/demo-sessions`, { headers: getAuthHeaders() });
+					if (!res.ok) return;
+					const sessions = await res.json();
+
+					const active = sessions.filter(s => !s.returned_at);
+					const history = sessions.filter(s => s.returned_at);
+
+					const activeTbody = document.getElementById('active-demos-table');
+					const historyTbody = document.getElementById('demo-history-table');
+
+					if (activeTbody) {
+						if (active.length === 0) {
+							activeTbody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-sm text-gray-500">No active demo sessions.</td></tr>';
+						} else {
+							activeTbody.innerHTML = active.map(s => `
+								<tr>
+									<td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${s.brand || ''} ${s.model || ''}</td>
+									<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${s.player_name || 'Walk-in'}</td>
+									<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${new Date(s.checked_out_at).toLocaleDateString()}</td>
+									<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${s.notes || '-'}</td>
+									<td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+										<button class="text-green-600 hover:text-green-900 return-demo-btn" data-session-id="${s.id}">Return</button>
+									</td>
+								</tr>
+							`).join('');
+
+							activeTbody.querySelectorAll('.return-demo-btn').forEach(btn => {
+								btn.addEventListener('click', async () => {
+									if (!confirm('Mark this demo as returned?')) return;
+									try {
+										await fetch(`${API_URL}/api/demo-sessions/${btn.getAttribute('data-session-id')}`, {
+											method: 'PUT',
+											headers: getAuthHeaders(),
+											body: JSON.stringify({ returned_at: new Date().toISOString() }),
+										});
+								loadDemoSessions();
+									} catch (e) {
+										alert('Failed to return demo session.');
+									}
+								});
+							});
+						}
+					}
+
+					if (historyTbody) {
+						if (history.length === 0) {
+							historyTbody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-sm text-gray-500">No demo history yet.</td></tr>';
+						} else {
+							historyTbody.innerHTML = history.map(s => `
+								<tr>
+									<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${s.brand || ''} ${s.model || ''}</td>
+									<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${s.player_name || 'Walk-in'}</td>
+									<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${new Date(s.checked_out_at).toLocaleDateString()}</td>
+									<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${new Date(s.returned_at).toLocaleDateString()}</td>
+									<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${s.notes || '-'}</td>
+								</tr>
+							`).join('');
+						}
+					}
+				} catch (e) {
+					console.error('Failed to load demo sessions:', e);
+				}
+			}
+
+			const demoPlayerNameInput = document.getElementById('demo-player-name') as HTMLInputElement;
+			const demoPlayerSearchResults = document.getElementById('demo-player-search-results') as HTMLDivElement;
+			const demoPlayerIdInput = document.getElementById('demo-player-id') as HTMLInputElement;
+
+			let allPlayersForSearch: any[] = [];
+			async function loadPlayersForSearch() {
+				if (allPlayersForSearch.length > 0) return;
+				try {
+					allPlayersForSearch = await fetchPlayers();
+				} catch (e) {
+					console.error('Failed to load players for demo session search:', e);
+				}
+			}
+
+			function filterAndShowDemoPlayers(query: string) {
+				if (!query || query.length < 1) {
+					demoPlayerSearchResults.classList.add('hidden');
+					return;
+				}
+
+				const scored = allPlayersForSearch
+					.filter(p => p.name)
+					.map(p => ({ player: p, score: fuzzyScore(query, p.name) }))
+					.filter(s => s.score > 0)
+					.sort((a, b) => b.score - a.score)
+					.slice(0, 10);
+
+				if (scored.length === 0) {
+					demoPlayerSearchResults.innerHTML = '<div class="px-3 py-2 text-sm text-gray-500">No players found</div>';
+					demoPlayerSearchResults.classList.remove('hidden');
+					return;
+				}
+
+				demoPlayerSearchResults.innerHTML = scored.map(s => `
+					<div class="demo-player-result px-3 py-2 text-sm cursor-pointer hover:bg-indigo-50 flex items-center gap-2" data-player-id="${s.player.id}" data-player-name="${s.player.name}">
+						<span class="font-medium">${s.player.name}</span>
+						${s.player.club ? `<span class="text-gray-400">— ${s.player.club}</span>` : ''}
+						${s.player.phone ? `<span class="text-gray-400 text-xs ml-auto">${s.player.phone}</span>` : ''}
+					</div>
+				`).join('');
+
+				demoPlayerSearchResults.classList.remove('hidden');
+
+				// Add click listeners
+				demoPlayerSearchResults.querySelectorAll('.demo-player-result').forEach(el => {
+					el.addEventListener('click', () => {
+						const id = el.getAttribute('data-player-id');
+						const name = el.getAttribute('data-player-name');
+						demoPlayerNameInput.value = name;
+						demoPlayerIdInput.value = id;
+						demoPlayerSearchResults.classList.add('hidden');
+					});
+				});
+			}
+
+			if (demoPlayerNameInput) {
+				demoPlayerNameInput.addEventListener('input', () => {
+					demoPlayerIdInput.value = ''; // clear on typing
+					filterAndShowDemoPlayers(demoPlayerNameInput.value.trim());
+				});
+
+				demoPlayerNameInput.addEventListener('focus', async () => {
+					await loadPlayersForSearch();
+					if (demoPlayerNameInput.value.trim()) {
+						filterAndShowDemoPlayers(demoPlayerNameInput.value.trim());
+					}
+				});
+			}
+
+			// Close dropdown when clicking outside
+			document.addEventListener('click', (e) => {
+				if (demoPlayerNameInput && demoPlayerSearchResults && !demoPlayerNameInput.contains(e.target as Node) && !demoPlayerSearchResults.contains(e.target as Node)) {
+					demoPlayerSearchResults.classList.add('hidden');
+				}
+			});
+
+			// Open demo checkout modal
+			async function openDemoCheckoutModal(racketId) {
+				const demoModal = document.getElementById('demo-modal');
+				const demoRacketSelect = document.getElementById('demo-racket-select');
+				// Pre-select racket
+				demoRacketSelect.value = racketId;
+				document.getElementById('demo-player-name').value = '';
+				if (demoPlayerIdInput) demoPlayerIdInput.value = '';
+				document.getElementById('demo-notes').value = '';
+				await loadPlayersForSearch();
+				demoModal.classList.remove('hidden');
+				demoModal.classList.add('flex');
+			}
+
+			// Demo modal handlers
+			const demoModal = document.getElementById('demo-modal');
+			const demoCancelBtn = document.getElementById('demo-cancel-btn');
+			const demoForm = document.getElementById('demo-form');
+			const startDemoBtn = document.getElementById('start-demo-btn');
+
+			// Wire up start demo button
+			if (startDemoBtn) {
+				startDemoBtn.addEventListener('click', async () => {
+					await populateDemoRacketSelect();
+					await loadPlayersForSearch();
+					if (demoPlayerIdInput) demoPlayerIdInput.value = '';
+					demoModal.classList.remove('hidden');
+					demoModal.classList.add('flex');
+				});
+			}
+
+			if (demoCancelBtn) demoCancelBtn.addEventListener('click', () => { demoModal.classList.add('hidden'); demoModal.classList.remove('flex'); });
+			// Demo checkout form submission
+			if (demoForm) demoForm.addEventListener('submit', async (e) => {
+				e.preventDefault();
+				const racketId = document.getElementById('demo-racket-select').value;
+				const playerName = document.getElementById('demo-player-name').value.trim();
+				const playerId = demoPlayerIdInput.value;
+				const notes = document.getElementById('demo-notes').value.trim();
+
+				if (!racketId) { alert('Select a racket'); return; }
+				if (!playerId) { alert('Please select an existing player from the list'); return; }
+
+				try {
+					await fetch(`${API_URL}/api/demo-sessions`, {
+						method: 'POST',
+						headers: getAuthHeaders(),
+						body: JSON.stringify({
+							racket_id: racketId,
+							player_id: playerId,
+							player_name: playerName || null,
+							checked_out_at: new Date().toISOString(),
+							notes: notes || null,
+						}),
+					});
+					demoModal.classList.add('hidden');
+					demoModal.classList.remove('flex');
+					loadDemoSessions();
+				} catch (err) {
+					alert('Failed to create demo session.');
+				}
+			});
+
+		// Load demo sessions on page load
+		loadDemoSessions();
 		</script>
 	</body>
 </html>

@@ -206,3 +206,80 @@ export async function regeneratePlayerToken(playerId: string) {
   if (!response.ok) throw new Error('Failed to regenerate token');
   return response.json();
 }
+
+// Demo sessions
+export async function fetchDemoSessions() {
+  const response = await fetch(`${getApiUrl()}/api/demo-sessions`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Failed to fetch demo sessions');
+  return response.json();
+}
+
+export async function createDemoSession(data: any) {
+  const response = await fetch(`${getApiUrl()}/api/demo-sessions`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to create demo session');
+  return response.json();
+}
+
+export async function returnDemoSession(id: string, notes?: string) {
+  const response = await fetch(`${getApiUrl()}/api/demo-sessions/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ returned_at: new Date().toISOString(), notes }),
+  });
+  if (!response.ok) throw new Error('Failed to return demo session');
+  return response.json();
+}
+
+export async function deleteDemoSession(id: string) {
+  const response = await fetch(`${getApiUrl()}/api/demo-sessions/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Failed to delete demo session');
+  return response.json();
+}
+
+// Player racket setups (stock vs customized)
+export async function fetchPlayerRacketSetups(playerId?: string) {
+  const url = playerId
+    ? `${getApiUrl()}/api/player-racket-setups?player_id=${playerId}`
+    : `${getApiUrl()}/api/player-racket-setups`;
+  const response = await fetch(url, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Failed to fetch player racket setups');
+  return response.json();
+}
+
+export async function fetchPlayerRacketSetupForRacket(racketId: string) {
+  const response = await fetch(`${getApiUrl()}/api/player-racket-setups?racket_id=${racketId}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Failed to fetch racket setup');
+  return response.json();
+}
+
+export async function savePlayerRacketSetup(data: any) {
+  const response = await fetch(`${getApiUrl()}/api/player-racket-setups`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to save racket setup');
+  return response.json();
+}
+
+export async function deletePlayerRacketSetup(id: string) {
+  const response = await fetch(`${getApiUrl()}/api/player-racket-setups/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Failed to delete racket setup');
+  return response.json();
+}
