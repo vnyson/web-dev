@@ -151,6 +151,9 @@ body {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    box-shadow:
+      0 16px 32px rgba(0, 0, 0, 0.8),
+      0 32px 32px rgba(0, 0, 0, 0.5);
   }
 
   .splash:not(.splash--seen) ~ .mobile-navigation-bottom {

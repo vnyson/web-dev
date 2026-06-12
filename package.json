@@ -14,7 +14,7 @@
     "build:site": "turbo run build --filter=tennis-stringing-site",
     "build:admin": "turbo run build --filter=admin",
     "dev": "turbo run dev",
-    "lint": "eslint 'sites/*/js/**/*.js' && stylelint 'packages/**/*.css' 'sites/**/*.css' && htmlhint 'sites/**/*.html'",
+    "lint": "eslint 'sites/**/*/*.js' && stylelint 'packages/**/*.css' 'sites/**/*.css' && htmlhint 'sites/**/*.html'",
     "lint:css": "stylelint 'packages/**/*.css' 'sites/**/*.css'",
     "lint:html": "htmlhint 'sites/**/*.html'",
     "format": "prettier --write .",
