@@ -463,7 +463,7 @@ import MobileNav from '../components/MobileNav.astro';
 
         if (other.length > 0) {
           html += `
-            <div class="inventory-category-header" style="margin-top: var(--space-md);">Equipment & Accessories</div>
+            <div class="inventory-category-header inventory-category-header--secondary">Equipment & Accessories</div>
             <table class="inventory-table">
               <thead>
                 <tr>
@@ -497,7 +497,7 @@ import MobileNav from '../components/MobileNav.astro';
         inventoryGrid.innerHTML = html;
       } catch (err) {
         console.error('Failed to load inventory:', err);
-        inventoryGrid.innerHTML = '<p style="color: red; text-align: center;">Failed to load inventory.</p>';
+        inventoryGrid.innerHTML = '<p class="demo-error">Failed to load inventory.</p>';
       }
     }
 
@@ -574,7 +574,7 @@ import MobileNav from '../components/MobileNav.astro';
           `;
         }).join('');
       } catch (err) {
-        demoGrid.innerHTML = '<p style="text-align:center;padding:1rem;color:red;">Failed to load demo rackets.</p>';
+        demoGrid.innerHTML = '<p class="demo-error">Failed to load demo rackets.</p>';
       }
     }
 

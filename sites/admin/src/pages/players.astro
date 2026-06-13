@@ -143,7 +143,7 @@ import '../styles/global.css';
 
 					<!-- Add/Edit Racket Modal -->
 					<div id="racket-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden items-center justify-center z-50">
-						<div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
+						<div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
 							<div class="px-6 py-4 border-b border-gray-200">
 								<h3 id="racket-modal-title" class="text-lg font-medium text-gray-900">Add Racket</h3>
 							</div>
@@ -304,6 +304,26 @@ import '../styles/global.css';
 			const racketOwnerField = document.getElementById('racket-owner-field');
 			const racketOwnerSelect = document.getElementById('racket-owner');
 
+			// Cancel button for player modal
+			cancelBtn.addEventListener('click', () => {
+				playerModal.classList.add('hidden');
+				playerModal.classList.remove('flex');
+				playerForm.reset();
+				playerIdInput.value = '';
+				modalTitle.textContent = 'Add Player';
+			});
+
+			// Close player modal on backdrop click
+			playerModal.addEventListener('click', (e) => {
+				if (e.target === playerModal) {
+					playerModal.classList.add('hidden');
+					playerModal.classList.remove('flex');
+					playerForm.reset();
+					playerIdInput.value = '';
+					modalTitle.textContent = 'Add Player';
+				}
+			});
+
 			// Handle player form submission
 			playerForm.addEventListener('submit', async (e) => {
 				e.preventDefault();
@@ -385,7 +405,7 @@ import '../styles/global.css';
 					if (racketId) {
 						await updateRacket(racketId, data);
 					} else {
-						await createRacket(playerId, data);
+						await createRacket(data);
 					}
 					closeRacketModal();
 					loadPlayers();
@@ -441,6 +461,7 @@ import '../styles/global.css';
 				}
 
 				racketModal.classList.remove('hidden');
+				racketModal.classList.add('flex');
 				populateOwnerDropdown(playerId, racketData?.player_id);
 			}
 
@@ -697,8 +718,8 @@ import '../styles/global.css';
 							<div class="flex justify-between items-center py-1 border-b last:border-0">
 								<a href="/customization?player=${encodeURIComponent(playerId)}&racket=${encodeURIComponent(racket.id)}" class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline font-medium flex-1" onclick="event.stopPropagation()">${racket.brand || ''} ${racket.model || ''} ${racket.year ? `(${racket.year})` : ''}${racket.notes ? ` — ${racket.notes}` : ''}</a>
 								<div class="flex space-x-1 ml-2 items-center">
-									<button class="toggle-demo-btn text-xs px-1.5 py-0.5 rounded border ${racket.available_for_demo ? 'bg-blue-100 text-blue-700 border-blue-300' : 'bg-gray-50 text-gray-400 border-gray-200'}" data-racket-id="${racket.id}" data-player-id="${playerId}" data-available="${racket.available_for_demo ? '1' : '0'}" title="${racket.available_for_demo ? 'Available for demo - click to remove' : 'Click to make available for demo'}">Demo</button>
-									<button class="toggle-sale-btn text-xs px-1.5 py-0.5 rounded border ${racket.available_for_sale ? 'bg-green-100 text-green-700 border-green-300' : 'bg-gray-50 text-gray-400 border-gray-200'}" data-racket-id="${racket.id}" data-player-id="${playerId}" data-available="${racket.available_for_sale ? '1' : '0'}" title="${racket.available_for_sale ? 'Available for sale - click to remove' : 'Click to make available for sale'}">Sale</button>
+								<button class="toggle-demo-btn text-xs px-1.5 py-0.5 rounded border cursor-pointer ${racket.available_for_demo ? 'bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-200 hover:text-gray-600'}" data-racket-id="${racket.id}" data-player-id="${playerId}" data-available="${racket.available_for_demo ? '1' : '0'}" title="${racket.available_for_demo ? 'Available for demo - click to remove' : 'Click to make available for demo'}">Demo</button>
+									<button class="toggle-sale-btn text-xs px-1.5 py-0.5 rounded border cursor-pointer ${racket.available_for_sale ? 'bg-green-100 text-green-700 border-green-300 hover:bg-green-200' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-200 hover:text-gray-600'}" data-racket-id="${racket.id}" data-player-id="${playerId}" data-available="${racket.available_for_sale ? '1' : '0'}" title="${racket.available_for_sale ? 'Available for sale - click to remove' : 'Click to make available for sale'}">Sale</button>
 									<button class="edit-racket-btn text-indigo-600 hover:text-indigo-900 text-xs" data-racket-id="${racket.id}" data-player-id="${playerId}">Edit</button>
 									<button class="delete-racket-btn text-red-600 hover:text-red-900 text-xs" data-racket-id="${racket.id}" data-player-id="${playerId}">Delete</button>
 								</div>
