@@ -85,6 +85,10 @@ body {
   padding: 0 var(--space-md) var(--space-md);
 }
 
+.desktop-section:first-child {
+  margin-top: var(--space-md);
+}
+
 .desktop-navigation-bar {
   display: flex;
   align-items: center;
@@ -121,7 +125,6 @@ body {
   padding: var(--space-md);
   text-align: center;
   min-height: 120px;
-  max-height: 140px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -367,10 +370,6 @@ body {
 .contact-header__info.tagline {
   font-size: calc(var(--font-size-md) - 6px);
   margin-bottom: 0;
-}
-
-.contact-header__info.tagline:first-of-type {
-  margin-top: var(--space-lg);
 }
 
 .contact-header__string-display {
@@ -636,6 +635,20 @@ body {
 
 .desktop-customer-actions {
   gap: var(--space-lg);
+}
+
+.demo-button {
+  cursor: pointer;
+}
+
+.demo-error {
+  text-align: center;
+  padding: 1rem;
+  color: red;
+}
+
+.inventory-category-header--secondary {
+  margin-top: var(--space-md);
 }
 
 /* Profile Overlay Header */
