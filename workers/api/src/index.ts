@@ -1703,17 +1703,28 @@ export async function handleRackets(
   }
 
   if (request.method === 'PUT') {
-    // Requires admin session
+    // Requires admin session or player token
+    const token = url.searchParams.get('token');
     const isAdmin = await validateAdminSession(request, env);
-    if (!isAdmin) {
+
+    if (!token && !isAdmin) {
       return new Response('Unauthorized', { status: 401, headers: corsHeaders });
     }
 
-    const body = await request.json();
     const existing = await env.DB.prepare('SELECT * FROM rackets WHERE id = ?').bind(id).first();
     if (!existing) {
       return new Response('Not Found', { status: 404, headers: corsHeaders });
     }
+
+    if (token && !isAdmin) {
+      // Validate player token matches the racket's player_id
+      const tokenPlayerId = await validatePlayerToken(token, env);
+      if (!tokenPlayerId || tokenPlayerId !== (existing as any).player_id) {
+        return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+      }
+    }
+
+    const body = await request.json();
 
     // Merge: only update fields that are provided in the request body
     const merged = {

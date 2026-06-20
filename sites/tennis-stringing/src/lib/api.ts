@@ -167,3 +167,20 @@ export async function fetchDemoRackets(): Promise<DemoRacket[]> {
   if (!response.ok) throw new Error('Failed to fetch demo rackets');
   return response.json();
 }
+
+export async function updateRacket(
+  racketId: string,
+  token: string,
+  payload: Record<string, unknown>,
+): Promise<{ success: boolean }> {
+  const response = await fetch(
+    `${API_URL}/api/rackets/${racketId}?token=${encodeURIComponent(token)}`,
+    {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    },
+  );
+  if (!response.ok) throw new Error('Failed to update racket');
+  return response.json();
+}
