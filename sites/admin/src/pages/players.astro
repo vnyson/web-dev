@@ -304,6 +304,15 @@ import '../styles/global.css';
 			const racketOwnerField = document.getElementById('racket-owner-field');
 			const racketOwnerSelect = document.getElementById('racket-owner');
 
+			// Add player button
+			addPlayerBtn.addEventListener('click', () => {
+				playerForm.reset();
+				playerIdInput.value = '';
+				modalTitle.textContent = 'Add Player';
+				playerModal.classList.remove('hidden');
+				playerModal.classList.add('flex');
+			});
+
 			// Cancel button for player modal
 			cancelBtn.addEventListener('click', () => {
 				playerModal.classList.add('hidden');
