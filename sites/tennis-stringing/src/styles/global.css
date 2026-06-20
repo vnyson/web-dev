@@ -742,6 +742,243 @@ body {
   color: #006600;
 }
 
+/* Profile Racket Slots - Empty state */
+.profile-racket-inventory__slot--empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-brand);
+  font-size: 8px;
+  color: var(--color-gray-500);
+}
+
+/* Profile Racket Cards */
+.profile-racket-card {
+  border: 2px solid var(--color-gray-800);
+  background: var(--color-white);
+  font-family: var(--font-family-brand);
+}
+
+.profile-racket-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.profile-racket-card__header:hover {
+  background: var(--color-gray-100);
+}
+
+.profile-racket-card__header-image {
+  width: 40px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-racket-card__header-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.profile-racket-card__header-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-racket-card__name {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.profile-racket-card__expand {
+  font-size: 8px;
+  color: var(--color-gray-500);
+  flex-shrink: 0;
+}
+
+.profile-racket-card__body {
+  border-top: 2px solid var(--color-gray-800);
+  padding: var(--space-xs);
+}
+
+.profile-racket-card__field {
+  margin-bottom: var(--space-xs);
+}
+
+.profile-racket-card__field label {
+  display: block;
+  font-size: calc(var(--font-size-xs) - 2px);
+  color: var(--color-gray-600);
+  margin-bottom: 1px;
+  text-transform: uppercase;
+}
+
+.profile-racket-card__hero {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-sm);
+  border-bottom: 2px solid var(--color-gray-800);
+  margin-bottom: var(--space-xs);
+}
+
+.profile-racket-card__hero-image {
+  width: 120px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-racket-card__hero-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.profile-racket-card__actions {
+  margin-top: var(--space-xs);
+  text-align: right;
+}
+
+.profile-racket-card__save {
+  cursor: pointer;
+  font-family: var(--font-family-brand);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  padding: var(--space-xs) var(--space-sm);
+}
+
+/* Job Item with Racket Image */
+.profile-job-item__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: 2px;
+}
+
+.profile-job-item__racket-img {
+  width: 28px;
+  height: 22px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-job-item__racket-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* Profile Job Items */
+.profile-jobs-empty {
+  font-family: var(--font-family-brand);
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  text-align: center;
+  padding: var(--space-md);
+}
+
+.profile-job-item {
+  border: 2px solid var(--color-gray-800);
+  padding: var(--space-xs);
+  font-family: var(--font-family-brand);
+  font-size: var(--font-size-xs);
+  background: var(--color-white);
+}
+
+.profile-job-item__racquet {
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.profile-job-item__string {
+  color: var(--color-gray-700);
+  margin-bottom: 1px;
+}
+
+.profile-job-item__tension {
+  color: var(--color-gray-600);
+  font-family: var(--font-family-mono);
+  font-size: calc(var(--font-size-xs) - 2px);
+  margin-bottom: 2px;
+}
+
+.profile-job-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
+  margin-top: 2px;
+}
+
+.profile-job-item__status {
+  display: inline-block;
+  padding: 1px 4px;
+  font-size: calc(var(--font-size-xs) - 2px);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  border: 2px solid currentColor;
+}
+
+.profile-job-item__status--open {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.profile-job-item__status--queued,
+.profile-job-item__status--in-queue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.profile-job-item__status--ready-for-pickup {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.profile-job-item__status--completed,
+.profile-job-item__status--picked-up {
+  background: var(--color-gray-200);
+  color: var(--color-gray-600);
+}
+
+.profile-job-item__queue {
+  font-family: var(--font-family-mono);
+  font-size: calc(var(--font-size-xs) - 2px);
+  color: var(--color-gray-600);
+}
+
+.profile-job-item__date {
+  font-family: var(--font-family-mono);
+  font-size: calc(var(--font-size-xs) - 2px);
+  color: var(--color-gray-500);
+  margin-left: auto;
+}
+
 /* List Styles */
 .pixel-list {
   display: flex;

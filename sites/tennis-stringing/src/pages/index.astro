@@ -97,9 +97,9 @@ import MobileNav from '../components/MobileNav.astro';
 </BaseLayout>
 
 <script>
-  import { fetchQueueStatus, verifyPlayer, loadPlayerByToken, updatePlayer, fetchInventory, fetchDemoRackets } from '../lib/api';
+  import { fetchQueueStatus, verifyPlayer, loadPlayerByToken, updatePlayer, updateRacket, fetchInventory, fetchDemoRackets } from '../lib/api';
   import { updateQueueDisplayElements } from '../lib/queue-display';
-  import { getRacketImage } from '../lib/racket-images';
+  import { getRacketImage, RACKET_INVENTORY_SLOTS } from '../lib/racket-images';
 
   const API_URL =
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -184,6 +184,7 @@ import MobileNav from '../components/MobileNav.astro';
     const profileGripInput = document.getElementById('profile-grip');
     const profileNotesInput = document.getElementById('profile-notes');
     const profileJobsList = document.getElementById('profile-jobs-list');
+    const profileRacketsList = document.getElementById('profile-rackets-list');
     const profileRacketSlots = document.getElementById('profile-racket-slots');
     const profileRacketDetail = document.getElementById('profile-racket-detail');
     const profileRacketInventory = document.getElementById('profile-racket-inventory');
@@ -196,6 +197,7 @@ import MobileNav from '../components/MobileNav.astro';
     let currentPlayerRackets = [];
     let isCollisionActive = false;
     let alertDismissTimeout = null;
+    let racketsTabExpandIndex = -1;
     const ALERT_DISMISS_MS = 4000;
 
     const GENERIC_PROFILE_IMAGE = 'assets/images/profile/generic.png';
@@ -259,12 +261,199 @@ import MobileNav from '../components/MobileNav.astro';
       if (profileJobStatus) { profileJobStatus.textContent = ''; profileJobStatus.className = 'profile-job-status hidden'; }
     }
 
+    function switchToTab(tabName) {
+      profileTabButtons.forEach((b) => {
+        b.classList.toggle('active', b.dataset.tab === tabName);
+      });
+      profileTabContents.forEach((content) => {
+        content.classList.toggle('hidden', content.id !== `profile-tab-${tabName}`);
+      });
+    }
+
+    function renderRacketsTab() {
+      if (!profileRacketsList) return;
+      if (!currentPlayerRackets || currentPlayerRackets.length === 0) {
+        profileRacketsList.innerHTML = '<p class="profile-jobs-empty">No rackets on file.</p>';
+        return;
+      }
+      profileRacketsList.innerHTML = currentPlayerRackets.map((racket, index) => {
+        const imgSrc = getRacketImage(racket.brand, racket.model);
+        const fields = [
+          { key: 'brand', label: 'Brand', value: racket.brand || '' },
+          { key: 'model', label: 'Model', value: racket.model || '' },
+          { key: 'year', label: 'Year', value: racket.year || '' },
+          { key: 'head_size', label: 'Head Size (sq in)', value: racket.head_size || '' },
+          { key: 'length', label: 'Length (in)', value: racket.length || '' },
+          { key: 'static_weight', label: 'Weight (g)', value: racket.static_weight || '' },
+          { key: 'swing_weight', label: 'Swing Weight', value: racket.swing_weight || '' },
+          { key: 'balance', label: 'Balance (cm)', value: racket.balance || '' },
+          { key: 'stiffness', label: 'Stiffness', value: racket.stiffness || '' },
+          { key: 'string_pattern', label: 'String Pattern', value: racket.string_pattern || '' },
+          { key: 'beam_width', label: 'Beam Width (mm)', value: racket.beam_width || '' },
+          { key: 'grip_size', label: 'Grip Size', value: racket.grip_size || '' },
+          { key: 'color', label: 'Color', value: racket.color || '' },
+          { key: 'notes', label: 'Notes', value: racket.notes || '' },
+        ];
+        const expanded = racketsTabExpandIndex === index;
+        return `
+          <div class="profile-racket-card" data-racket-index="${index}">
+            <div class="profile-racket-card__header" tabindex="0" role="button" aria-expanded="${expanded ? 'true' : 'false'}">
+              <div class="profile-racket-card__header-image">
+                <img src="${imgSrc}" alt="${racket.brand || ''} ${racket.model || ''}" />
+              </div>
+              <div class="profile-racket-card__header-title">
+                <span class="profile-racket-card__name">${racket.brand || ''} ${racket.model || ''}${racket.year ? ` (${racket.year})` : ''}</span>
+              </div>
+              <span class="profile-racket-card__expand">${expanded ? '▲' : '▼'}</span>
+            </div>
+            <div class="profile-racket-card__body ${expanded ? '' : 'hidden'}">
+              <div class="profile-racket-card__hero">
+                <div class="profile-racket-card__hero-image">
+                  <img src="${imgSrc}" alt="${racket.brand || ''} ${racket.model || ''}" />
+                </div>
+              </div>
+              ${fields.map((f) => `
+                <div class="profile-racket-card__field">
+                  <label>${f.label}</label>
+                  <input type="text" class="pixel-input racket-edit-input" data-field="${f.key}" value="${f.value}" />
+                </div>
+              `).join('')}
+              <div class="profile-racket-card__actions">
+                <button class="profile-racket-card__save pixel-borders pixel-borders--1 pixel-button">Save</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      racketsTabExpandIndex = -1;
+
+      // Expand/collapse on header click
+      profileRacketsList.querySelectorAll('.profile-racket-card__header').forEach((header) => {
+        header.addEventListener('click', () => {
+          const body = header.nextElementSibling;
+          const expand = header.querySelector('.profile-racket-card__expand');
+          const isHidden = body.classList.contains('hidden');
+          body.classList.toggle('hidden');
+          header.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+          if (expand) expand.textContent = isHidden ? '▲' : '▼';
+        });
+      });
+
+      // Save edits
+      profileRacketsList.querySelectorAll('.profile-racket-card__save').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const card = btn.closest('.profile-racket-card');
+          const index = parseInt(card.dataset.racketIndex, 10);
+          const racket = currentPlayerRackets[index];
+          if (!racket || !currentPlayerData?.token) return;
+          const inputs = card.querySelectorAll('.racket-edit-input');
+          const payload = {};
+          inputs.forEach((input) => {
+            const val = input.value.trim();
+            if (val) payload[input.dataset.field] = val;
+          });
+          try {
+            await updateRacket(racket.id, currentPlayerData.token, payload);
+            Object.assign(racket, payload);
+            showAlert('success', 'Racket updated!');
+          } catch (err) {
+            showAlert('error', 'Failed to update racket.');
+          }
+        });
+      });
+    }
+
+    function renderPlayerRackets(rackets) {
+      if (!profileRacketSlots) return;
+      currentPlayerRackets = rackets || [];
+      if (currentPlayerRackets.length === 0) {
+        profileRacketSlots.innerHTML = '<div class="profile-racket-inventory__slot profile-racket-inventory__slot--empty"><span>No rackets on file</span></div>';
+        return;
+      }
+      profileRacketSlots.innerHTML = currentPlayerRackets.slice(0, RACKET_INVENTORY_SLOTS.length).map((racket, index) => {
+        const slot = RACKET_INVENTORY_SLOTS[index];
+        const imgSrc = getRacketImage(racket.brand, racket.model);
+        return `
+          <div class="profile-racket-inventory__slot" data-racket-index="${index}" style="left: ${slot.left}; bottom: ${slot.bottom}; width: ${slot.width};">
+            <img src="${imgSrc}" alt="" loading="lazy" />
+          </div>
+        `;
+      }).join('');
+
+      // Click handler: switch to rackets tab with the clicked racket expanded
+      profileRacketSlots.querySelectorAll('.profile-racket-inventory__slot').forEach((el) => {
+        el.addEventListener('click', () => {
+          racketsTabExpandIndex = parseInt(el.dataset.racketIndex, 10);
+          switchToTab('rackets');
+          renderRacketsTab();
+        });
+      });
+    }
+
+    function renderPlayerJobs(jobs) {
+      if (!profileJobsList) return;
+      if (!jobs || jobs.length === 0) {
+        profileJobsList.innerHTML = '<p class="profile-jobs-empty">No jobs yet.</p>';
+        return;
+      }
+      profileJobsList.innerHTML = jobs.map((job) => {
+        const statusLabels = {
+          'open': 'In Progress',
+          'queued': 'Queued',
+          'in_queue': 'In Queue',
+          'ready_for_pickup': 'Ready for Pickup',
+          'completed': 'Completed',
+          'picked_up': 'Picked Up',
+        };
+        const statusClass = (job.status || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const statusLabel = statusLabels[job.status] || job.status || 'Unknown';
+        const racquetLabel = job.racquet || 'Unknown racquet';
+        const stringInfo = [job.string_mains, job.string_crosses].filter(Boolean).join(' / ') || 'Unknown string';
+        const tensionInfo = [job.tension_mains, job.tension_crosses].filter(Boolean).join(' / ') + (job.tension_unit ? ` ${job.tension_unit}` : '');
+        // Try to find matching racket image
+        const matchingRacket = currentPlayerRackets.find((r) => {
+          const fullName = `${r.brand || ''} ${r.model || ''}`.trim().toLowerCase();
+          const jobRacquet = (racquetLabel || '').toLowerCase();
+          return fullName && (jobRacquet.includes(fullName) || fullName.includes(jobRacquet));
+        });
+        const racketImg = matchingRacket ? getRacketImage(matchingRacket.brand, matchingRacket.model) : null;
+        return `
+          <div class="profile-job-item">
+            <div class="profile-job-item__header">
+              ${racketImg ? `<div class="profile-job-item__racket-img"><img src="${racketImg}" alt="" /></div>` : ''}
+              <div class="profile-job-item__racquet">${racquetLabel}</div>
+            </div>
+            <div class="profile-job-item__string">${stringInfo}</div>
+            ${tensionInfo ? `<div class="profile-job-item__tension">${tensionInfo}</div>` : ''}
+            <div class="profile-job-item__meta">
+              <span class="profile-job-item__status profile-job-item__status--${statusClass}">${statusLabel}</span>
+              ${job.queue_position ? `<span class="profile-job-item__queue">Queue #${job.queue_position}</span>` : ''}
+              <span class="profile-job-item__date">${new Date(job.created_at).toLocaleDateString()}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Click on job racquet name or image switches to rackets tab
+      profileJobsList.querySelectorAll('.profile-job-item__header').forEach((header) => {
+        header.style.cursor = 'pointer';
+        header.title = 'View rackets';
+        header.addEventListener('click', () => {
+          switchToTab('rackets');
+          renderRacketsTab();
+        });
+      });
+    }
+
     function renderProfileData(data, token) {
       currentPlayerData = data.player;
       currentPlayerData.token = token;
       setClearTokenButtonVisible(true);
       if (profileLoading) profileLoading.classList.add('hidden');
-      const playerRackets = data.rackets || [];
+      renderPlayerRackets(data.rackets || []);
+      renderPlayerJobs(data.jobs || []);
+      renderRacketsTab();
       if (profileImage) { profileImage.src = getProfileImageForPlayer(data.player.name); profileImage.alt = 'profile'; }
       if (profileNameInput) profileNameInput.value = data.player.name || '';
       if (profileEmailInput) profileEmailInput.value = data.player.email || '';
@@ -274,13 +463,26 @@ import MobileNav from '../components/MobileNav.astro';
       if (profileTensionCrossInput) profileTensionCrossInput.value = data.player.tension_cross || '';
       if (profileGripInput) profileGripInput.value = data.player.grip || '';
       if (profileNotesInput) profileNotesInput.value = data.player.notes || '';
-      // Job status
+      // Job status banner
       if (profileJobStatus) {
-        const readyJobs = (data.jobs || []).filter((j) => j.status === 'ready_for_pickup');
+        const jobs = data.jobs || [];
+        const readyJobs = jobs.filter((j) => j.status === 'ready_for_pickup');
+        const openJobs = jobs.filter((j) => j.status === 'open' || j.status === 'queued' || j.status === 'in_queue');
+        const minQueuePosition = Math.min(...openJobs.map((j) => j.queue_position).filter(Boolean));
+
         if (readyJobs.length > 0) {
           const countLabel = readyJobs.length > 1 ? ` (${readyJobs.length} racquets)` : '';
           profileJobStatus.textContent = `Ready to pick up${countLabel}`;
           profileJobStatus.className = 'profile-job-status profile-job-status--ready';
+          profileJobStatus.classList.remove('hidden');
+        } else if (minQueuePosition && minQueuePosition > 0) {
+          profileJobStatus.textContent = `Queue position: #${minQueuePosition}`;
+          profileJobStatus.className = 'profile-job-status profile-job-status--queue';
+          profileJobStatus.classList.remove('hidden');
+        } else if (openJobs.length > 0) {
+          const countLabel = openJobs.length > 1 ? ` (${openJobs.length} jobs)` : '';
+          profileJobStatus.textContent = `Job in progress${countLabel}`;
+          profileJobStatus.className = 'profile-job-status profile-job-status--queue';
           profileJobStatus.classList.remove('hidden');
         } else {
           profileJobStatus.textContent = '';
@@ -373,12 +575,8 @@ import MobileNav from '../components/MobileNav.astro';
     // Tab switching
     profileTabButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
-        profileTabButtons.forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-        const targetTab = btn.dataset.tab;
-        profileTabContents.forEach((content) => {
-          content.classList.toggle('hidden', content.id !== `profile-tab-${targetTab}`);
-        });
+        switchToTab(btn.dataset.tab);
+        if (btn.dataset.tab === 'rackets') renderRacketsTab();
       });
     });
 
@@ -445,7 +643,7 @@ import MobileNav from '../components/MobileNav.astro';
                   const characteristics = Array.isArray(item.string_characteristics)
                     ? item.string_characteristics
                     : (item.string_characteristics ? JSON.parse(item.string_characteristics as string) : []);
-                  const tagsHtml = characteristics.map((tag: string) => `<span class="inventory-tag">${tag}</span>`).join(' ');
+                  const tagsHtml = characteristics.map((tag) => `<span class="inventory-tag">${tag}</span>`).join(' ');
                   const priceHtml = item.price ? `<span class="inventory-price">$${item.price}</span>` : '—';
                   return `
                     <tr>
@@ -546,7 +744,7 @@ import MobileNav from '../components/MobileNav.astro';
           const onDemo = r.active_demos > 0
             ? '<span class="demo-status--out">On Demo</span>'
             : '<span class="demo-status--available">Available</span>';
-          const imgSrc = r.image_url || getRacketImage(r.brand, r.model, r.year);
+          const imgSrc = r.image_url || getRacketImage(r.brand, r.model);
           return `
             <div class="demo-racket-card panel-pixel pixel-borders pixel-borders--1">
               <div class="demo-racket-card__inner">
