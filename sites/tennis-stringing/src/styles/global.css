@@ -8,6 +8,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Override design system hover effects on non-interactive cards */
+.service-card,
+.service-card:hover,
+.card,
+.card:hover,
+.contact-card,
+.contact-card:hover,
+.contact-header__content,
+.contact-header__content:hover,
+.queue-card,
+.queue-card:hover,
+.stringing-card,
+.stringing-card:hover {
+  transform: none !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  transition: none !important;
+  background: white;
+}
+
 /* ============================================
    Tennis Stringing Site - Site-specific styles
    ============================================ */
@@ -412,15 +431,6 @@ body {
   padding: var(--space-lg);
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition:
-    transform var(--transition-normal),
-    box-shadow var(--transition-normal);
-  cursor: pointer;
-}
-
-.service-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 .service-heading {
@@ -772,10 +782,6 @@ body {
   width: 100%;
   text-align: left;
   transition: background var(--transition-fast);
-}
-
-.profile-racket-card__header:hover {
-  background: var(--color-gray-100);
 }
 
 .profile-racket-card__header-image {

@@ -201,7 +201,7 @@ import MobileNav from '../components/MobileNav.astro';
     const ALERT_DISMISS_MS = 4000;
 
     const GENERIC_PROFILE_IMAGE = 'assets/images/profile/generic.png';
-    const PROFILE_IMAGES = ['Jason Ford.png', 'Michal Paw.png'];
+    const PROFILE_IMAGES = ['Jason Ford.png', 'Michal Paw.png', 'Grace Rust.png'];
 
     function getProfileImageForPlayer(playerName) {
       const name = (playerName || '').trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
@@ -468,14 +468,17 @@ import MobileNav from '../components/MobileNav.astro';
         const jobs = data.jobs || [];
         const readyJobs = jobs.filter((j) => j.status === 'ready_for_pickup');
         const openJobs = jobs.filter((j) => j.status === 'open' || j.status === 'queued' || j.status === 'in_queue');
-        const minQueuePosition = Math.min(...openJobs.map((j) => j.queue_position).filter(Boolean));
+        const queuedJobsWithPosition = openJobs.filter((j) => j.queue_position != null && j.queue_position > 0);
+        const minQueuePosition = queuedJobsWithPosition.length > 0
+          ? Math.min(...queuedJobsWithPosition.map((j) => j.queue_position))
+          : null;
 
         if (readyJobs.length > 0) {
           const countLabel = readyJobs.length > 1 ? ` (${readyJobs.length} racquets)` : '';
           profileJobStatus.textContent = `Ready to pick up${countLabel}`;
           profileJobStatus.className = 'profile-job-status profile-job-status--ready';
           profileJobStatus.classList.remove('hidden');
-        } else if (minQueuePosition && minQueuePosition > 0) {
+        } else if (minQueuePosition != null) {
           profileJobStatus.textContent = `Queue position: #${minQueuePosition}`;
           profileJobStatus.className = 'profile-job-status profile-job-status--queue';
           profileJobStatus.classList.remove('hidden');
