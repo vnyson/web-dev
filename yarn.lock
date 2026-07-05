@@ -11048,14 +11048,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"tennis-backup-worker@workspace:workers/backup":
-  version: 0.0.0-use.local
-  resolution: "tennis-backup-worker@workspace:workers/backup"
-  dependencies:
-    wrangler: "npm:^3.78.0"
-  languageName: unknown
-  linkType: soft
-
 "tennis-stringing-site@workspace:sites/tennis-stringing":
   version: 0.0.0-use.local
   resolution: "tennis-stringing-site@workspace:sites/tennis-stringing"
