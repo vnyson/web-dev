@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProgrammingTable from '../components/ProgrammingTable.astro';
+
+const friendSettings = {
+  title: 'Your Radio (Friend Group)',
+  rows: [
+    { label: 'Channel', value: 'GMRS 16 (462.575 MHz)' },
+    { label: 'Transmit (TX) Tone', value: '100.0 Hz (CTCSS)' },
+    { label: 'Receive (RX) Tone', value: 'OFF / NONE' },
+    { label: 'Power', value: 'High (5W)' },
+    { label: 'Squelch', value: '1 (or lowest)' },
+  ],
+};
+
+const baseSettings = {
+  title: 'Home Base Station (Stuart Ave)',
+  rows: [
+    { label: 'Channel', value: 'GMRS 16 (462.575 MHz)' },
+    { label: 'Transmit (TX) Tone', value: 'OFF / NONE' },
+    { label: 'Receive (RX) Tone', value: '100.0 Hz (CTCSS)' },
+    { label: 'Power', value: 'High (5W)' },
+    { label: 'Squelch', value: '1' },
+  ],
+};
+---
+
+<BaseLayout>
+  <div class="max-w-3xl mx-auto w-full px-4 py-8 sm:px-6 space-y-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Radio Programming Guide</h1>
+      <p class="mt-2 text-gray-600 text-sm">
+        Set your handheld radio to these settings to connect to the network.
+        The key is the <strong>split tone</strong>: your radio <em>transmits</em> with a 100.0 Hz tone
+        so the base hears you, but <em>receives</em> with no tone so you hear everything.
+      </p>
+    </div>
+
+    <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded text-sm text-amber-900">
+      <strong>⚠️ One-time check:</strong> Before programming, listen on Ch 16 for 30 seconds.
+      If you hear constant chatter, that channel may be in use in Richmond.
+      If so, pick an alternate from the <a href="#alternates" class="underline">table below</a>
+      and coordinate with the group.
+    </div>
+
+    <ProgrammingTable {...friendSettings} />
+    <ProgrammingTable {...baseSettings} />
+
+    <section id="alternates" class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="bg-gray-800 text-white font-semibold px-4 py-3 text-sm uppercase tracking-wider">
+        Alternate Channels (if Ch 16 is busy)
+      </div>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-t border-gray-200 bg-gray-50">
+            <th class="px-4 py-2 text-left font-medium text-gray-600">Channel</th>
+            <th class="px-4 py-2 text-left font-medium text-gray-600">Frequency</th>
+            <th class="px-4 py-2 text-left font-medium text-gray-600">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-t border-gray-100"><td class="px-4 py-2 font-mono">GMRS 15</td><td class="px-4 py-2 font-mono">462.550</td><td class="px-4 py-2 text-gray-600">Good alternate, less urban use</td></tr>
+          <tr class="border-t border-gray-100"><td class="px-4 py-2 font-mono">GMRS 18</td><td class="px-4 py-2 font-mono">462.625</td><td class="px-4 py-2 text-gray-600">Neutral option</td></tr>
+          <tr class="border-t border-gray-100"><td class="px-4 py-2 font-mono">GMRS 22</td><td class="px-4 py-2 font-mono">462.725</td><td class="px-4 py-2 text-gray-600">Listen first — may have local users</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded text-sm text-blue-900">
+      <strong>💡 Tip:</strong> Save these settings as a memory slot on your radio
+      so you can switch back to it easily. Most handhelds support 128+ channels.
+    </div>
+  </div>
+</BaseLayout>

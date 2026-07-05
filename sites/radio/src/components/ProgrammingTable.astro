@@ -1,0 +1,26 @@
+---
+interface Props {
+  title: string;
+  rows: { label: string; value: string }[];
+}
+
+const { title, rows } = Astro.props;
+---
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+  <div class="bg-amber-500 text-gray-900 font-semibold px-4 py-3 text-sm uppercase tracking-wider">
+    {title}
+  </div>
+  <table class="w-full text-sm">
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr class="border-t border-gray-100">
+            <td class="px-4 py-3 font-medium text-gray-700 w-1/3">{row.label}</td>
+            <td class="px-4 py-3 text-gray-900 font-mono">{row.value}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

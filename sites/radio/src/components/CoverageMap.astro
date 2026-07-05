@@ -1,0 +1,169 @@
+---
+export interface Props {
+  class?: string;
+  style?: string;
+}
+---
+
+<div id="coverage-map" class={Astro.props.class} style={Astro.props.style}></div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script>
+  import { calculateFspl, wattsToDbm } from '../../scripts/propagation.js';
+  const L = await import('leaflet');
+
+  const el = document.getElementById('coverage-map');
+  if (!el) throw new Error('Map element not found');
+  const map = L.map(el, { center: [37.555492, -77.469064], zoom: 14 });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+  // ─── Coverage calculation ─────────────────────────────────
+  // Uses FSPL + clutter with realistic thresholds
+  // 5W handheld ERP ~39 dBm. In dense urban Fan district, real-world range is ~0.3-0.8 km
+
+  function destination(lat, lon, bearingDeg, distKm) {
+    const R = 6371.0, lat1 = lat * Math.PI / 180, lon1 = lon * Math.PI / 180, b = bearingDeg * Math.PI / 180;
+    const lat2 = Math.asin(Math.sin(lat1) * Math.cos(distKm / R) + Math.cos(lat1) * Math.sin(distKm / R) * Math.cos(b));
+    const lon2 = lon1 + Math.atan2(Math.sin(b) * Math.sin(distKm / R) * Math.cos(lat1), Math.cos(distKm / R) - Math.sin(lat1) * Math.sin(lat2));
+    return { lat: lat2 * 180 / Math.PI, lng: lon2 * 180 / Math.PI };
+  }
+
+  function generateZones(txLat, txLon, txPowerDbm, clutterDb, freqMhz, maxRadiusKm) {
+    const zones = { strong: [], usable: [], fringe: [] };
+    const NUM_R = 40, NUM_B = 36;
+    for (let r = 1; r <= NUM_R; r++) {
+      const dKm = (r / NUM_R) * maxRadiusKm;
+      for (let b = 0; b < 360; b += 360 / NUM_B) {
+        const p = destination(txLat, txLon, b, dKm);
+        const fspl = calculateFspl(dKm, freqMhz);
+        const rssi = txPowerDbm - fspl - clutterDb;
+        let zone = rssi > -75 ? 'strong' : rssi > -90 ? 'usable' : rssi > -105 ? 'fringe' : null;
+        if (zone) zones[zone].push([p.lng, p.lat]);
+      }
+    }
+    return zones;
+  }
+
+  function buildContours(zones) {
+    const features = [];
+    for (const [zoneName, pts] of Object.entries(zones)) {
+      if (pts.length < 3) continue;
+      const sorted = pts.slice().sort((a, b) => a[1] - b[1] || a[0] - b[0]);
+      const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+      const lower = [];
+      for (const p of sorted) { while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop(); lower.push(p); }
+      const upper = [];
+      for (const p of sorted.reverse()) { while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop(); upper.push(p); }
+      lower.pop(); upper.pop();
+      const hull = lower.concat(upper);
+      if (hull.length < 3) continue;
+      features.push({ type: 'Feature', geometry: { type: 'Polygon', coordinates: [hull.concat([hull[0]])] }, properties: { zone: zoneName } });
+    }
+    return { type: 'FeatureCollection', features };
+  }
+
+  function recalcAll() {
+    const sPw = parseFloat(document.getElementById('simplex-power').value);
+    const sHt = parseFloat(document.getElementById('simplex-height').value);
+    const sGn = parseFloat(document.getElementById('simplex-gain').value);
+    const rPw = parseFloat(document.getElementById('repeater-power').value);
+    const rHt = parseFloat(document.getElementById('repeater-height').value);
+    const rGn = parseFloat(document.getElementById('repeater-gain').value);
+    const cl = parseFloat(document.getElementById('clutter-loss').value);
+
+    // Height adds effective gain
+    const sDbm = wattsToDbm(sPw) + sGn + 20 * Math.log10(Math.max(1, sHt / 1.5));
+    const rDbm = wattsToDbm(rPw) + rGn + 20 * Math.log10(Math.max(1, rHt / 1.5));
+
+    // Simplex: max 5km, Repeater: max 15km
+    simplexLayer.clearLayers();
+    simplexLayer.addData(buildContours(generateZones(37.555492, -77.469064, sDbm, cl, 462.575, 5.0)));
+    repeaterLayer.clearLayers();
+    repeaterLayer.addData(buildContours(generateZones(37.555492, -77.469064, rDbm, cl, 462.575, 15.0)));
+  }
+
+  // ─── Layers ───────────────────────────────────────────────
+  const simplexColors = { strong: '#2563eb', usable: '#3b82f6', fringe: '#93c5fd' };
+  const repeaterColors = { strong: '#16a34a', usable: '#22c55e', fringe: '#86efac' };
+  const styleFn = (colors) => (f) => {
+    const c = colors[f.properties.zone];
+    return { color: '#000', weight: 1, fillColor: c || 'transparent', fillOpacity: 0.35 };
+  };
+
+  const simplexLayer = L.geoJSON(null, { style: styleFn(simplexColors) }).addTo(map);
+  const repeaterLayer = L.geoJSON(null, { style: styleFn(repeaterColors) }).addTo(map);
+  const buildingsLayer = L.geoJSON(null, { style: { color: '#94a3b8', weight: 0.5, fillColor: '#cbd5e1', fillOpacity: 0.25 } }).addTo(map);
+  const reportsLayer = L.featureGroup().addTo(map);
+
+  // ─── Load initial data ────────────────────────────────────
+  fetch('/data/coverage-simplex.geojson').then(r => r.json()).then(d => simplexLayer.addData(d)).catch(() => {});
+  fetch('/data/coverage-repeater.geojson').then(r => r.json()).then(d => repeaterLayer.addData(d)).catch(() => {});
+  fetch('/data/buildings.geojson').then(r => r.json()).then(d => buildingsLayer.addData(d)).catch(() => {});
+  fetch('/data/checkpoints.json').then(r => r.json()).then(reports => {
+    for (const rpt of reports) {
+      if (!rpt.lat || !rpt.lng) continue;
+      L.marker([rpt.lat, rpt.lng], {
+        icon: L.divIcon({
+          className: '', html: `<div style="background:${rpt.quality >= 4 ? '#22c55e' : rpt.quality >= 3 ? '#eab308' : '#ef4444'};width:16px;height:16px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:bold">${rpt.quality}</div>`,
+          iconSize: [16, 16], iconAnchor: [8, 8],
+        }),
+      }).addTo(reportsLayer).bindPopup(`<b>${rpt.name || rpt.submitted_by || 'Signal Report'}</b><br>Quality: ${rpt.quality}/5`);
+    }
+  }).catch(() => {});
+
+  L.marker([37.555492, -77.469064], {
+    icon: L.divIcon({ className: '', html: '<div style="background:#dc2626;width:18px;height:18px;border-radius:50%;border:3px solid white;box-shadow:0 2px 5px rgba(0,0,0,.4)"></div>', iconSize: [18, 18], iconAnchor: [9, 9] }),
+  }).addTo(map).bindPopup('<b>Stuart Ave Base Station</b>');
+
+  // ─── Toggles ──────────────────────────────────────────────
+  function wireToggle(id, layer) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', e => e.target.checked ? map.addLayer(layer) : map.removeLayer(layer));
+  }
+  wireToggle('toggle-simplex', simplexLayer);
+  wireToggle('toggle-repeater', repeaterLayer);
+  wireToggle('toggle-buildings', buildingsLayer);
+  wireToggle('toggle-reports', reportsLayer);
+
+  // ─── Sliders ──────────────────────────────────────────────
+  function wireSlider(id, fmt) {
+    const slider = document.getElementById(id);
+    const valEl = document.getElementById(id + '-val');
+    if (!slider) return;
+    slider.addEventListener('input', () => {
+      if (valEl) valEl.textContent = fmt(parseFloat(slider.value));
+      recalcAll();
+    });
+  }
+  wireSlider('simplex-power', v => v + 'W');
+  wireSlider('simplex-height', v => v + 'm');
+  wireSlider('simplex-gain', v => v + ' dBi');
+  wireSlider('repeater-power', v => v + 'W');
+  wireSlider('repeater-height', v => v + 'm');
+  wireSlider('repeater-gain', v => v + ' dBi');
+  wireSlider('clutter-loss', v => v + ' dB');
+
+  const recalcBtn = document.getElementById('recalculate-coverage');
+  if (recalcBtn) recalcBtn.addEventListener('click', recalcAll);
+
+  // ─── Collapsible panels ──────────────────────────────────
+  function setupCollapsible(btnId, panelId, chevronId) {
+    const btn = document.getElementById(btnId);
+    const panel = document.getElementById(panelId);
+    const chevron = document.getElementById(chevronId);
+    if (btn && panel) {
+      btn.addEventListener('click', () => {
+        panel.classList.toggle('hidden');
+        if (chevron) chevron.classList.toggle('rotate-180');
+      });
+    }
+  }
+  setupCollapsible('toggle-hw-settings', 'hw-settings-panel', 'hw-chevron');
+  setupCollapsible('toggle-channel-settings', 'channel-settings-panel', 'channel-chevron');
+
+  setTimeout(() => map.invalidateSize(), 200);
+</script>
+
+<style>
+  #coverage-map { width: 100%; height: 100%; min-height: 400px; }
+</style>

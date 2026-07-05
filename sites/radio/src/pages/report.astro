@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout>
+  <div class="max-w-xl mx-auto w-full px-4 py-8 sm:px-6">
+    <h1 class="text-2xl font-bold text-gray-900">Report Your Signal</h1>
+    <p class="mt-2 text-sm text-gray-600">
+      Tell us where you were and how well you connected to the network.
+      Reports get merged into the map so everyone knows what to expect.
+    </p>
+
+    <form
+      action="https://formspree.io/f/YOUR_FORM_ID"
+      method="POST"
+      class="mt-6 space-y-5"
+    >
+      <!-- ⚠️ Replace YOUR_FORM_ID above with your actual Formspree form ID -->
+
+      <!-- Location -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Your approximate location</label>
+        <p class="text-xs text-gray-500 mb-2">Drop a pin on the map or enter coordinates manually.</p>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500">Latitude</label>
+            <input type="text" name="lat" placeholder="e.g. 37.5483" class="mt-1 block w-full rounded border-gray-300 border px-3 py-2 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500" />
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500">Longitude</label>
+            <input type="text" name="lng" placeholder="e.g. -77.4602" class="mt-1 block w-full rounded border-gray-300 border px-3 py-2 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500" />
+          </div>
+        </div>
+        <p class="text-xs text-gray-400 mt-1">
+          Find your coordinates: <a href="https://what3words.com" target="_blank" class="underline">what3words</a> or drop a pin in Google Maps.
+        </p>
+      </div>
+
+      <!-- Quality -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Signal quality</label>
+        <select name="quality" class="mt-1 block w-full rounded border-gray-300 border px-3 py-2 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500">
+          <option value="">Select...</option>
+          <option value="5">5 — Crystal clear, full quieting</option>
+          <option value="4">4 — Clear with slight static</option>
+          <option value="3">3 — Readable with moderate noise</option>
+          <option value="2">2 — Barely readable, heavy static</option>
+          <option value="1">1 — Unusable</option>
+        </select>
+      </div>
+
+      <!-- Notes -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Notes (optional)</label>
+        <textarea name="notes" rows="3" placeholder="e.g. Was behind a brick building, signal was weaker than expected." class="mt-1 block w-full rounded border-gray-300 border px-3 py-2 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500"></textarea>
+      </div>
+
+      <!-- Name -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Your name (optional)</label>
+        <input type="text" name="submitted_by" placeholder="e.g. Alex" class="mt-1 block w-full rounded border-gray-300 border px-3 py-2 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500" />
+      </div>
+
+      <button type="submit" class="w-full px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-medium hover:bg-amber-400 transition">
+        📡 Submit Report
+      </button>
+    </form>
+
+    <p class="mt-4 text-xs text-gray-400 text-center">
+      Reports are manually reviewed and merged. They won't appear on the map immediately.
+    </p>
+  </div>
+</BaseLayout>

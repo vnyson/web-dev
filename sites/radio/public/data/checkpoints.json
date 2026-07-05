@@ -1,0 +1,34 @@
+[
+  {
+    "lat": 37.5495,
+    "lng": -77.4650,
+    "quality": 5,
+    "notes": "Scuffletown Park — corner of Strawberry & Park. Crystal clear, full quieting.",
+    "submitted_by": "Baseline",
+    "date": "Phase 1A"
+  },
+  {
+    "lat": 37.5510,
+    "lng": -77.4550,
+    "quality": 4,
+    "notes": "Robinson St near Joe's Inn. Clear with slight static.",
+    "submitted_by": "Baseline",
+    "date": "Phase 1A"
+  },
+  {
+    "lat": 37.5600,
+    "lng": -77.4650,
+    "quality": 3,
+    "notes": "Science Museum of Virginia — Broad St Lawn. Readable with moderate noise.",
+    "submitted_by": "Baseline",
+    "date": "Phase 1A"
+  },
+  {
+    "lat": 37.5650,
+    "lng": -77.4500,
+    "quality": 2,
+    "notes": "The Diamond parking lot. Barely readable, heavy static — fringe limit.",
+    "submitted_by": "Baseline",
+    "date": "Phase 1A"
+  }
+]

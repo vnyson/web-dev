@@ -1,0 +1,42 @@
+{
+  "simplex": {
+    "transmitter": {
+      "lat": 37.555492,
+      "lng": -77.469064,
+      "height_m": 1.5,
+      "radio_id": "tidradio_h3",
+      "frequency_mhz": 462.575
+    },
+    "receiver": {
+      "height_m": 1.5,
+      "indoor": false
+    },
+    "coverage": {
+      "radius_km": 1.6,
+      "grid_spacing_m": 50
+    },
+    "output": {
+      "file": "../public/data/coverage-simplex.geojson"
+    }
+  },
+  "repeater": {
+    "transmitter": {
+      "lat": 37.555492,
+      "lng": -77.469064,
+      "height_m": 12.0,
+      "radio_id": "midland_mxt575",
+      "frequency_mhz": 462.575
+    },
+    "receiver": {
+      "height_m": 1.5,
+      "indoor": false
+    },
+    "coverage": {
+      "radius_km": 3.0,
+      "grid_spacing_m": 50
+    },
+    "output": {
+      "file": "../public/data/coverage-repeater.geojson"
+    }
+  }
+}
