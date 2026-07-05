@@ -1,0 +1,43 @@
+name: Deploy Radio App to Cloudflare Pages
+
+on:
+  push:
+    paths:
+      - 'sites/radio/**'
+      - 'packages/design-system/**'
+      - '.github/workflows/deploy-radio.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy-radio:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    name: Deploy Radio App to Cloudflare Pages
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Yarn
+        run: corepack enable && corepack prepare yarn@4.5.0 --activate
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build radio app
+        run: yarn build --filter=radio
+
+      - name: Deploy Radio App to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ vars.CLOUDFLARE_RADIO_PROJECT_NAME || 'radio' }}
+          directory: sites/radio/dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
