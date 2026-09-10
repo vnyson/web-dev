@@ -14,6 +14,8 @@
     "build:site": "turbo run build --filter=tennis-stringing-site",
     "build:admin": "turbo run build --filter=admin",
     "dev": "turbo run dev",
+    "start:dev": "turbo run dev --filter=tennis-stringing-site --filter=admin --filter=tennis-admin-api",
+    "setup:local": "yarn workspace tennis-admin-api d1:site-settings:local",
     "lint": "eslint 'sites/**/*/*.js' && stylelint 'packages/**/*.css' 'sites/**/*.css' && htmlhint 'sites/**/*.html'",
     "lint:css": "stylelint 'packages/**/*.css' 'sites/**/*.css'",
     "lint:html": "htmlhint 'sites/**/*.html'",

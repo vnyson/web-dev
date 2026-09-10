@@ -129,6 +129,29 @@ body {
   min-width: 200px;
 }
 
+.site-message {
+  width: 100%;
+  max-width: 34rem;
+  margin: var(--space-sm) 0 0;
+  padding: var(--space-sm);
+  color: #fffaf4;
+  --pb-background-color: #9a6b4a;
+  --pb-border-color: #70452d;
+  --pb-border-inset-highlight-color: #bc8d69;
+  --pb-border-inset-shadow-color: #7b5036;
+  background: var(--pb-background-color);
+  border-image-source: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9"><path d="M1 1h1v1H1zM2 0h1v1H2zM0 2h1v1H0zM3 0h3v1H3zM0 3h1v4H0zM1 7h1v1H1zM2 8h1v1H2zM3 8h4v1H3zM7 7h1v1H7zM7 1h1v1H7zM8 2h1v1H8zM8 3h1v3H8z" fill="%2370452d" /></svg>');
+  font-family: var(--font-family-brand);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  box-shadow: 0 3px 14px rgba(112, 69, 45, 0.24);
+}
+
+.site-message[hidden] {
+  display: none;
+}
+
 /* Mobile Section */
 .mobile-section {
   display: none;

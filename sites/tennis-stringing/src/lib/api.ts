@@ -8,6 +8,11 @@ export interface QueueStatus {
   count: number;
 }
 
+export interface SiteSettings {
+  message: string;
+  showMessage: boolean;
+}
+
 export interface Player {
   id: string;
   name: string;
@@ -95,6 +100,12 @@ export interface PlayerByTokenResponse {
 export async function fetchQueueStatus(): Promise<QueueStatus> {
   const response = await fetch(`${API_URL}/api/queue-status`);
   if (!response.ok) throw new Error('Failed to fetch queue status');
+  return response.json();
+}
+
+export async function fetchSiteSettings(): Promise<SiteSettings> {
+  const response = await fetch(`${API_URL}/api/site-settings`);
+  if (!response.ok) throw new Error('Failed to fetch site settings');
   return response.json();
 }
 

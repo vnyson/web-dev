@@ -128,12 +128,68 @@ import { fetchPlayers, fetchStringing, fetchInventory } from '../lib/api';
 							</div>
 						</div>
 					</div>
+
+					<div class="bg-white shadow rounded-lg mt-6">
+						<div class="px-4 py-5 sm:p-6">
+							<h3 class="text-lg leading-6 font-medium text-gray-900">Public Site Message</h3>
+							<p class="mt-1 text-sm text-gray-500">Show a short message in the RVA Racket Services section.</p>
+							<form id="site-message-form" class="mt-4 space-y-4">
+								<div>
+									<label for="site-message" class="block text-sm font-medium text-gray-700">Message</label>
+									<textarea id="site-message" maxlength="500" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+								</div>
+								<label class="flex items-center gap-2 text-sm text-gray-700">
+									<input id="site-message-visible" type="checkbox" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+									<span>Show this message publicly</span>
+								</label>
+								<div class="flex items-center gap-3">
+									<button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">Save Message</button>
+									<span id="site-message-status" class="text-sm" role="status"></span>
+								</div>
+							</form>
+						</div>
+					</div>
 				</div>
 			</main>
 		</div>
 
 		<script>
-			import { fetchPlayers, fetchStringing, fetchInventory } from '../lib/api';
+			import { fetchPlayers, fetchStringing, fetchInventory, fetchSiteSettings, saveSiteSettings } from '../lib/api';
+
+			const siteMessageForm = document.getElementById('site-message-form') as HTMLFormElement;
+			const siteMessageInput = document.getElementById('site-message') as HTMLTextAreaElement;
+			const siteMessageVisible = document.getElementById('site-message-visible') as HTMLInputElement;
+			const siteMessageStatus = document.getElementById('site-message-status') as HTMLSpanElement;
+
+			async function loadSiteSettings() {
+				try {
+					const settings = await fetchSiteSettings();
+					siteMessageInput.value = settings.message;
+					siteMessageVisible.checked = settings.showMessage;
+				} catch (error) {
+					console.error('Failed to load site message:', error);
+					siteMessageStatus.textContent = 'Could not load message settings.';
+					siteMessageStatus.className = 'text-sm text-red-600';
+				}
+			}
+
+			siteMessageForm.addEventListener('submit', async (event) => {
+				event.preventDefault();
+				const message = siteMessageInput.value.trim();
+				const showMessage = siteMessageVisible.checked && message.length > 0;
+				try {
+					await saveSiteSettings({ message, showMessage });
+					siteMessageVisible.checked = showMessage;
+					siteMessageStatus.textContent = 'Message saved.';
+					siteMessageStatus.className = 'text-sm text-green-600';
+				} catch (error) {
+					console.error('Failed to save site message:', error);
+					siteMessageStatus.textContent = 'Could not save message.';
+					siteMessageStatus.className = 'text-sm text-red-600';
+				}
+			});
+
+			loadSiteSettings();
 
 			async function loadDashboardData() {
 				try {

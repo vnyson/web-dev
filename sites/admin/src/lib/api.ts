@@ -63,8 +63,31 @@ export function getAuthHeaders(): HeadersInit {
   return headers;
 }
 
+export interface SiteSettings {
+  message: string;
+  showMessage: boolean;
+}
+
 // Export auth helpers for use in components
 export { getAuthToken, setAuthToken, clearAuthToken };
+
+export async function fetchSiteSettings(): Promise<SiteSettings> {
+  const response = await fetch(`${getApiUrl()}/api/site-settings`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Failed to fetch site settings');
+  return response.json();
+}
+
+export async function saveSiteSettings(settings: SiteSettings) {
+  const response = await fetch(`${getApiUrl()}/api/site-settings`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(settings),
+  });
+  if (!response.ok) throw new Error('Failed to save site settings');
+  return response.json();
+}
 
 export async function fetchPlayers() {
   const response = await fetch(`${getApiUrl()}/api/players`, {
