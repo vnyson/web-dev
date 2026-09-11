@@ -12,7 +12,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'node test/server.cjs',
+    command: 'yarn workspace tennis-stringing-site build && node test/server.cjs',
     url: 'http://localhost:8080',
     reuseExistingServer: !process.env.CI,
     timeout: 15000,

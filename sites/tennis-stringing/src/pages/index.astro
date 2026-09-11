@@ -30,6 +30,11 @@ import MobileNav from '../components/MobileNav.astro';
           <h2 class="contact-header__title">rva racket services</h2>
           <p class="contact-header__info">vinay soni</p>
           <p class="contact-header__info">817 798 3062</p>
+          <p
+            class="site-message site-message--mobile panel-pixel pixel-borders pixel-borders--2 pixel-borders--inset pixel-borders--inset-all"
+            data-site-message
+            hidden
+          ></p>
         </div>
       </div>
     </section>
@@ -97,7 +102,7 @@ import MobileNav from '../components/MobileNav.astro';
 </BaseLayout>
 
 <script>
-  import { fetchQueueStatus, verifyPlayer, loadPlayerByToken, updatePlayer, updateRacket, fetchInventory, fetchDemoRackets } from '../lib/api';
+  import { fetchQueueStatus, fetchSiteSettings, verifyPlayer, loadPlayerByToken, updatePlayer, updateRacket, fetchInventory, fetchDemoRackets } from '../lib/api';
   import { updateQueueDisplayElements } from '../lib/queue-display';
   import { getRacketImage, RACKET_INVENTORY_SLOTS } from '../lib/racket-images';
 
@@ -107,6 +112,16 @@ import MobileNav from '../components/MobileNav.astro';
       : 'https://tennis-admin-api.vnyson.workers.dev';
 
   document.addEventListener('DOMContentLoaded', () => {
+    fetchSiteSettings()
+      .then(({ message, showMessage }) => {
+        document.querySelectorAll<HTMLElement>('[data-site-message]').forEach((element) => {
+          const visible = showMessage && message.trim().length > 0;
+          element.textContent = visible ? message : '';
+          element.hidden = !visible;
+        });
+      })
+      .catch(() => {});
+
     // Queue Data Fetching
     const queueImages = document.querySelectorAll('.queue-image');
     const queueTexts = document.querySelectorAll('.queue-text');

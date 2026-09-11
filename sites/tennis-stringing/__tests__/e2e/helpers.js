@@ -21,6 +21,7 @@ import {
  * @param {object} [options.playerVerifyCollision] - Response for collision
  * @param {object} [options.inventory] - Override inventory response
  * @param {object} [options.playerUpdate] - Response for profile update
+ * @param {object} [options.siteSettings] - Override public site message response
  */
 export async function setupApiMocks(page, options = {}) {
   const {
@@ -36,6 +37,7 @@ export async function setupApiMocks(page, options = {}) {
     playerVerifyCollision = { multiple: true },
     inventory = MOCK_INVENTORY,
     playerUpdate = { success: true },
+    siteSettings = { message: '', showMessage: false },
   } = options;
 
   // Intercept all /api/ requests
@@ -50,6 +52,15 @@ export async function setupApiMocks(page, options = {}) {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(queueStatus),
+      });
+    }
+
+    // Public site settings
+    if (path.endsWith('/api/site-settings') && method === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(siteSettings),
       });
     }
 

@@ -56,6 +56,18 @@ test.describe('Responsive Layout', () => {
     await expect(contactInfo.first()).toBeVisible();
   });
 
+  test('desktop contact card shows the public site message when enabled', async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await setupApiMocks(page, {
+      siteSettings: { message: 'Taking drop-offs this week.', showMessage: true },
+    });
+    await navigateToSite(page);
+
+    await expect(page.locator('.desktop-section [data-site-message]')).toHaveText(
+      'Taking drop-offs this week.',
+    );
+  });
+
   test('mobile contact section shows business info', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await setupApiMocks(page);
@@ -65,5 +77,17 @@ test.describe('Responsive Layout', () => {
     const mobileContactHeader = page.locator('.mobile-section .contact-header__content');
     await expect(mobileContactHeader).toBeVisible();
     await expect(mobileContactHeader).toContainText('rva racket services');
+  });
+
+  test('mobile contact section shows the public site message when enabled', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await setupApiMocks(page, {
+      siteSettings: { message: 'Taking drop-offs this week.', showMessage: true },
+    });
+    await navigateToSite(page);
+
+    await expect(page.locator('.mobile-section [data-site-message]')).toHaveText(
+      'Taking drop-offs this week.',
+    );
   });
 });

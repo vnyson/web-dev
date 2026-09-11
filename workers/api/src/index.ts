@@ -515,6 +515,75 @@ async function handleQueueStatus(
   });
 }
 
+export async function handleSiteSettings(
+  request: Request,
+  env: Env,
+  corsHeaders: HeadersInit,
+): Promise<Response> {
+  if (request.method === 'GET') {
+    const result = await env.DB.prepare(
+      'SELECT public_message, show_public_message FROM site_settings WHERE id = 1',
+    ).first();
+    const settings = result || { public_message: '', show_public_message: 0 };
+    return new Response(
+      JSON.stringify({
+        message: settings.public_message || '',
+        showMessage: settings.show_public_message === 1 || settings.show_public_message === true,
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    );
+  }
+
+  if (request.method !== 'PUT') {
+    return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+  }
+
+  const isAdmin = await validateAdminSession(request, env);
+  if (!isAdmin) {
+    return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+  }
+
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (typeof body.message !== 'string' || typeof body.showMessage !== 'boolean') {
+    return new Response(JSON.stringify({ error: 'message and showMessage are required' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const message = body.message.trim();
+  if (message.length > 500) {
+    return new Response(JSON.stringify({ error: 'message must be 500 characters or fewer' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  await env.DB.prepare(
+    `INSERT INTO site_settings (id, public_message, show_public_message, updated_at)
+     VALUES (1, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET
+       public_message = excluded.public_message,
+       show_public_message = excluded.show_public_message,
+       updated_at = excluded.updated_at`,
+  )
+    .bind(message, body.showMessage && message ? 1 : 0, new Date().toISOString())
+    .run();
+
+  return new Response(JSON.stringify({ success: true }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     try {
@@ -571,6 +640,9 @@ export default {
       }
       if (path === '/api/queue-status') {
         return handleQueueStatus(request, env, corsHeaders);
+      }
+      if (path === '/api/site-settings') {
+        return handleSiteSettings(request, env, corsHeaders);
       }
       if (path.startsWith('/api/demo-sessions')) {
         return handleDemoSessions(request, env, corsHeaders);

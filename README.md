@@ -48,7 +48,20 @@ yarn build
 
 # Start all dev servers
 yarn dev
+
+# Start the tennis public site, admin, and API together
+yarn start:dev
+
+# Initialize the local site-settings table used by the public message
+yarn setup:local
 ```
+
+The local services run at `http://localhost:8080` (public site),
+`http://localhost:4321` (admin), and `http://127.0.0.1:8787` (API). The public
+site automatically uses the local API when opened on localhost. The full
+historical D1 migration command may fail against an already-seeded local
+database because some older migrations are not recorded consistently; use
+`yarn setup:local` for the site message table.
 
 ## Code Quality
 

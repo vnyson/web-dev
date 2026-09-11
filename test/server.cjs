@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const root = path.join(__dirname, '..', 'sites', 'tennis-stringing');
+const root = path.join(__dirname, '..', 'sites', 'tennis-stringing', 'dist');
 const port = 8080;
 
 const MIME_TYPES = {
@@ -13,6 +13,8 @@ const MIME_TYPES = {
   '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.ttf': 'font/ttf',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
   '.json': 'application/json',
 };
 
