@@ -293,9 +293,8 @@ import { fetchStringing, getAuthToken } from '../lib/api';
 				}
 			}
 
-			async function editJob(jobId) {
-				// Redirect to edit page (to be implemented)
-				window.location.href = `/jobs/edit/${jobId}`;
+			function editJob(jobId: string) {
+				window.location.href = `/jobs/edit?id=${encodeURIComponent(jobId)}`;
 			}
 
 			async function deleteJob(jobId) {
