@@ -1,0 +1,154 @@
+---
+import '../../styles/global.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Edit Job - Tennis Admin</title>
+  </head>
+  <body class="bg-gray-50">
+    <main class="min-h-screen max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <a href="/jobs" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">&larr; Back to Jobs</a>
+      <h1 class="mt-4 text-2xl font-bold text-gray-900">Edit Stringing Job</h1>
+      <p id="job-summary" class="mt-2 text-sm text-gray-600"></p>
+
+      <p id="loading" class="mt-6 text-sm text-gray-600" role="status">Loading job...</p>
+      <div id="error" class="mt-6 rounded-md bg-red-50 p-4 text-sm text-red-700" role="alert" hidden></div>
+      <p id="success" class="mt-6 rounded-md bg-green-50 p-4 text-sm text-green-700" role="status" hidden></p>
+
+      <form id="job-form" class="mt-6 space-y-6 rounded-lg bg-white p-6 shadow" hidden>
+        <div>
+          <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+          <select id="status" name="status" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <option value="in_queue">In queue</option>
+            <option value="queued">Queued</option>
+            <option value="ready_for_pickup">Ready for pickup</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <label for="strung-at" class="block text-sm font-medium text-gray-700">Strung at</label>
+            <input id="strung-at" name="strung_at" type="datetime-local" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label for="picked-up-at" class="block text-sm font-medium text-gray-700">Picked up at</label>
+            <input id="picked-up-at" name="picked_up_at" type="datetime-local" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+          </div>
+        </div>
+
+        <div>
+          <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+          <textarea id="notes" name="notes" rows="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+        </div>
+
+        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <a href="/jobs" class="inline-flex justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</a>
+          <button id="save-job" type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Save changes</button>
+        </div>
+      </form>
+    </main>
+
+    <script>
+      import { fetchStringing, getAuthToken, updateStringingJob } from '../../lib/api';
+
+      const jobForm = document.getElementById('job-form') as HTMLFormElement;
+      const loadingMessage = document.getElementById('loading')!;
+      const errorMessage = document.getElementById('error')!;
+      const jobSummary = document.getElementById('job-summary')!;
+      const saveButton = document.getElementById('save-job') as HTMLButtonElement;
+      const jobId = new URLSearchParams(window.location.search).get('id');
+
+      function showError(message: string) {
+        errorMessage.textContent = message;
+        errorMessage.hidden = false;
+      }
+
+      function toLocalDateTime(value: string | null | undefined): string {
+        if (!value) return '';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+
+        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+        return localDate.toISOString().slice(0, 16);
+      }
+
+      function toIsoDateTime(value: FormDataEntryValue | null): string | null {
+        if (typeof value !== 'string' || !value) return null;
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date.toISOString();
+      }
+
+      async function loadJob() {
+        if (!getAuthToken()) {
+          window.location.href = '/login';
+          return;
+        }
+
+        if (!jobId) {
+          loadingMessage.hidden = true;
+          showError('No job was selected. Return to Jobs and choose a job to edit.');
+          return;
+        }
+
+        try {
+          const jobs = await fetchStringing();
+          const job = jobs.find((item: { id: string }) => item.id === jobId);
+          if (!job) throw new Error('Job not found');
+
+          const statusSelect = document.getElementById('status') as HTMLSelectElement;
+          if (![...statusSelect.options].some((option) => option.value === job.status)) {
+            const existingStatus = document.createElement('option');
+            existingStatus.value = job.status;
+            existingStatus.textContent = job.status;
+            statusSelect.append(existingStatus);
+          }
+          statusSelect.value = job.status || 'queued';
+          (document.getElementById('strung-at') as HTMLInputElement).value = toLocalDateTime(job.strung_at);
+          (document.getElementById('picked-up-at') as HTMLInputElement).value = toLocalDateTime(job.picked_up_at);
+          (document.getElementById('notes') as HTMLTextAreaElement).value = job.notes || '';
+          jobSummary.textContent = `${job.player_name || job.player_id || 'Unknown player'} · ${job.racquet || 'Racket not specified'}`;
+          jobForm.hidden = false;
+          loadingMessage.hidden = true;
+        } catch (error) {
+          console.error('Failed to load job for editing:', error);
+          loadingMessage.hidden = true;
+          showError('Unable to load this job. Return to Jobs and try again.');
+        }
+      }
+
+      jobForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!jobId) return;
+
+        const formData = new FormData(jobForm);
+        errorMessage.hidden = true;
+        saveButton.disabled = true;
+        saveButton.textContent = 'Saving…';
+
+        try {
+          await updateStringingJob(jobId, {
+            status: formData.get('status'),
+            strung_at: toIsoDateTime(formData.get('strung_at')),
+            picked_up_at: toIsoDateTime(formData.get('picked_up_at')),
+            notes: formData.get('notes'),
+          });
+          window.location.assign('/jobs');
+        } catch (error) {
+          console.error('Failed to save job:', error);
+          showError('Unable to save changes. Your edits are still here; please try again.');
+          saveButton.disabled = false;
+          saveButton.textContent = 'Save changes';
+        }
+      });
+
+      loadJob();
+    </script>
+  </body>
+</html>

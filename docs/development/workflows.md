@@ -22,6 +22,7 @@ The public site, admin, and API packages also have their own `dev` scripts. See 
 - `yarn format:check` / `yarn format` — check formatting or format with Prettier. Prefer the check during validation.
 - `yarn test --run` — run Vitest tests discovered by the root config.
 - `yarn test:e2e` — run Playwright tests; see [Playwright config](../../playwright.config.ts) and tennis E2E tests.
+- `yarn test:e2e:admin` — run admin browser tests with the admin-specific [Playwright config](../../playwright.admin.config.ts).
 
 Run the narrowest relevant test first, then affected workspace builds and formatting. Tests can have side effects or require browser setup; inspect configuration and report skipped checks accurately.
 

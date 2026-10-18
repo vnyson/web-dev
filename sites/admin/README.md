@@ -47,9 +47,12 @@ See the [architecture overview](../../docs/architecture/overview.md) for data fl
 
 - Dashboard for active jobs, inventory, and players.
 - Inventory and stringing-job management.
+- Job status, stringed/pickup timestamps, and notes can be edited from the Jobs workflow.
 - Player profiles and racket information.
 - Site settings and player-facing services.
 
 ## Deployment
 
 The repository has GitHub Actions workflows for Pages and Worker deployment. Review [development and deployment workflows](../../docs/development/workflows.md#ci-and-deployment) and the applicable workflow under `.github/workflows/` before relying on deployment behavior or triggering a deployment.
+
+Run focused admin browser tests from the repository root with `yarn test:e2e:admin`.
