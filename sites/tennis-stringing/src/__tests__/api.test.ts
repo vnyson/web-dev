@@ -153,14 +153,19 @@ describe('fetchInventory', () => {
   });
 
   it('fetches inventory successfully', async () => {
-    const mockData = [{ id: '1', name: 'String', category: 'string' }];
+    const mockData = [
+      { id: '1', name: 'Available string', category: 'string', quantity: 2 },
+      { id: '2', name: 'Out of stock string', category: 'string', quantity: 0 },
+      { id: '3', name: 'Zero string quantity', category: 'string', quantity: '0' },
+      { id: '4', name: 'Legacy item', category: 'other' },
+    ];
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       json: async () => mockData,
     });
 
     const result = await fetchInventory();
-    expect(result).toEqual(mockData);
+    expect(result).toEqual([mockData[0]]);
   });
 
   it('throws when fetch fails', async () => {
