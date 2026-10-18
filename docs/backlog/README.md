@@ -8,7 +8,7 @@ This is the maintained queue for ideas and feature work that should be captured 
 - **Refine:** Gather relevant codebase context and evidence, clarify user outcome and acceptance criteria, and resolve blocking decisions. Keep early ideas in `Idea` or `Refining` until the Ready checklist is met.
 - **Pull:** When asked to work on a card, read the entire card and re-open its linked source, tests, configs, docs, and dependencies. Card context can go stale; runtime source and tests remain authoritative. If the card is ambiguous or materially stale, stop implementation, update/refine the card, and ask for confirmation if a product decision is needed.
 - **Deliver:** Move the card to `In progress`; use a lightweight implementation plan from [`../templates/implementation-plan.md`](../templates/implementation-plan.md) when work crosses files/workspaces or has meaningful data, security, rollout, or dependency risks. Keep implementation scope within the card unless the user approves a change.
-- **Close:** On completion, update status and date, summarize what was actually delivered, link relevant changes/decisions, and record checks run and deferred items. Do not leave uncompleted acceptance criteria checked.
+- **Close:** On completion, update status and date, summarize what was actually delivered, link relevant changes/decisions, and record checks run and deferred items. Do not leave uncompleted acceptance criteria checked. Move `Done` cards into [`archive/`](archive/README.md) and update both indexes. Keep `Dropped` cards in the closed section here unless a future policy says otherwise.
 
 For a one-off request that the user wants implemented now, follow the repository workflow without creating a backlog card unless the user asks to capture it or an existing card is being pulled.
 
@@ -57,8 +57,10 @@ Create one row per card and update the index in the same change as card creation
 
 ### Closed cards
 
-Keep `Done` and `Dropped` cards linked here for traceability. Move a row from Open to Closed when its status changes.
+Keep `Dropped` cards linked here for traceability. `Done` cards are moved to the archive; keep their links here so IDs and completion history remain searchable. Move a row from Open to Closed when its status changes.
 
-| ID      | Status | Card                                                                                | Updated    |
-| ------- | ------ | ----------------------------------------------------------------------------------- | ---------- |
-| BL-0004 | Done   | [Keep job editing within the selected job flow](BL-0004-fix-job-edit-navigation.md) | 2026-10-18 |
+| ID      | Status | Card                                                                                        | Updated    |
+| ------- | ------ | ------------------------------------------------------------------------------------------- | ---------- |
+| BL-0004 | Done   | [Keep job editing within the selected job flow](archive/BL-0004-fix-job-edit-navigation.md) | 2026-10-18 |
+
+See the [archive index](archive/README.md) for completed cards.

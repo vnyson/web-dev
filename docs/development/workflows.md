@@ -16,9 +16,9 @@ The public site, admin, and API packages also have their own `dev` scripts. See 
 - `yarn build` — build workspaces through Turbo.
 - `yarn build:site` — build the public site through the `tennis-stringing-site` Turbo filter.
 - `yarn build:admin` — build the admin through the `admin` Turbo filter.
-- `yarn lint` — lint JavaScript under `sites`, CSS, and HTML; it does not comprehensively lint Astro or TypeScript.
-- `yarn lint:css` — lint CSS in packages and sites.
-- `yarn lint:html` — lint HTML files under sites.
+- `yarn lint` — lint JavaScript, CSS, and HTML under the admin and tennis-stringing workspaces; it does not comprehensively lint Astro or TypeScript.
+- `yarn lint:css` — lint CSS in packages, admin, and tennis-stringing.
+- `yarn lint:html` — lint HTML under admin and tennis-stringing.
 - `yarn format:check` / `yarn format` — check formatting or format with Prettier. Prefer the check during validation.
 - `yarn test --run` — run Vitest tests discovered by the root config.
 - `yarn test:e2e` — run Playwright tests; see [Playwright config](../../playwright.config.ts) and tennis E2E tests.
@@ -28,6 +28,6 @@ Run the narrowest relevant test first, then affected workspace builds and format
 
 ## CI and deployment
 
-The current [CI workflow](../../.github/workflows/ci.yml) runs `yarn format:check`, `yarn lint`, and `yarn build`; it does not run Vitest or Playwright. Deployment workflows are separate: [public Pages](../../.github/workflows/deploy-cloudflare.yml), [admin Pages](../../.github/workflows/deploy-admin.yml), [Worker](../../.github/workflows/deploy-workers.yml), plus preview and npm publishing workflows. Read the applicable workflow before documenting or triggering deployment.
+The current [CI workflow](../../.github/workflows/ci.yml) runs `yarn format:check`, `yarn lint`, and `yarn build`; it does not run Vitest or Playwright. A lightweight scope-detection job skips those checks for pull requests that change only `sites/radio/**` and/or `db/migrations/radio/**`; mixed pull requests still run CI, but radio paths are excluded from root Prettier and lint globs. The root build runs registered Yarn/Turbo workspaces only; `sites/radio` is not a configured workspace. Deployment workflows are separate: [public Pages](../../.github/workflows/deploy-cloudflare.yml), [admin Pages](../../.github/workflows/deploy-admin.yml), [Worker](../../.github/workflows/deploy-workers.yml), plus preview and npm publishing workflows. Read the applicable workflow before documenting or triggering deployment.
 
 The public Pages workflow currently uploads `sites/tennis-stringing` after building rather than the apparent Astro `dist` output directory. Do not assume the deployed artifact configuration is correct or describe the target as settled without verifying Cloudflare project settings and workflow intent. This documentation records observed configuration, not a deployment fix.
