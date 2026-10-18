@@ -8,6 +8,7 @@ import {
   createStringingJob,
   updateStringingJob,
   createInventoryItem,
+  deleteInventoryItem,
   updateInventoryItem,
 } from '../lib/api';
 
@@ -381,6 +382,20 @@ describe('API Client - Inventory', () => {
 
     await expect(updateInventoryItem('1', { quantity: 5 })).rejects.toThrow(
       'Failed to update inventory item',
+    );
+  });
+
+  it('should surface the server message when inventory deletion is blocked', async () => {
+    (global.fetch as any).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({
+        error: 'inventory_item_in_use',
+        message: 'This item has stringing consumption history and cannot be deleted.',
+      }),
+    });
+
+    await expect(deleteInventoryItem('inventory-1')).rejects.toThrow(
+      'This item has stringing consumption history and cannot be deleted.',
     );
   });
 });

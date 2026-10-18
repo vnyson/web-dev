@@ -1554,7 +1554,38 @@ export async function handleInventory(
         return new Response('Unauthorized', { status: 401, headers: corsHeaders });
       }
 
-      await env.DB.prepare('DELETE FROM inventory WHERE id = ?').bind(id).run();
+      const consumption = await env.DB.prepare(
+        'SELECT COUNT(*) AS count FROM inventory_consumption WHERE inventory_id = ?',
+      )
+        .bind(id)
+        .first();
+
+      if (consumption?.count > 0) {
+        return new Response(
+          JSON.stringify({
+            error: 'inventory_item_in_use',
+            message: 'This item has stringing consumption history and cannot be deleted.',
+          }),
+          { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
+      }
+
+      try {
+        await env.DB.prepare('DELETE FROM inventory WHERE id = ?').bind(id).run();
+      } catch (error: any) {
+        const detail = error?.message || String(error);
+        if (/FOREIGN KEY constraint failed|SQLITE_CONSTRAINT_FOREIGNKEY/i.test(detail)) {
+          return new Response(
+            JSON.stringify({
+              error: 'inventory_item_in_use',
+              message: 'This item has related history and cannot be deleted.',
+            }),
+            { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+          );
+        }
+        throw error;
+      }
+
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

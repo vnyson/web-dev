@@ -176,7 +176,10 @@ export async function deleteInventoryItem(id: string) {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
-  if (!response.ok) throw new Error('Failed to delete inventory item');
+  if (!response.ok) {
+    const error = await response.json().catch(() => null);
+    throw new Error(error?.message || 'Failed to delete inventory item');
+  }
   return response.json();
 }
 

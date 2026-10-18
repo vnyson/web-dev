@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { handlePlayers, handleStringing, handleInventory, handleHistory } from '../index';
 
 // Mock crypto.randomUUID
-global.crypto = {
+vi.stubGlobal('crypto', {
   randomUUID: vi.fn(() => 'test-uuid-123'),
-} as any;
+});
 
 // Mock D1 database
 const mockDB = {
@@ -224,19 +224,85 @@ describe('API - Inventory', () => {
     expect(data).toEqual({ success: true });
   });
 
-  it('should delete an inventory item', async () => {
-    mockDB.prepare.mockReturnValue({
-      bind: vi.fn(() => ({
-        run: vi.fn(() => Promise.resolve({ success: true })),
-      })),
+  it('deletes an authorized inventory item when it has no consumption history', async () => {
+    const statements: string[] = [];
+    mockDB.prepare.mockImplementation((sql: string) => {
+      statements.push(sql);
+      return {
+        bind: vi.fn(() => ({
+          first: vi.fn(() => Promise.resolve({ count: 0 })),
+          run: vi.fn(() => Promise.resolve({ success: true })),
+        })),
+      } as any;
     });
 
-    const request = new Request('https://example.com/api/inventory/1', { method: 'DELETE' });
+    const request = new Request('https://example.com/api/inventory/1', {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer test-admin-token' },
+    });
     const response = await handleInventory(request, mockEnv as any, mockCorsHeaders);
     const data = await response.json();
 
     expect(response.status).toBe(200);
     expect(data).toEqual({ success: true });
+    expect(statements).toContain('DELETE FROM inventory WHERE id = ?');
+  });
+
+  it('blocks deletion when consumption history references the inventory item', async () => {
+    const statements: string[] = [];
+    mockDB.prepare.mockImplementation((sql: string) => {
+      statements.push(sql);
+      return {
+        bind: vi.fn(() => ({
+          first: vi.fn(() => Promise.resolve({ count: 2 })),
+          run: vi.fn(() => Promise.resolve({ success: true })),
+        })),
+      } as any;
+    });
+
+    const request = new Request('https://example.com/api/inventory/1', {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer test-admin-token' },
+    });
+    const response = await handleInventory(request, mockEnv as any, mockCorsHeaders);
+    const data = await response.json();
+
+    expect(response.status).toBe(409);
+    expect(data).toEqual({
+      error: 'inventory_item_in_use',
+      message: 'This item has stringing consumption history and cannot be deleted.',
+    });
+    expect(statements).not.toContain('DELETE FROM inventory WHERE id = ?');
+  });
+
+  it('returns a conflict if a foreign-key reference is added during deletion', async () => {
+    mockDB.prepare.mockImplementation(
+      (sql: string) =>
+        ({
+          bind: vi.fn(() => ({
+            first: vi.fn(() => Promise.resolve({ count: 0 })),
+            run: vi.fn(() => {
+              if (sql === 'DELETE FROM inventory WHERE id = ?') {
+                throw new Error('D1_ERROR: FOREIGN KEY constraint failed');
+              }
+              return Promise.resolve({ success: true });
+            }),
+          })),
+        }) as any,
+    );
+
+    const request = new Request('https://example.com/api/inventory/1', {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer test-admin-token' },
+    });
+    const response = await handleInventory(request, mockEnv as any, mockCorsHeaders);
+    const data = await response.json();
+
+    expect(response.status).toBe(409);
+    expect(data).toEqual({
+      error: 'inventory_item_in_use',
+      message: 'This item has related history and cannot be deleted.',
+    });
   });
 });
 

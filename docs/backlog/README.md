@@ -47,20 +47,20 @@ Create one row per card and update the index in the same change as card creation
 
 ### Open cards
 
-| ID      | Status   | Priority  | Card                                                                                                        | Updated    |
-| ------- | -------- | --------- | ----------------------------------------------------------------------------------------------------------- | ---------- |
-| BL-0001 | Refining | Untriaged | [Run automated tests in pull-request CI](BL-0001-automate-tests-in-ci.md)                                   | 2026-10-18 |
-| BL-0002 | Refining | Untriaged | [Align public Pages deployment with the Astro build output](BL-0002-align-public-pages-deploy-artifact.md)  | 2026-10-18 |
-| BL-0003 | Refining | Untriaged | [Handle inventory deletion when consumption history exists](BL-0003-handle-inventory-delete-foreign-key.md) | 2026-10-18 |
-| BL-0005 | Refining | Untriaged | [Make admin management workflows usable on mobile](BL-0005-improve-admin-mobile-usability.md)               | 2026-10-18 |
-| BL-0006 | Refining | Untriaged | [Let players correct their own profile name](BL-0006-allow-player-self-service-name-edit.md)                | 2026-10-18 |
+| ID      | Status   | Priority  | Card                                                                                                       | Updated    |
+| ------- | -------- | --------- | ---------------------------------------------------------------------------------------------------------- | ---------- |
+| BL-0001 | Refining | Untriaged | [Run automated tests in pull-request CI](BL-0001-automate-tests-in-ci.md)                                  | 2026-10-18 |
+| BL-0002 | Refining | Untriaged | [Align public Pages deployment with the Astro build output](BL-0002-align-public-pages-deploy-artifact.md) | 2026-10-18 |
+| BL-0005 | Refining | Untriaged | [Make admin management workflows usable on mobile](BL-0005-improve-admin-mobile-usability.md)              | 2026-10-18 |
+| BL-0006 | Refining | Untriaged | [Let players correct their own profile name](BL-0006-allow-player-self-service-name-edit.md)               | 2026-10-18 |
 
 ### Closed cards
 
 Keep `Dropped` cards linked here for traceability. `Done` cards are moved to the archive; keep their links here so IDs and completion history remain searchable. Move a row from Open to Closed when its status changes.
 
-| ID      | Status | Card                                                                                        | Updated    |
-| ------- | ------ | ------------------------------------------------------------------------------------------- | ---------- |
-| BL-0004 | Done   | [Keep job editing within the selected job flow](archive/BL-0004-fix-job-edit-navigation.md) | 2026-10-18 |
+| ID      | Status | Card                                                                                                                | Updated    |
+| ------- | ------ | ------------------------------------------------------------------------------------------------------------------- | ---------- |
+| BL-0003 | Done   | [Handle inventory deletion when consumption history exists](archive/BL-0003-handle-inventory-delete-foreign-key.md) | 2026-10-18 |
+| BL-0004 | Done   | [Keep job editing within the selected job flow](archive/BL-0004-fix-job-edit-navigation.md)                         | 2026-10-18 |
 
 See the [archive index](archive/README.md) for completed cards.
