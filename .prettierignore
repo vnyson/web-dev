@@ -9,3 +9,5 @@ dist
 **/css/design-system/
 *.min.css
 *.min.js
+sites/radio/**
+db/migrations/radio/**

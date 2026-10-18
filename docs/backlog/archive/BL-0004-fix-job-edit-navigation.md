@@ -34,7 +34,7 @@ As an **admin user**, I want **to edit a job in any supported state and remain i
 ## Context and evidence
 
 - **Current behavior/evidence:** The Jobs page now links to `/jobs/edit?id=<jobId>`, served by a static Astro page. It loads the authenticated job list, edits fields supported by the Worker update endpoint, and returns to `/jobs` after save.
-- **Relevant source, tests, configs, migrations, workflows, docs:** [Jobs page](../../sites/admin/src/pages/jobs.astro), [edit page](../../sites/admin/src/pages/jobs/edit.astro), [admin Astro config](../../sites/admin/astro.config.mjs), [admin Playwright config](../../playwright.admin.config.ts), [browser regression tests](../../sites/admin/__tests__/e2e/job-edit.spec.js), [admin API client](../../sites/admin/src/lib/api.ts), [Worker job handler](../../workers/api/src/index.ts), and [development workflow guide](../development/workflows.md).
+- **Relevant source, tests, configs, migrations, workflows, docs:** [Jobs page](../../../sites/admin/src/pages/jobs.astro), [edit page](../../../sites/admin/src/pages/jobs/edit.astro), [admin Astro config](../../../sites/admin/astro.config.mjs), [admin Playwright config](../../../playwright.admin.config.ts), [browser regression tests](../../../sites/admin/__tests__/e2e/job-edit.spec.js), [admin API client](../../../sites/admin/src/lib/api.ts), [Worker job handler](../../../workers/api/src/index.ts), and [development workflow guide](../../development/workflows.md).
 - **Related cards/decisions/issues:** None known.
 
 ## Pickup context checklist
