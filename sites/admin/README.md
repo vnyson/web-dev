@@ -1,167 +1,55 @@
 # Tennis Admin System
 
-Admin dashboard for tennis stringing services, built with Astro and Tailwind CSS, backed by Cloudflare D1 database.
+Admin dashboard for tennis stringing services, built with Astro and Tailwind CSS and backed by Cloudflare D1.
 
-## 🚀 Setup
+For the current workspace map, shared development and testing commands, and D1 safety guidance, see the [repository documentation index](../../docs/README.md), [development workflows](../../docs/development/workflows.md), and [database guide](../../docs/data/database.md). This README provides admin-oriented setup context; verify commands against the current package manifests.
 
-### Prerequisites
+## Prerequisites
 
-- Node.js 20+
-- Yarn 4.5.0
-- Cloudflare account with API token
-- Wrangler CLI installed globally
+- Node.js 22.12+ (the strictest current workspace engine requirement)
+- Yarn 4.5.0 via Corepack
+- Cloudflare account and credentials only for explicitly authorized remote operations
 
-### Database Setup
+Install dependencies once from the repository root:
 
-1. **Create Cloudflare D1 database:**
-
-   ```bash
-   cd workers/api
-   yarn d1:create
-   ```
-
-   This will create a database and output a database ID. Update `workers/api/wrangler.toml` with the database ID.
-
-2. **Run migrations:**
-
-   ```bash
-   cd workers/api
-   yarn d1:migrate
-   ```
-
-3. **Seed data (optional):**
-   ```bash
-   cd db/seed
-   node seed.js > seed.sql
-   cd ../../workers/api
-   wrangler d1 execute tennis-admin-db --local --file=../../db/seed/seed.sql
-   ```
-
-### Workers API Setup
-
-1. **Install dependencies:**
-
-   ```bash
-   cd workers/api
-   yarn install
-   ```
-
-2. **Run locally:**
-
-   ```bash
-   yarn dev
-   ```
-
-   The API will be available at `http://localhost:8787`
-
-3. **Deploy to Cloudflare:**
-   ```bash
-   yarn deploy
-   ```
-
-### Admin App Setup
-
-1. **Install dependencies:**
-
-   ```bash
-   cd sites/admin
-   yarn install
-   ```
-
-2. **Run locally:**
-
-   ```bash
-   yarn dev
-   ```
-
-   The admin app will be available at `http://localhost:4321`
-
-3. **Build for production:**
-
-   ```bash
-   yarn build
-   ```
-
-4. **Preview production build:**
-   ```bash
-   yarn preview
-   ```
-
-## 📁 Project Structure
-
-```
-web-dev/
-├── sites/
-│   ├── tennis-stringing/     # Static public site
-│   └── admin/                # Admin dashboard (Astro)
-│       ├── src/
-│       │   ├── pages/        # Astro pages
-│       │   ├── lib/          # API client
-│       │   └── styles/       # Global CSS
-│       └── package.json
-├── workers/
-│   └── api/                  # Cloudflare Workers API
-│       ├── src/
-│       │   └── index.ts      # API endpoints
-│       └── wrangler.toml
-└── db/
-    ├── migrations/           # D1 database migrations
-    └── seed/                 # Seed data scripts
+```sh
+corepack enable
+corepack prepare yarn@4.5.0 --activate
+yarn install
 ```
 
-## 🧞 Commands
+## Local development
 
-### Admin App (sites/admin)
+Prefer starting the public site, admin app, and API together from the repository root with `yarn start:dev`. The services are available at `http://localhost:8080`, `http://localhost:4321`, and `http://127.0.0.1:8787`, respectively.
 
-| Command        | Action                                     |
-| -------------- | ------------------------------------------ |
-| `yarn install` | Install dependencies                       |
-| `yarn dev`     | Start local dev server at `localhost:4321` |
-| `yarn build`   | Build production site to `./dist/`         |
-| `yarn preview` | Preview build locally                      |
+To work on one service, its scripts are declared in its package manifest:
 
-### Workers API (workers/api)
+- Admin app: [sites/admin/package.json](package.json) — `yarn dev`, `yarn build`, `yarn preview`.
+- Worker API: [workers/api/package.json](../../workers/api/package.json) — `yarn dev`, `yarn deploy`, and D1 scripts.
 
-| Command           | Action                                     |
-| ----------------- | ------------------------------------------ |
-| `yarn install`    | Install dependencies                       |
-| `yarn dev`        | Start local dev server at `localhost:8787` |
-| `yarn deploy`     | Deploy to Cloudflare Workers               |
-| `yarn d1:create`  | Create D1 database                         |
-| `yarn d1:migrate` | Run database migrations                    |
+## Database setup and safety
 
-## 🔧 Configuration
+Read the [database guide](../../docs/data/database.md) before creating a database or applying migrations. Commands targeting remote D1 or creating Cloudflare resources can have external impact; inspect the script and target, and obtain explicit authorization before running them. The root `yarn setup:local` command applies the local site-settings SQL operation.
 
-### Environment Variables
+For migrations, the Worker uses the migration directory configured in [wrangler.toml](../../workers/api/wrangler.toml). The historical migration set may not apply cleanly to an already-seeded local database. Do not modify an already-applied migration; add a new migration and update affected Worker behavior/tests.
 
-Set the following environment variable for the admin app:
+## Project structure
 
-- `PUBLIC_API_URL`: URL of the Workers API (default: `http://localhost:8787`)
+- `src/pages/` — Astro admin pages.
+- `src/lib/` — client-side API access and application utilities.
+- `src/styles/` — app styles.
+- `workers/api/` — backend Worker, maintained separately from the admin frontend.
+- `db/migrations/` — D1 schema history.
 
-### Cloudflare Secrets
+See the [architecture overview](../../docs/architecture/overview.md) for data flow and workspace boundaries.
 
-Add these secrets to your Cloudflare Workers project:
+## Features
 
-- `CLOUDFLARE_API_TOKEN`: Your Cloudflare API token
-- `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID
+- Dashboard for active jobs, inventory, and players.
+- Inventory and stringing-job management.
+- Player profiles and racket information.
+- Site settings and player-facing services.
 
-## 📊 Features
+## Deployment
 
-- **Dashboard**: Overview of active jobs, inventory items, and players
-- **Inventory Management**: Track strings, grips, and demo rackets
-- **Jobs Tracker**: Manage stringing jobs with status workflow
-- **Player Profiles**: Manage customer information and preferences
-- **New Drop Off**: Quick form for creating new stringing jobs
-
-## 🚀 Deployment
-
-The project uses GitHub Actions for automatic deployment:
-
-- **Static site**: Deployed to Cloudflare Pages on push to main
-- **Admin app**: Deployed to Cloudflare Pages on push to main (when admin files change)
-- **Workers API**: Deployed to Cloudflare Workers on push to main (when workers files change)
-
-Configure the following secrets in your GitHub repository:
-
-- `CLOUDFLARE_API_TOKEN`
-- `CLOUDFLARE_ACCOUNT_ID`
+The repository has GitHub Actions workflows for Pages and Worker deployment. Review [development and deployment workflows](../../docs/development/workflows.md#ci-and-deployment) and the applicable workflow under `.github/workflows/` before relying on deployment behavior or triggering a deployment.
