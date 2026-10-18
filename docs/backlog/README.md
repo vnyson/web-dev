@@ -53,6 +53,7 @@ Create one row per card and update the index in the same change as card creation
 | BL-0002 | Refining | Untriaged | [Align public Pages deployment with the Astro build output](BL-0002-align-public-pages-deploy-artifact.md) | 2026-10-18 |
 | BL-0005 | Refining | Untriaged | [Make admin management workflows usable on mobile](BL-0005-improve-admin-mobile-usability.md)              | 2026-10-18 |
 | BL-0006 | Refining | Untriaged | [Let players correct their own profile name](BL-0006-allow-player-self-service-name-edit.md)               | 2026-10-18 |
+| BL-0007 | Refining | Untriaged | [Add a direct public inventory route](BL-0007-public-inventory-route.md)                                   | 2026-10-18 |
 
 ### Closed cards
 

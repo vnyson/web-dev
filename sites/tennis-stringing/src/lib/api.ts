@@ -74,6 +74,7 @@ export interface InventoryItem {
   id: string;
   name: string;
   category: string;
+  quantity?: number | string;
   price?: string;
   string_type?: string;
   string_characteristics?: string;
@@ -148,7 +149,8 @@ export async function updatePlayer(
 export async function fetchInventory(): Promise<InventoryItem[]> {
   const response = await fetch(`${API_URL}/api/inventory`);
   if (!response.ok) throw new Error('Failed to fetch inventory');
-  return response.json();
+  const inventory: InventoryItem[] = await response.json();
+  return inventory.filter((item) => Number(item.quantity) > 0);
 }
 
 export interface DemoRacket {
