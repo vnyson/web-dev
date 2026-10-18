@@ -4,6 +4,7 @@ Completed cards are moved here to keep the active backlog focused while preservi
 
 ## Done cards
 
+- [BL-0003: Handle inventory deletion when consumption history exists](BL-0003-handle-inventory-delete-foreign-key.md) — completed 2026-10-18.
 - [BL-0004: Keep job editing within the selected job flow](BL-0004-fix-job-edit-navigation.md) — completed 2026-10-18.
 
 Dropped cards remain in the main backlog's closed section unless a future policy explicitly moves them here.

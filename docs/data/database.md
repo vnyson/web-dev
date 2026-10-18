@@ -7,6 +7,10 @@
 - [Seed utilities](../../db/seed/) and exports provide development/import data; they do not replace migrations or define the schema.
 - There is also a radio migration under `db/migrations/radio/`. It is outside the configured root migrations directory; do not assume Wrangler applies it. Resolve migration strategy before operationalizing radio storage.
 
+## Inventory consumption history
+
+`inventory_consumption.inventory_id` references `inventory.id` without cascading deletion. Inventory items with consumption history cannot be hard-deleted: the API returns HTTP 409 with an actionable message, and the admin UI displays that message. Keep the inventory row to preserve the relationship and history; do not delete consumption rows to force removal. If inventory retirement is needed, design archiving/soft deletion as a separate data-model change.
+
 ## Schema change workflow
 
 1. Inspect existing migrations, migration metadata/sequence, Worker queries, and tests.
